@@ -1,0 +1,222 @@
+{% extends 'app/base/base.html' %}
+{% block title %}{{ formation.libelle }}{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+    <div>
+        <a href="{% url 'formations_liste' %}" class="back-link">
+            <i class="bi bi-chevron-left"></i>Formations
+        </a>
+        <h3 class="mb-1">{{ formation.libelle }}</h3>
+        <div>
+            {% if formation.archive %}
+            <span class="badge badge-gray"><i class="bi bi-archive me-1"></i>Archivée</span>
+            {% elif formation.is_active %}
+            <span class="badge badge-green"><i class="bi bi-circle-fill me-1" style="font-size:.4rem;vertical-align:middle;"></i>Active</span>
+            {% else %}
+            <span class="badge badge-gray"><i class="bi bi-circle me-1" style="font-size:.4rem;vertical-align:middle;"></i>Inactive</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'formation_modifier' pk=formation.pk %}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-pencil me-1"></i>Modifier
+        </a>
+        <a href="{% url 'formation_archiver' pk=formation.pk %}"
+           class="btn btn-sm {% if formation.archive %}btn-outline-success{% else %}btn-outline-secondary{% endif %}">
+            {% if formation.archive %}<i class="bi bi-arrow-counterclockwise me-1"></i>Désarchiver
+            {% else %}<i class="bi bi-archive me-1"></i>Archiver{% endif %}
+        </a>
+        <a href="{% url 'session_creer_pour_formation' formation_pk=formation.pk %}" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Nouvelle session
+        </a>
+    </div>
+</div>
+
+<!-- Info cards -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="card p-4 h-100">
+            <div class="section-head">
+                <div>
+                    <div class="section-label">Contenu</div>
+                    <h5 class="mb-0">Description & objectifs</h5>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="text-muted small fw-700 text-uppercase mb-1" style="letter-spacing:.05em;">Description</div>
+                <p class="mb-0">{{ formation.descriptif }}</p>
+            </div>
+            <hr style="border-color:var(--gray-200);">
+            <div>
+                <div class="text-muted small fw-700 text-uppercase mb-1" style="letter-spacing:.05em;">Objectifs pédagogiques</div>
+                <p class="mb-0">{{ formation.objectifs_pedagogiques }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card p-4 h-100">
+            <div class="section-head">
+                <div>
+                    <div class="section-label">Paramètres</div>
+                    <h5 class="mb-0">Informations pratiques</h5>
+                </div>
+            </div>
+            <ul class="list-unstyled mb-0">
+                <li class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid var(--gray-200);">
+                    <i class="bi bi-clock" style="color:var(--blue);width:16px;text-align:center;"></i>
+                    <div>
+                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;">Durée</div>
+                        <div class="fw-500 small">{{ formation.duree }}</div>
+                    </div>
+                </li>
+                <li class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid var(--gray-200);">
+                    <i class="bi bi-people" style="color:var(--blue);width:16px;text-align:center;"></i>
+                    <div>
+                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;">Public cible</div>
+                        <div class="fw-500 small">{{ formation.public_cible }}</div>
+                    </div>
+                </li>
+                <li class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid var(--gray-200);">
+                    <i class="bi bi-person-check" style="color:var(--blue);width:16px;text-align:center;"></i>
+                    <div>
+                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;">Capacité</div>
+                        <div class="fw-500 small">{{ formation.nombre_places }} places</div>
+                    </div>
+                </li>
+                {% if formation.periode_previsionnelle %}
+                <li class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid var(--gray-200);">
+                    <i class="bi bi-calendar" style="color:var(--blue);width:16px;text-align:center;"></i>
+                    <div>
+                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;">Période</div>
+                        <div class="fw-500 small">{{ formation.periode_previsionnelle }}</div>
+                    </div>
+                </li>
+                {% endif %}
+                <li class="d-flex align-items-center gap-3 py-2">
+                    <i class="bi bi-tag" style="color:var(--blue);width:16px;text-align:center;"></i>
+                    <div>
+                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;">Coût</div>
+                        <div class="fw-500 small">
+                            {% if formation.cout %}{{ formation.cout }} FCFA
+                            {% else %}<span class="text-green">Gratuit</span>{% endif %}
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Sessions -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <div class="section-label">Planification</div>
+        <h5 class="mb-0">
+            Sessions
+            <span class="badge bg-primary ms-1" style="font-size:.65rem;vertical-align:middle;">{{ sessions.count }}</span>
+        </h5>
+    </div>
+    <a href="{% url 'session_creer_pour_formation' formation_pk=formation.pk %}"
+       class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-plus-lg me-1"></i>Nouvelle session
+    </a>
+</div>
+
+{% if sessions %}
+<div class="row g-3">
+    {% for session in sessions %}
+    <div class="col-md-6 col-xl-4">
+        <div class="card card-hover h-100" style="border-top:3px solid
+            {% if session.statut == 'planifiee' %}var(--blue)
+            {% elif session.statut == 'en_cours' %}var(--amber)
+            {% elif session.statut == 'cloturee' %}var(--gray-400)
+            {% else %}var(--red){% endif %} !important;">
+            <div class="card-body p-4">
+                <!-- Date + statut -->
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <div class="fw-700" style="font-size:1rem;">{{ session.date|date:"d/m/Y" }}</div>
+                        <div class="text-muted small">{{ session.lieu }}</div>
+                    </div>
+                    {% if session.statut == 'planifiee' %}
+                    <span class="badge badge-blue">Planifiée</span>
+                    {% elif session.statut == 'en_cours' %}
+                    <span class="badge badge-amber">En cours</span>
+                    {% elif session.statut == 'cloturee' %}
+                    <span class="badge badge-gray">Clôturée</span>
+                    {% else %}
+                    <span class="badge bg-danger">Annulée</span>
+                    {% endif %}
+                </div>
+
+                <div class="text-muted small mb-3">
+                    <i class="bi bi-person me-1"></i>{{ session.formateur }}
+                    <span class="mx-2">·</span>
+                    <i class="bi bi-people me-1"></i>{{ session.capacite }} places
+                </div>
+
+                <!-- Stats row -->
+                <div class="row g-2 mb-3 text-center">
+                    
+                    
+                    <div class="col-4">
+                        <div style="background:var(--gray-100);border-radius:4px;padding:.5rem .25rem;">
+                            <div class="fw-700 text-amber" style="font-size:.95rem;">{{ session.nb_avis }}</div>
+                            <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);">Avis</div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if session.lien and session.lien.actif %}
+                <div class="input-group input-group-sm mb-3">
+                    <input type="text" class="form-control font-mono" style="font-size:.72rem;"
+                           value="{{ request.scheme }}://{{ request.get_host }}/avis/{{ session.lien.token }}/"
+                           readonly id="lien-{{ session.pk }}">
+                    <button class="btn btn-sm btn-outline-secondary" type="button"
+                            onclick="copierLien('lien-{{ session.pk }}', this)">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
+                {% endif %}
+
+                <a href="{% url 'session_detail' pk=session.pk %}"
+                   class="btn btn-sm btn-outline-primary w-100">
+                    <i class="bi bi-eye me-1"></i>Voir le détail
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card empty-state">
+    <span class="empty-icon bi bi-calendar-x"></span>
+    <p class="fw-500 mb-1" style="color:var(--gray-700);">Aucune session créée</p>
+    <p class="text-muted small mb-3">Créez la première session pour commencer à affecter des participants.</p>
+    <a href="{% url 'session_creer_pour_formation' formation_pk=formation.pk %}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg me-1"></i>Créer la première session
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copierLien(inputId, btn) {
+    const val = document.getElementById(inputId).value;
+    navigator.clipboard.writeText(val).then(function () {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-check2"></i>';
+        btn.classList.replace('btn-outline-secondary', 'btn-success');
+        setTimeout(function () {
+            btn.innerHTML = orig;
+            btn.classList.replace('btn-success', 'btn-outline-secondary');
+        }, 2000);
+    });
+}
+</script>
+{% endblock %}

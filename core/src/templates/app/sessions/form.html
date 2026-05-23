@@ -1,0 +1,137 @@
+{% extends 'app/base/base.html' %}
+{% block title %}{{ titre }} — Bediakon Formation{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        {% if formation %}
+        <a href="{% url 'formation_detail' pk=formation.pk %}" class="back-link">
+            <i class="bi bi-chevron-left"></i>{{ formation.libelle }}
+        </a>
+        {% elif session %}
+        <a href="{% url 'session_detail' pk=session.pk %}" class="back-link">
+            <i class="bi bi-chevron-left"></i>Retour à la session
+        </a>
+        {% else %}
+        <a href="{% url 'formations_liste' %}" class="back-link">
+            <i class="bi bi-chevron-left"></i>Formations
+        </a>
+        {% endif %}
+
+        <h3 class="mb-4">{{ titre }}</h3>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <!-- Section 1 : Formation -->
+            <div class="card p-4 mb-3">
+                <div class="section-head"><div><div class="section-label">Étape 1</div><h5 class="mb-0">Formation concernée</h5></div></div>
+                <div class="row g-3">
+                    {% if formation %}
+                    <input type="hidden" name="formation" value="{{ formation.pk }}">
+                    <div class="col-12">
+                        <div class="p-3 rounded" style="background:var(--gray-50);border:1px solid var(--gray-200);">
+                            <div class="text-muted small mb-1">Formation associée</div>
+                            <div class="fw-600">{{ formation.libelle }}</div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-12">
+                        <label class="form-label">{{ form.formation.label }}</label>
+                        {{ form.formation }}
+                        {% if form.formation.errors %}<div class="text-danger small mt-1">{{ form.formation.errors.0 }}</div>{% endif %}
+                    </div>
+                    {% endif %}
+                    <div class="col-12">
+                        <label class="form-label">{{ form.public_cible.label }}</label>
+                        {{ form.public_cible }}
+                        {% if form.public_cible.errors %}<div class="text-danger small mt-1">{{ form.public_cible.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">{{ form.periode_previsionnelle.label }}</label>
+                        {{ form.periode_previsionnelle }}
+                        {% if form.periode_previsionnelle.errors %}<div class="text-danger small mt-1">{{ form.periode_previsionnelle.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2 : Logistique -->
+            <div class="card p-4 mb-3">
+                <div class="section-head"><div><div class="section-label">Étape 2</div><h5 class="mb-0">Logistique</h5></div></div>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="form-label">{{ form.date.label }}</label>
+                        {{ form.date }}
+                        {% if form.date.errors %}<div class="text-danger small mt-1">{{ form.date.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label">{{ form.lieu.label }}</label>
+                        {{ form.lieu }}
+                        {% if form.lieu.errors %}<div class="text-danger small mt-1">{{ form.lieu.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">{{ form.formateur.label }}</label>
+                        {{ form.formateur }}
+                        {% if form.formateur.errors %}<div class="text-danger small mt-1">{{ form.formateur.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="form-label">{{ form.capacite.label }}</label>
+                        {{ form.capacite }}
+                        {% if form.capacite.errors %}<div class="text-danger small mt-1">{{ form.capacite.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="form-label">{{ form.duree.label }}</label>
+                        {{ form.duree }}
+                        {% if form.duree.errors %}<div class="text-danger small mt-1">{{ form.duree.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="form-label">{{ form.cout.label }}</label>
+                        <div class="input-group">
+                            {{ form.cout }}
+                            <span class="input-group-text">FCFA</span>
+                        </div>
+                        {% if form.cout.errors %}<div class="text-danger small mt-1">{{ form.cout.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3 : Lien sécurisé -->
+            <div class="card p-4 mb-3">
+                <div class="section-head"><div><div class="section-label">Étape 3</div><h5 class="mb-0">Lien sécurisé</h5></div></div>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="form-label">{{ form.date_expiration_lien.label }}</label>
+                        {{ form.date_expiration_lien }}
+                        {% if form.date_expiration_lien.errors %}<div class="text-danger small mt-1">{{ form.date_expiration_lien.errors.0 }}</div>{% endif %}
+                        <div class="text-muted" style="font-size:.75rem;margin-top:.3rem;">{{ form.date_expiration_lien.help_text }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4 : Statut -->
+            <div class="card p-4 mb-4">
+                <div class="section-head"><div><div class="section-label">Étape 4</div><h5 class="mb-0">Statut</h5></div></div>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="form-label">{{ form.statut.label }}</label>
+                        {{ form.statut }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-check-lg me-1"></i>Enregistrer
+                </button>
+                {% if session %}
+                <a href="{% url 'session_detail' pk=session.pk %}" class="btn btn-outline-secondary">Annuler</a>
+                {% elif formation %}
+                <a href="{% url 'formation_detail' pk=formation.pk %}" class="btn btn-outline-secondary">Annuler</a>
+                {% else %}
+                <a href="{% url 'formations_liste' %}" class="btn btn-outline-secondary">Annuler</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

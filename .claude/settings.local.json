@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python manage.py check)",
+      "Bash(python manage.py makemigrations app)",
+      "Bash(python manage.py shell)",
+      "Bash(python manage.py runserver)",
+      "PowerShell(Start-Process python -ArgumentList \"manage.py\", \"runserver\" -WorkingDirectory \"c:\\\\Users\\\\HP\\\\Documents\\\\GitHub\\\\linkProject\\\\core\\\\src\" -PassThru)",
+      "Bash(python manage.py migrate)",
+      "PowerShell(npx skills add https://github.com/anthropics/skills --skill frontend-design 2>&1)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Skill(frontend-design)",
+      "Skill(frontend-design:*)"
+    ]
+  }
+}

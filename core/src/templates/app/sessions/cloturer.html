@@ -1,0 +1,37 @@
+{% extends 'app/base/base.html' %}
+
+{% block title %}Clôturer la session{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <div class="text-center mb-4">
+                <i class="bi bi-flag-fill fs-1 text-warning"></i>
+                <h4 class="fw-bold mt-2">Clôturer la session</h4>
+                <p class="text-muted">
+                    <strong>{{ session.formation.libelle }}</strong><br>
+                    <span class="small">{{ session.date|date:"d/m/Y" }} — {{ session.lieu }}</span>
+                </p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Nouveau statut final</label>
+                    <select name="statut" class="form-select">
+                        <option value="cloturee">Clôturée (session terminée)</option>
+                        <option value="annulee">Annulée</option>
+                    </select>
+                </div>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-flag me-1"></i>Confirmer
+                    </button>
+                    <a href="{% url 'session_detail' pk=session.pk %}" class="btn btn-outline-secondary">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

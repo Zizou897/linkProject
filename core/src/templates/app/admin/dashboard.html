@@ -1,0 +1,184 @@
+{% extends 'app/base/base.html' %}
+
+{% block title %}Dashboard — Bediakon Formation{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <div class="section-label">Vue d'ensemble</div>
+        <h3 class="mb-0">Tableau de bord</h3>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                <i class="bi bi-download me-1"></i>Exporter
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><div class="dropdown-header">Excel</div></li>
+                <li><a class="dropdown-item" href="{% url 'export_avis_excel' %}">
+                    <i class="bi bi-file-earmark-spreadsheet me-2" style="color:var(--green);"></i>Avis collectés
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><div class="dropdown-header">PDF</div></li>
+                <li><a class="dropdown-item" href="{% url 'export_rapport_pdf' %}">
+                    <i class="bi bi-file-earmark-pdf me-2" style="color:var(--red);"></i>Rapport analytique
+                </a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Stat cards -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card p-4 position-relative overflow-hidden" style="border-top:3px solid var(--blue) !important;">
+            <div class="stat-label">Total formations</div>
+            <div class="stat-value text-blue">{{ total_formations_all }}</div>
+            <div class="text-muted small mt-1">dans le catalogue</div>
+            <i class="bi bi-collection-fill stat-bg-icon" style="color:var(--blue);"></i>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card p-4 position-relative overflow-hidden" style="border-top:3px solid var(--green) !important;">
+            <div class="stat-label">Formations</div>
+            <div class="stat-value text-green">{{ total_formations }}</div>
+            <div class="text-muted small mt-1">non archivées</div>
+            <i class="bi bi-collection stat-bg-icon" style="color:var(--green);"></i>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card p-4 position-relative overflow-hidden" style="border-top:3px solid var(--amber) !important;">
+            <div class="stat-label">Avis</div>
+            <div class="stat-value text-amber">{{ total_avis }}</div>
+            <div class="text-muted small mt-1">collectés</div>
+            <i class="bi bi-chat-square-text stat-bg-icon" style="color:var(--amber);"></i>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card p-4 position-relative overflow-hidden" style="border-top:3px solid var(--gray-400) !important;">
+            <div class="stat-label">Sessions</div>
+            <div class="stat-value" style="color:var(--gray-700);">{{ total_sessions }}</div>
+            <div class="text-muted small mt-1">planifiées</div>
+            <i class="bi bi-calendar-event stat-bg-icon" style="color:var(--gray-400);"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Data panels -->
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card h-100">
+            <div class="p-4 pb-0">
+                <div class="section-head">
+                    <div>
+                        <div class="section-label">Popularité</div>
+                        <h5 class="mb-0">Formations les plus demandées</h5>
+                    </div>
+                </div>
+            </div>
+            {% if formations %}
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="padding-left:1.5rem;">Formation</th>
+                            <th class="text-end" style="padding-right:1.5rem;">Avis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in formations %}
+                        <tr>
+                            <td style="padding-left:1.5rem;">
+                                <a href="{% url 'formation_detail' pk=f.pk %}"
+                                   class="text-decoration-none fw-500" style="color:var(--gray-900);">
+                                    {{ f.libelle }}
+                                </a>
+                            </td>
+                            <td class="text-end" style="padding-right:1.5rem;">
+                                <span class="badge bg-primary">{{ f.nb_avis }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state p-4">
+                <span class="empty-icon bi bi-collection"></span>
+                <p>Aucune formation.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card h-100">
+            <div class="p-4 pb-0">
+                <div class="section-head">
+                    <div>
+                        <div class="section-label">Géographie</div>
+                        <h5 class="mb-0">Répartition par zone</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 pt-0">
+                {% if geo %}
+                <ul class="list-unstyled mb-0">
+                    {% for g in geo %}
+                    <li class="d-flex justify-content-between align-items-center py-2"
+                        style="border-bottom:1px solid var(--gray-200);">
+                        <span style="font-size:.875rem;color:var(--gray-700);">
+                            {{ g.zone_geographique|default:"Non renseigné" }}
+                        </span>
+                        <span class="badge badge-blue">{{ g.total }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state p-2">
+                    <span class="empty-icon bi bi-geo-alt"></span>
+                    <p>Aucune donnée géographique.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="p-4 pb-0">
+                <div class="section-head">
+                    <div>
+                        <div class="section-label">Activité récente</div>
+                        <h5 class="mb-0">Derniers avis collectés</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="padding-left:1.5rem;">Participant</th>
+                            <th class="d-none d-md-table-cell">Formation</th>
+                            <th class="d-none d-lg-table-cell">Structure</th>
+                            <th class="text-end" style="padding-right:1.5rem;">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in avis_recents %}
+                        <tr>
+                            <td style="padding-left:1.5rem;" class="fw-500">{{ a.prenom }} {{ a.nom }}</td>
+                            <td class="text-muted small d-none d-md-table-cell">{{ a.session.formation.libelle }}</td>
+                            <td class="text-muted small d-none d-lg-table-cell">{{ a.structure }}</td>
+                            <td class="text-end text-muted small" style="padding-right:1.5rem;">{{ a.created_at|date:"d/m/Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-muted p-4">Aucun avis collecté.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

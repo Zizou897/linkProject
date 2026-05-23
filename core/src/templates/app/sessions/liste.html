@@ -1,0 +1,69 @@
+{% extends 'app/base/base.html' %}
+
+{% block title %}Sessions présentiel{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0">
+        <i class="bi bi-calendar-event me-2 text-primary"></i>Sessions présentiel
+    </h3>
+    <a href="{% url 'session_creer' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Nouvelle session
+    </a>
+</div>
+
+{% if sessions %}
+<div class="table-responsive">
+    <table class="table align-middle table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Formation</th>
+                <th>Date</th>
+                <th>Lieu</th>
+                <th>Formateur</th>
+                <th class="text-center">Avis</th>
+                <th>Statut</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in sessions %}
+            <tr>
+                <td class="fw-semibold">{{ s.formation.libelle }}</td>
+                <td>{{ s.date|date:"d/m/Y" }}</td>
+                <td class="text-muted small">{{ s.lieu }}</td>
+                <td class="text-muted small">{{ s.formateur }}</td>
+                <td class="text-center">
+                    <span class="badge badge-blue">{{ s.nb_avis }}</span>
+                </td>
+                <td>
+                    {% if s.statut == 'planifiee' %}
+                        <span class="badge bg-info text-dark">Planifiée</span>
+                    {% elif s.statut == 'en_cours' %}
+                        <span class="badge bg-warning text-dark">En cours</span>
+                    {% elif s.statut == 'cloturee' %}
+                        <span class="badge bg-secondary">Clôturée</span>
+                    {% else %}
+                        <span class="badge bg-danger">Annulée</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'session_detail' pk=s.pk %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card p-5 text-center text-muted">
+    <i class="bi bi-calendar-x fs-1 mb-3"></i>
+    <p>Aucune session créée pour l'instant.</p>
+    <a href="{% url 'session_creer' %}" class="btn btn-primary mx-auto" style="width:fit-content">
+        Créer la première session
+    </a>
+</div>
+{% endif %}
+{% endblock %}

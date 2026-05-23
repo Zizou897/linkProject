@@ -1,0 +1,12 @@
+django
+django-jazzmin
+django-tinymce
+django-colorfield
+django-cors-headers
+pillow
+python-decouple
+sweetify
+django-after-response
+celery[redis]
+openpyxl
+reportlab

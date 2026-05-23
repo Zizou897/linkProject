@@ -1,0 +1,364 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bediakon Formation — Plateforme de gestion des formations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --ink:         #1a1209;
+            --chalk:       #fdf8f0;
+            --chalk-2:     #f5ede0;
+            --copper:      #c8601a;
+            --copper-dark: #a04d12;
+            --copper-pale: #fdf0e8;
+            --copper-bdr:  #f0c090;
+            --forest:      #1c4a35;
+            --forest-pale: #e8f5ee;
+            --slate:       #6b6358;
+            --border:      #e8ddd3;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background: var(--chalk);
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+        h1, h2, h3, h4 { font-family: 'Playfair Display', Georgia, serif; letter-spacing: -.01em; }
+
+        /* ── Navbar ── */
+        .site-nav {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--ink);
+            border-bottom: 3px solid var(--copper);
+            padding: .7rem 0;
+        }
+        .site-nav .brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem; color: #fff;
+            text-decoration: none;
+            display: flex; align-items: center; gap: .5rem;
+        }
+        .site-nav .brand span { color: var(--copper); }
+        .nav-cta {
+            background: var(--copper); color: #fff; border: none;
+            padding: .45rem 1.2rem; border-radius: 999px;
+            font-family: 'Outfit', sans-serif; font-size: .82rem; font-weight: 600;
+            text-decoration: none; transition: background .2s;
+        }
+        .nav-cta:hover { background: var(--copper-dark); color: #fff; }
+
+        /* ── Hero ── */
+        .hero {
+            padding: 5rem 0 4rem;
+            background: var(--ink);
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 30% 60%, rgba(200,96,26,.22) 0%, transparent 55%),
+                        radial-gradient(ellipse at 80% 20%, rgba(28,74,53,.2) 0%, transparent 50%);
+        }
+        .hero::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--copper), transparent);
+        }
+        .hero-content { position: relative; z-index: 1; }
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: .5rem;
+            background: rgba(200,96,26,.15); border: 1px solid rgba(200,96,26,.3);
+            color: #f0a070; padding: .3rem .85rem; border-radius: 999px;
+            font-size: .78rem; font-weight: 600; letter-spacing: .04em;
+            text-transform: uppercase; margin-bottom: 1.25rem;
+        }
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 700;
+            color: #fff; line-height: 1.15; margin-bottom: 1rem;
+        }
+        .hero h1 em { font-style: italic; color: var(--copper); }
+        .hero-sub {
+            font-size: 1.05rem; color: rgba(255,255,255,.65);
+            line-height: 1.65; max-width: 520px; margin-bottom: 2rem;
+        }
+        .btn-hero-primary {
+            background: var(--copper); color: #fff; border: none;
+            padding: .75rem 1.75rem; border-radius: 8px;
+            font-weight: 600; font-size: .95rem; text-decoration: none;
+            transition: background .2s, transform .2s; display: inline-flex; align-items: center; gap: .5rem;
+        }
+        .btn-hero-primary:hover { background: var(--copper-dark); color: #fff; transform: translateY(-1px); }
+        .btn-hero-outline {
+            background: transparent; color: rgba(255,255,255,.8);
+            border: 1.5px solid rgba(255,255,255,.25);
+            padding: .75rem 1.75rem; border-radius: 8px;
+            font-weight: 500; font-size: .95rem; text-decoration: none;
+            transition: all .2s; display: inline-flex; align-items: center; gap: .5rem;
+        }
+        .btn-hero-outline:hover { color: #fff; border-color: rgba(255,255,255,.6); background: rgba(255,255,255,.06); }
+
+        /* ── Access card ── */
+        .access-card {
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 14px; padding: 1.75rem;
+        }
+        .access-card h6 {
+            font-family: 'Outfit', sans-serif; font-size: .72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .07em;
+            color: rgba(255,255,255,.5); margin-bottom: .75rem;
+        }
+        .access-input {
+            border: 1.5px solid rgba(255,255,255,.18); border-radius: 8px;
+            background: rgba(255,255,255,.07); color: #fff;
+            padding: .7rem 1rem; width: 100%;
+            font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+            outline: none; transition: border-color .2s;
+        }
+        .access-input::placeholder { color: rgba(255,255,255,.3); }
+        .access-input:focus { border-color: var(--copper); }
+        .btn-access {
+            width: 100%; margin-top: .75rem;
+            background: rgba(200,96,26,.85); border: 1px solid var(--copper);
+            color: #fff; padding: .7rem; border-radius: 8px;
+            font-weight: 600; font-size: .9rem; cursor: pointer; transition: background .2s;
+        }
+        .btn-access:hover { background: var(--copper); }
+
+        /* ── Steps ── */
+        .steps-section { padding: 5rem 0; }
+        .section-label {
+            font-size: .75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .1em; color: var(--copper); margin-bottom: .5rem;
+        }
+        .section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; margin-bottom: 1rem; }
+        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; }
+        .step-card {
+            background: #fff; border: 1px solid var(--border);
+            border-radius: 14px; padding: 1.75rem;
+            transition: box-shadow .22s;
+        }
+        .step-card:hover { box-shadow: 0 6px 24px rgba(26,18,9,.1); }
+        .step-num {
+            font-family: 'Playfair Display', serif; font-size: 2.5rem;
+            font-weight: 700; color: var(--copper-bdr); line-height: 1; margin-bottom: .75rem;
+        }
+        .step-icon {
+            width: 44px; height: 44px;
+            background: var(--copper-pale); border: 1px solid var(--copper-bdr);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1rem; color: var(--copper); font-size: 1.15rem;
+        }
+        .step-card h5 {
+            font-family: 'Outfit', sans-serif; font-size: .95rem;
+            font-weight: 700; color: var(--ink); margin-bottom: .4rem;
+        }
+        .step-card p { font-size: .85rem; color: var(--slate); line-height: 1.55; }
+
+        /* ── Formations ── */
+        .formations-section { padding: 4rem 0 5rem; background: var(--chalk-2); }
+        .formations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; }
+        .fcard {
+            background: #fff; border: 1px solid var(--border);
+            border-radius: 14px; padding: 1.5rem;
+            transition: all .22s;
+        }
+        .fcard:hover { box-shadow: 0 6px 24px rgba(26,18,9,.1); transform: translateY(-2px); }
+        .fcard-title {
+            font-family: 'Playfair Display', serif; font-size: 1.05rem;
+            font-weight: 700; color: var(--ink); margin-bottom: .5rem; line-height: 1.3;
+        }
+        .fcard-desc { font-size: .855rem; color: var(--slate); line-height: 1.55; margin-bottom: 1rem; }
+        .fmeta-badge {
+            font-size: .72rem; padding: .25em .7em; border-radius: 999px;
+            background: var(--copper-pale); color: var(--copper-dark);
+            border: 1px solid var(--copper-bdr); font-weight: 500;
+        }
+        .fmeta-badge.free {
+            background: var(--forest-pale); color: var(--forest); border-color: #b8ddca;
+        }
+
+        /* ── Footer ── */
+        .site-footer {
+            background: var(--ink); border-top: 3px solid var(--copper);
+            padding: 2rem 0; color: rgba(255,255,255,.45);
+            font-size: .82rem; text-align: center;
+        }
+        .site-footer strong { color: rgba(255,255,255,.7); }
+
+        /* ── Animations ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .fade-up   { animation: fadeUp .5s ease both; }
+        .fade-up-2 { animation: fadeUp .5s .12s ease both; }
+        .fade-up-3 { animation: fadeUp .5s .24s ease both; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--chalk); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="site-nav">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a href="{% url 'home' %}" class="brand">
+            <i class="bi bi-mortarboard-fill" style="color:var(--copper);font-size:1.1rem;"></i>
+            Bediakon&nbsp;<span>Formation</span>
+        </a>
+        <a href="{% url 'login' %}" class="nav-cta">
+            <i class="bi bi-box-arrow-in-right me-1"></i>Espace admin
+        </a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7 hero-content">
+                <div class="hero-eyebrow fade-up">
+                    <i class="bi bi-mortarboard-fill"></i>
+                    Plateforme de formation professionnelle
+                </div>
+                <h1 class="fade-up-2">
+                    Développez vos<br><em>compétences</em><br>avec Bediakon
+                </h1>
+                <p class="hero-sub fade-up-3">
+                    Accédez au catalogue de formations, exprimez vos intérêts et suivez votre parcours de développement professionnel.
+                </p>
+                <div class="d-flex gap-3 flex-wrap fade-up-3">
+                    <a href="#formations" class="btn-hero-primary">
+                        <i class="bi bi-collection"></i>Voir les formations
+                    </a>
+                    <a href="#acces" class="btn-hero-outline">
+                        <i class="bi bi-key"></i>Accès sécurisé
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-5" id="acces">
+                <div class="access-card">
+                    <h6><i class="bi bi-key me-1"></i>Accès via lien sécurisé</h6>
+                    <p style="color:rgba(255,255,255,.55);font-size:.83rem;margin-bottom:1rem;line-height:1.5;">
+                        Vous avez reçu un lien d'accès personnalisé ? Saisissez votre code pour accéder au catalogue réservé.
+                    </p>
+                    <form id="accessForm">
+                        <input type="text" class="access-input"
+                               placeholder="Entrez votre code d'accès…"
+                               autocomplete="off" id="tokenInput">
+                        <button type="submit" class="btn-access">
+                            <i class="bi bi-arrow-right-circle me-1"></i>Accéder
+                        </button>
+                    </form>
+                    <p style="font-size:.72rem;color:rgba(255,255,255,.3);margin-top:.75rem;text-align:center;">
+                        Lien fourni par l'équipe Bediakon Formation
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Comment ça marche -->
+<section class="steps-section">
+    <div class="container">
+        <div class="text-center mb-4">
+            <div class="section-label">Processus</div>
+            <h2 class="section-title">Comment ça fonctionne ?</h2>
+            <p style="color:var(--slate);max-width:520px;margin:0 auto;line-height:1.65;">
+                Un parcours simple pour manifester votre intérêt et rejoindre une session de formation.
+            </p>
+        </div>
+        <div class="steps-grid mt-5">
+            <div class="step-card">
+                <div class="step-num">01</div>
+                <div class="step-icon"><i class="bi bi-person-badge"></i></div>
+                <h5>Identification</h5>
+                <p>Accédez au catalogue via votre lien sécurisé et renseignez vos coordonnées.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">02</div>
+                <div class="step-icon"><i class="bi bi-collection"></i></div>
+                <h5>Sélection</h5>
+                <p>Choisissez les formations qui correspondent à vos besoins et motivez vos choix.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">03</div>
+                <div class="step-icon"><i class="bi bi-envelope-check"></i></div>
+                <h5>Confirmation</h5>
+                <p>Recevez un accusé de réception par email et préparez votre participation.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">04</div>
+                <div class="step-icon"><i class="bi bi-mortarboard"></i></div>
+                <h5>Formation</h5>
+                <p>Participez à votre session et développez vos compétences professionnelles.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Catalogue -->
+{% if formations %}
+<section class="formations-section" id="formations">
+    <div class="container">
+        <div class="text-center mb-4">
+            <div class="section-label">Catalogue</div>
+            <h2 class="section-title">Formations disponibles</h2>
+            <p style="color:var(--slate);max-width:480px;margin:0 auto;line-height:1.65;">
+                Découvrez notre offre de formations professionnelles et exprimez votre intérêt.
+            </p>
+        </div>
+        <div class="formations-grid mt-5">
+            {% for f in formations %}
+            <div class="fcard">
+                <div class="fcard-title">{{ f.libelle }}</div>
+                <div class="fcard-desc">{{ f.descriptif|truncatewords:22 }}</div>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="fmeta-badge"><i class="bi bi-clock me-1"></i>{{ f.duree }}</span>
+                    {% if f.cout %}
+                    <span class="fmeta-badge"><i class="bi bi-tag me-1"></i>{{ f.cout }} FCFA</span>
+                    {% else %}
+                    <span class="fmeta-badge free"><i class="bi bi-tag me-1"></i>Gratuit</span>
+                    {% endif %}
+                    {% if f.periode_previsionnelle %}
+                    <span class="fmeta-badge"><i class="bi bi-calendar me-1"></i>{{ f.periode_previsionnelle }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Footer -->
+<footer class="site-footer">
+    <div class="container">
+        <strong>Bediakon Formation</strong> &mdash;
+        Plateforme de gestion des formations professionnelles &mdash;
+        &copy; {% now "Y" %}
+    </div>
+</footer>
+
+<script>
+document.getElementById('accessForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const token = document.getElementById('tokenInput').value.trim();
+    if (token) window.location.href = '/s/' + token + '/';
+});
+</script>
+</body>
+</html>

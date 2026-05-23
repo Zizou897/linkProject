@@ -1,0 +1,363 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion — Bediakon Formation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --navy:      #0d1b2e;
+            --navy-mid:  #1e3a5f;
+            --blue:      #1a56db;
+            --blue-h:    #1648c0;
+            --gray-50:   #f8fafc;
+            --gray-100:  #f1f5f9;
+            --gray-200:  #e2e8f0;
+            --gray-300:  #cbd5e1;
+            --gray-500:  #64748b;
+            --gray-700:  #334155;
+            --gray-900:  #0f172a;
+            --red-pale:  #fef2f2;
+            --red:       #b91c1c;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+
+        body {
+            font-family: 'Roboto', system-ui, sans-serif;
+            background: var(--gray-100);
+            display: flex;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Left panel ── */
+        .l-panel {
+            display: none;
+            width: 42%;
+            flex-direction: column;
+            justify-content: space-between;
+            background: var(--navy);
+            padding: 48px 56px;
+            position: relative;
+            overflow: hidden;
+        }
+        @media (min-width: 900px) { .l-panel { display: flex; } }
+
+        .l-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--blue);
+        }
+        .l-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -120px;
+            right: -80px;
+            width: 380px; height: 380px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,.05);
+        }
+
+        .l-brand {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            font-size: .875rem;
+            font-weight: 700;
+            color: rgba(255,255,255,.9);
+            letter-spacing: .02em;
+            position: relative;
+            z-index: 1;
+        }
+        .l-brand-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--blue); flex-shrink: 0;
+        }
+
+        .l-body { position: relative; z-index: 1; }
+        .l-label {
+            font-size: .6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: rgba(255,255,255,.35);
+            margin-bottom: .75rem;
+        }
+        .l-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.25;
+            margin-bottom: .85rem;
+            letter-spacing: -.02em;
+        }
+        .l-sub {
+            font-size: .875rem;
+            color: rgba(255,255,255,.55);
+            line-height: 1.65;
+            margin-bottom: 2rem;
+        }
+
+        .feature-list { list-style: none; }
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: .85rem;
+            padding: .85rem 0;
+            border-top: 1px solid rgba(255,255,255,.07);
+            position: relative;
+            z-index: 1;
+        }
+        .feature-list li:last-child { border-bottom: 1px solid rgba(255,255,255,.07); }
+        .fi-icon {
+            width: 32px; height: 32px; border-radius: 6px;
+            background: rgba(26,86,219,.25);
+            border: 1px solid rgba(26,86,219,.3);
+            display: flex; align-items: center; justify-content: center;
+            color: #93c5fd; font-size: .9rem; flex-shrink: 0; margin-top: 1px;
+        }
+        .fi-title { font-size: .8375rem; font-weight: 700; color: rgba(255,255,255,.85); margin-bottom: 2px; }
+        .fi-desc  { font-size: .775rem; color: rgba(255,255,255,.4); line-height: 1.45; }
+
+        .l-footer {
+            font-size: .725rem;
+            color: rgba(255,255,255,.25);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Right panel ── */
+        .r-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 24px;
+            background: var(--gray-50);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            animation: fadeUp .3s ease both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand-mobile {
+            display: flex; align-items: center; gap: .5rem;
+            font-size: .875rem; font-weight: 700; color: var(--gray-900);
+            margin-bottom: 2rem; justify-content: center;
+        }
+        .brand-mobile .dot { width:7px; height:7px; border-radius:50%; background:var(--blue); }
+        @media (min-width: 900px) { .brand-mobile { display: none; } }
+
+        .login-head { margin-bottom: 2rem; }
+        .login-title {
+            font-size: 1.5rem; font-weight: 700; color: var(--gray-900);
+            letter-spacing: -.02em; margin-bottom: .3rem;
+        }
+        .login-sub { font-size: .875rem; color: var(--gray-500); }
+
+        .field-label {
+            display: block;
+            font-size: .725rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--gray-700);
+            margin-bottom: .4rem;
+        }
+        .input-row {
+            display: flex;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            overflow: hidden;
+            background: #fff;
+            transition: border-color .18s, box-shadow .18s;
+        }
+        .input-row:focus-within {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(26,86,219,.12);
+        }
+        .input-prefix {
+            padding: 0 .9rem;
+            display: flex; align-items: center;
+            background: var(--gray-50);
+            border-right: 1px solid var(--gray-200);
+            color: var(--gray-400);
+            font-size: .9rem;
+            flex-shrink: 0;
+        }
+        .input-field {
+            flex: 1; border: none; outline: none;
+            padding: .65rem .875rem;
+            font-family: 'Roboto', sans-serif; font-size: .875rem;
+            color: var(--gray-900); background: transparent;
+        }
+        .input-field::placeholder { color: var(--gray-300); }
+        .toggle-pwd {
+            border: none; background: var(--gray-50);
+            border-left: 1px solid var(--gray-200);
+            padding: 0 .9rem; color: var(--gray-400);
+            cursor: pointer; transition: color .18s; flex-shrink: 0;
+            display: flex; align-items: center;
+        }
+        .toggle-pwd:hover { color: var(--blue); }
+
+        .error-box {
+            background: var(--red-pale);
+            border: 1px solid #fecaca;
+            border-left: 3px solid var(--red);
+            border-radius: 6px;
+            color: #7f1d1d;
+            padding: .75rem 1rem;
+            font-size: .8375rem;
+            display: flex; align-items: flex-start; gap: .6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .btn-login {
+            width: 100%; padding: .7rem;
+            background: var(--blue); border: none;
+            border-radius: 6px; color: #fff;
+            font-family: 'Roboto', sans-serif;
+            font-size: .9rem; font-weight: 700;
+            cursor: pointer; letter-spacing: .01em;
+            transition: background .18s, box-shadow .18s;
+        }
+        .btn-login:hover {
+            background: var(--blue-h);
+            box-shadow: 0 4px 12px rgba(26,86,219,.3);
+        }
+
+        .login-footer-note {
+            text-align: center; margin-top: 1.75rem;
+            font-size: .75rem; color: var(--gray-400);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Left panel -->
+<div class="l-panel">
+    <div class="l-brand">
+        <span class="l-brand-dot"></span>
+        Bediakon Formation
+    </div>
+
+    <div class="l-body">
+        <div class="l-label">Espace administration</div>
+        <div class="l-title">Plateforme de gestion des formations</div>
+        <p class="l-sub">Gérez vos formations, vos sessions et vos participants depuis un espace centralisé et sécurisé.</p>
+
+        <ul class="feature-list">
+            <li>
+                <div class="fi-icon"><i class="bi bi-speedometer2"></i></div>
+                <div>
+                    <div class="fi-title">Tableau de bord</div>
+                    <div class="fi-desc">Statistiques en temps réel, avis et formations.</div>
+                </div>
+            </li>
+            <li>
+                <div class="fi-icon"><i class="bi bi-collection"></i></div>
+                <div>
+                    <div class="fi-title">Gestion des formations</div>
+                    <div class="fi-desc">Catalogue, sessions, participants et avis.</div>
+                </div>
+            </li>
+            <li>
+                <div class="fi-icon"><i class="bi bi-file-earmark-arrow-down"></i></div>
+                <div>
+                    <div class="fi-title">Exports Excel & PDF</div>
+                    <div class="fi-desc">Rapports analytiques et fiches sessions en un clic.</div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="l-footer">&copy; {% now "Y" %} Bediakon Formation — Accès réservé</div>
+</div>
+
+<!-- Right panel -->
+<div class="r-panel">
+    <div class="login-card">
+
+        <div class="brand-mobile">
+            <span class="dot"></span>Bediakon Formation
+        </div>
+
+        <div class="login-head">
+            <div class="login-title">Connexion</div>
+            <div class="login-sub">Accédez à votre espace d'administration</div>
+        </div>
+
+        {% if error %}
+        <div class="error-box">
+            <i class="bi bi-exclamation-circle" style="margin-top:1px;flex-shrink:0;"></i>
+            <span>{{ error }}</span>
+        </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% if request.GET.next %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+            {% endif %}
+
+            <div style="margin-bottom:1.1rem;">
+                <label class="field-label" for="username">Identifiant</label>
+                <div class="input-row">
+                    <div class="input-prefix"><i class="bi bi-person"></i></div>
+                    <input class="input-field" type="text" id="username" name="username"
+                           placeholder="Votre identifiant"
+                           value="{{ request.POST.username|default:'' }}"
+                           autofocus autocomplete="username">
+                </div>
+            </div>
+
+            <div style="margin-bottom:1.5rem;">
+                <label class="field-label" for="password">Mot de passe</label>
+                <div class="input-row">
+                    <div class="input-prefix"><i class="bi bi-lock"></i></div>
+                    <input class="input-field" type="password" id="password" name="password"
+                           placeholder="Votre mot de passe" autocomplete="current-password">
+                    <button type="button" class="toggle-pwd" id="togglePwd" tabindex="-1">
+                        <i class="bi bi-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Se connecter
+            </button>
+        </form>
+
+        <div class="login-footer-note">
+            Accès réservé aux administrateurs autorisés
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('togglePwd').addEventListener('click', function () {
+    const pwd  = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+    const show = pwd.type === 'password';
+    pwd.type = show ? 'text' : 'password';
+    icon.className = show ? 'bi bi-eye-slash' : 'bi bi-eye';
+});
+</script>
+</body>
+</html>
