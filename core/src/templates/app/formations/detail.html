@@ -60,49 +60,45 @@
         <div class="card p-4 h-100">
             <div class="section-head">
                 <div>
-                    <div class="section-label">Paramètres</div>
-                    <h5 class="mb-0">Informations pratiques</h5>
+                    <div class="section-label">Vue d'ensemble</div>
+                    <h5 class="mb-0">Statistiques</h5>
                 </div>
             </div>
             <ul class="list-unstyled mb-0">
                 <li class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid var(--gray-200);">
-                    <i class="bi bi-clock" style="color:var(--blue);width:16px;text-align:center;"></i>
-                    <div>
-                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;">Durée</div>
-                        <div class="fw-500 small">{{ formation.duree }}</div>
+                    <div style="width:32px;height:32px;background:var(--blue-pale);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="bi bi-calendar-event" style="color:var(--blue);font-size:.85rem;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;">Sessions</div>
+                        <div class="fw-600 small">{{ sessions.count }} au total</div>
                     </div>
                 </li>
                 <li class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid var(--gray-200);">
-                    <i class="bi bi-people" style="color:var(--blue);width:16px;text-align:center;"></i>
-                    <div>
-                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;">Public cible</div>
-                        <div class="fw-500 small">{{ formation.public_cible }}</div>
+                    <div style="width:32px;height:32px;background:var(--green-pale);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="bi bi-link-45deg" style="color:var(--green);font-size:.85rem;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;">Liens actifs</div>
+                        <div class="fw-600 small">{{ sessions_actives }} session{{ sessions_actives|pluralize }}</div>
                     </div>
                 </li>
                 <li class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid var(--gray-200);">
-                    <i class="bi bi-person-check" style="color:var(--blue);width:16px;text-align:center;"></i>
-                    <div>
-                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;">Capacité</div>
-                        <div class="fw-500 small">{{ formation.nombre_places }} places</div>
+                    <div style="width:32px;height:32px;background:var(--amber-pale, #fff8e1);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="bi bi-chat-square-text" style="color:var(--amber);font-size:.85rem;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;">Avis collectés</div>
+                        <div class="fw-600 small">{{ total_avis }} avis</div>
                     </div>
                 </li>
-                {% if formation.periode_previsionnelle %}
-                <li class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid var(--gray-200);">
-                    <i class="bi bi-calendar" style="color:var(--blue);width:16px;text-align:center;"></i>
-                    <div>
-                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;">Période</div>
-                        <div class="fw-500 small">{{ formation.periode_previsionnelle }}</div>
-                    </div>
-                </li>
-                {% endif %}
                 <li class="d-flex align-items-center gap-3 py-2">
-                    <i class="bi bi-tag" style="color:var(--blue);width:16px;text-align:center;"></i>
-                    <div>
-                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;">Coût</div>
-                        <div class="fw-500 small">
-                            {% if formation.cout %}{{ formation.cout }} FCFA
-                            {% else %}<span class="text-green">Gratuit</span>{% endif %}
-                        </div>
+                    <div style="width:32px;height:32px;background:var(--gray-100);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="bi bi-clock-history" style="color:var(--gray-500);font-size:.85rem;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="text-muted" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;">Créée le</div>
+                        <div class="fw-600 small">{{ formation.created_at|date:"d/m/Y" }}</div>
                     </div>
                 </li>
             </ul>

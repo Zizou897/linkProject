@@ -208,14 +208,20 @@ def formation_detail(request, pk):
     formation = get_object_or_404(Formation, pk=pk)
     sessions = (
         formation.sessions
-        .annotate(
-            nb_avis=Count('avis'),
-        )
+        .annotate(nb_avis=Count('avis'))
         .order_by('-date')
     )
+    total_avis = Avis.objects.filter(session__formation=formation).count()
+    sessions_actives = formation.sessions.filter(
+        lien__actif=True
+    ).filter(
+        Q(lien__date_expiration__isnull=True) | Q(lien__date_expiration__gt=timezone.now())
+    ).count()
     return render(request, 'app/formations/detail.html', {
         'formation': formation,
         'sessions': sessions,
+        'total_avis': total_avis,
+        'sessions_actives': sessions_actives,
     })
 
 
