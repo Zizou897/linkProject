@@ -5,11 +5,19 @@ from django.contrib.auth import authenticate, login, logout
 from django.db.models import Count, Q, Exists, OuterRef
 from django.contrib.admin.views.decorators import staff_member_required
 
-from .models import LienSecurise, Formation, SessionPresentielle, Avis
+from .models import LienSecurise, Formation, SessionPresentielle, Avis, Theme
 from .forms import SessionPresentielleForm, FormationForm, AvisForm
 
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
+
+def _sauvegarder_themes(request, formation):
+    """Synchronise les thèmes d'une formation depuis les champs POST 'themes'."""
+    libelles = [t.strip() for t in request.POST.getlist('themes') if t.strip()]
+    formation.themes.all().delete()
+    for libelle in libelles:
+        Theme.objects.create(formation=formation, libelle=libelle)
+
 
 def _active_sessions_subquery():
     """Sous-requête : sessions dont le lien est actif et non expiré."""
@@ -182,7 +190,8 @@ def formations_liste(request):
 def formation_creer(request):
     form = FormationForm(request.POST or None)
     if form.is_valid():
-        form.save()
+        formation = form.save()
+        _sauvegarder_themes(request, formation)
         messages.success(request, 'Formation créée avec succès.')
         return redirect('formations_liste')
     return render(request, 'app/formations/form.html', {'form': form, 'titre': 'Nouvelle formation'})
@@ -194,8 +203,9 @@ def formation_modifier(request, pk):
     form = FormationForm(request.POST or None, instance=formation)
     if form.is_valid():
         form.save()
+        _sauvegarder_themes(request, formation)
         messages.success(request, 'Formation mise à jour.')
-        return redirect('formations_liste')
+        return redirect('formation_detail', pk=formation.pk)
     return render(request, 'app/formations/form.html', {
         'form': form,
         'titre': 'Modifier la formation',
@@ -274,19 +284,21 @@ def avis_formation(request, token):
     formation = session.formation
 
     if request.method == 'POST':
-        form = AvisForm(request.POST)
+        form = AvisForm(request.POST, formation=formation)
         if form.is_valid():
             avis = form.save(commit=False)
             avis.session = session
             avis.save()
+            form.save_m2m()
             return redirect('avis_confirmation', token=token)
     else:
-        form = AvisForm()
+        form = AvisForm(formation=formation)
 
     return render(request, 'app/avis/formulaire.html', {
         'formation': formation,
         'session': session,
         'form': form,
+        'themes': formation.themes.all(),
     })
 
 

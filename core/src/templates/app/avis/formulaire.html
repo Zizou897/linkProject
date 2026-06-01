@@ -3,6 +3,18 @@
 
 {% block navbar %}{% endblock %}
 
+{% block styles %}
+<style>
+.theme-check:has(input:checked) {
+    background: var(--blue-pale) !important;
+    border-color: var(--blue-border) !important;
+}
+.theme-check:hover {
+    border-color: var(--blue-border) !important;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
@@ -79,7 +91,7 @@
                     <div class="col-sm-4">
                         <label class="form-label">{{ form.format_prefere.label }}</label>{{ form.format_prefere }}
                     </div>
-                    <div class="col-12">
+                    <div class="col-12" id="bloc-mobilite">
                         <div class="d-flex align-items-center gap-3 p-3 rounded"
                              style="background:var(--gray-50);border:1px solid var(--gray-200);">
                             {{ form.contrainte_mobilite }}
@@ -95,6 +107,32 @@
                 </div>
             </div>
 
+            {% if themes %}
+            <div class="card p-4 mb-3">
+                <div class="section-head">
+                    <div>
+                        <div class="section-label">Thèmes</div>
+                        <h5 class="mb-0">Centres d'intérêt</h5>
+                    </div>
+                </div>
+                <p class="text-muted small mb-3">Sélectionnez un ou plusieurs thèmes qui vous intéressent.</p>
+                <div class="row g-2">
+                    {% for theme in themes %}
+                    <div class="col-sm-6">
+                        <label class="d-flex align-items-center gap-2 p-3 rounded cursor-pointer theme-check"
+                               for="theme-{{ theme.pk }}"
+                               style="background:var(--gray-50);border:1px solid var(--gray-200);cursor:pointer;transition:.15s;">
+                            <input class="form-check-input flex-shrink-0 m-0" type="checkbox"
+                                   name="themes" value="{{ theme.pk }}"
+                                   id="theme-{{ theme.pk }}">
+                            <span class="small fw-500" style="color:var(--gray-800);">{{ theme.libelle }}</span>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary btn-lg">
                     <i class="bi bi-send me-2"></i>Soumettre mon avis
@@ -104,4 +142,26 @@
 
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    const select = document.getElementById('{{ form.format_prefere.id_for_label }}');
+    const bloc   = document.getElementById('bloc-mobilite');
+    const cb     = document.getElementById('{{ form.contrainte_mobilite.id_for_label }}');
+
+    function majMobilite() {
+        if (select.value === 'presentiel') {
+            bloc.style.display = 'none';
+            cb.checked = false;
+        } else {
+            bloc.style.display = '';
+        }
+    }
+
+    select.addEventListener('change', majMobilite);
+    majMobilite();
+})();
+</script>
 {% endblock %}

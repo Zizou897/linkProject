@@ -456,19 +456,67 @@
 {% endblock navbar %}
 
 <div class="container py-4 page-body">
-    {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible mb-3" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-    </div>
-    {% endfor %}
-    {% endif %}
-
     {% block content %}{% endblock %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+{% if messages %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const BfToast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 4500,
+        timerProgressBar: true,
+        customClass: {
+            popup:          'bf-toast-popup',
+            title:          'bf-toast-title',
+            timerProgressBar: 'bf-toast-bar',
+        },
+        didOpen: function (toast) {
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
+        }
+    });
+
+    {% for message in messages %}
+    BfToast.fire({
+        icon:  '{% if "success" in message.tags %}success{% elif "error" in message.tags %}error{% elif "warning" in message.tags %}warning{% else %}info{% endif %}',
+        title: '{{ message|escapejs }}'
+    });
+    {% endfor %}
+});
+</script>
+<style>
+    .bf-toast-popup {
+        font-family: var(--font) !important;
+        font-size: .875rem !important;
+        border-radius: var(--radius-lg) !important;
+        border: 1px solid var(--gray-200) !important;
+        box-shadow: var(--shadow) !important;
+        padding: .75rem 1rem !important;
+    }
+    .bf-toast-title {
+        font-size: .875rem !important;
+        font-weight: 500 !important;
+        color: var(--gray-900) !important;
+    }
+    /* Progress bar par type */
+    .swal2-success .bf-toast-bar { background: var(--green) !important; }
+    .swal2-error   .bf-toast-bar { background: var(--red)   !important; }
+    .swal2-warning .bf-toast-bar { background: var(--amber) !important; }
+    .swal2-info    .bf-toast-bar { background: var(--blue)  !important; }
+    /* Icône colorée */
+    .swal2-success .swal2-icon { border-color: var(--green-border) !important; color: var(--green) !important; }
+    .swal2-error   .swal2-icon { border-color: var(--red-border)   !important; color: var(--red)   !important; }
+    .swal2-warning .swal2-icon { border-color: var(--amber-border) !important; color: var(--amber) !important; }
+    .swal2-info    .swal2-icon { border-color: var(--blue-border)  !important; color: var(--blue)  !important; }
+</style>
+{% endif %}
+
 {% block modals %}{% endblock %}
 {% block scripts %}{% endblock %}
 </body>

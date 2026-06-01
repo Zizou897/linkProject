@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Formation, LienSecurise, SessionPresentielle, Avis
+from .models import Formation, LienSecurise, SessionPresentielle, Avis, Theme
+
+
+class ThemeInline(admin.TabularInline):
+    model = Theme
+    extra = 1
+    fields = ('libelle',)
 
 
 @admin.register(Formation)
@@ -7,6 +13,7 @@ class FormationAdmin(admin.ModelAdmin):
     list_display = ('libelle', 'archive', 'created_at')
     list_filter = ('archive',)
     search_fields = ('libelle', 'descriptif')
+    inlines = [ThemeInline]
 
 
 @admin.register(LienSecurise)

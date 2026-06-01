@@ -1,5 +1,5 @@
 from django import forms
-from .models import SessionPresentielle, Formation, Avis
+from .models import SessionPresentielle, Formation, Avis, Theme
 
 
 class SessionPresentielleForm(forms.ModelForm):
@@ -83,12 +83,26 @@ class FormationForm(forms.ModelForm):
 
 
 class AvisForm(forms.ModelForm):
+
+    themes = forms.ModelMultipleChoiceField(
+        queryset=Theme.objects.none(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(),
+        label='Thèmes d\'intérêt',
+    )
+
+    def __init__(self, *args, formation=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if formation:
+            self.fields['themes'].queryset = formation.themes.all()
+
     class Meta:
         model = Avis
         fields = [
             'nom', 'prenom', 'structure', 'fonction', 'email', 'telephone', 'zone_geographique',
             'motivations', 'probleme_professionnel', 'competences_attendues',
             'contraintes_calendrier', 'contrainte_mobilite', 'format_prefere', 'observation',
+            'themes',
         ]
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom'}),

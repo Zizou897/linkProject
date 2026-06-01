@@ -100,6 +100,23 @@ class SessionPresentielle(Convention):
         return f"{self.formation} — {self.date} ({self.lieu})"
 
 
+# ── THÈMES DE FORMATION ──────────────────────────────────────────────────────
+
+class Theme(models.Model):
+    formation = models.ForeignKey(
+        Formation, on_delete=models.CASCADE, related_name='themes'
+    )
+    libelle = models.CharField(max_length=200)
+
+    class Meta:
+        verbose_name = 'Thème'
+        verbose_name_plural = 'Thèmes'
+        ordering = ['libelle']
+
+    def __str__(self):
+        return self.libelle
+
+
 # ── AVIS ──────────────────────────────────────────────────────────────────────
 
 class Avis(models.Model):
@@ -120,6 +137,7 @@ class Avis(models.Model):
     contrainte_mobilite = models.BooleanField(default=False)
     format_prefere = models.CharField(max_length=50, blank=True)
     observation = models.TextField(blank=True)
+    themes = models.ManyToManyField('Theme', blank=True, related_name='avis')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
