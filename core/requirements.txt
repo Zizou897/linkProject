@@ -11,3 +11,4 @@ django-after-response
 celery[redis]
 openpyxl
 reportlab
+qrcode[pil]

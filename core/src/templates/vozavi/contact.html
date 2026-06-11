@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<title>Contact — Vozavi</title>
+<meta name="description" content="Contactez l'équipe Vozavi. Nous répondons en moins de 24h.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ── */
+:root{
+  --ind:#4F46B8;--ind-d:#3D35A0;--ind-m:#6B63C8;--ind-pale:#EEEDF9;
+  --amb:#F2A93B;--amb-pale:#FEF5E4;
+  --grn:#1D9E75;--grn-pale:#E5F8F2;
+  --bg:#F4F3FB;--white:#fff;
+  --txt:#2C2C3A;--txt-2:#5C5C72;--txt-3:#9B9BB5;--txt-4:#C2C1D8;
+  --bdr:#E2E1F0;--bdr-2:#D0CEEB;
+  --sh:0 2px 8px rgba(44,44,58,.07);
+  --sh-md:0 8px 24px rgba(44,44,58,.11);
+  --sh-lg:0 20px 56px rgba(44,44,58,.14);
+  --r:14px;--r-sm:10px;--r-xs:7px;
+  --fh:'Poppins',sans-serif;--fb:'Inter',sans-serif;
+  --dur-fast:140ms;--dur:220ms;--dur-slow:380ms;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--fb);font-size:15px;color:var(--txt);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ── LAYOUT ── */
+.cw{
+  display:grid;
+  grid-template-columns:420px 1fr;
+  min-height:100vh;
+}
+
+/* ── LEFT PANEL ── */
+.cp-left{
+  position:relative;overflow:hidden;
+  background:linear-gradient(155deg,#161328 0%,#251E5A 55%,#1A3048 100%);
+  padding:48px 48px 48px;
+  display:flex;flex-direction:column;
+}
+
+/* Dot grid */
+.cp-left::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.055) 1px,transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none;
+}
+
+/* Glow orbs */
+.orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
+.orb-1{width:360px;height:360px;background:rgba(79,70,184,.28);top:-80px;right:-100px}
+.orb-2{width:260px;height:260px;background:rgba(29,158,117,.14);bottom:-60px;left:-60px}
+.orb-3{width:180px;height:180px;background:rgba(242,169,59,.09);top:45%;right:30px}
+
+/* Giant decorative speech bubble */
+.deco-bubble{
+  position:absolute;
+  bottom:-30px;right:-50px;
+  width:440px;height:440px;
+  opacity:.06;
+  pointer-events:none;
+  transform:rotate(-12deg);
+  flex-shrink:0;
+}
+
+/* Left inner content */
+.cp-left-inner{position:relative;z-index:1;display:flex;flex-direction:column;height:100%}
+
+/* Logo */
+.cl-logo{display:flex;align-items:center;gap:10px;margin-bottom:auto}
+.cl-logo svg{height:26px;width:auto}
+.cl-logo-text{font-family:var(--fh);font-size:.8125rem;font-weight:600;color:rgba(255,255,255,.35);letter-spacing:.04em;text-transform:uppercase}
+
+/* Main copy */
+.cl-copy{margin-top:auto;margin-bottom:32px}
+.cl-eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(242,169,59,.12);border:1px solid rgba(242,169,59,.22);
+  border-radius:20px;padding:4px 12px;
+  font-size:.75rem;font-weight:600;color:var(--amb);
+  letter-spacing:.05em;text-transform:uppercase;margin-bottom:24px;
+}
+.cl-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--amb);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.cl-heading{
+  font-family:var(--fh);font-weight:800;
+  font-size:clamp(2rem,3.2vw,2.625rem);
+  color:#fff;line-height:1.12;letter-spacing:-.03em;
+  margin-bottom:16px;
+}
+.cl-heading em{
+  font-style:normal;
+  background:linear-gradient(90deg,var(--amb) 0%,#F7C06A 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.cl-sub{
+  font-size:.9375rem;color:rgba(255,255,255,.5);
+  line-height:1.7;max-width:320px;
+}
+
+/* Info cards */
+.cl-cards{display:flex;flex-direction:column;gap:8px;margin-bottom:32px}
+.cl-card{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:var(--r-sm);padding:12px 16px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:background var(--dur) var(--ease),transform var(--dur) var(--ease);
+}
+.cl-card:hover{background:rgba(255,255,255,.1);transform:translateX(4px)}
+.cl-card-icon{
+  width:38px;height:38px;border-radius:var(--r-xs);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.cl-card-icon.indigo{background:rgba(79,70,184,.25)}
+.cl-card-icon.green{background:rgba(29,158,117,.22)}
+.cl-card-icon.amber{background:rgba(242,169,59,.18)}
+.cl-card-icon svg{width:17px;height:17px}
+.cl-card-body{}
+.cl-card-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.35);font-weight:600;margin-bottom:2px}
+.cl-card-value{font-size:.875rem;color:rgba(255,255,255,.82);font-weight:500;font-family:var(--fb)}
+
+/* Trust row */
+.cl-trust{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding-top:24px;border-top:1px solid rgba(255,255,255,.08);
+}
+.cl-trust-badge{
+  display:flex;align-items:center;gap:5px;
+  font-size:.75rem;color:rgba(255,255,255,.4);font-weight:500;
+}
+.cl-trust-badge svg{width:12px;height:12px;color:var(--grn);opacity:.8}
+.cl-trust-sep{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.15)}
+
+/* ── RIGHT PANEL ── */
+.cp-right{
+  background:var(--white);
+  padding:clamp(32px,5vw,56px) clamp(28px,4.5vw,56px) 72px;
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+
+/* Top bar */
+.cr-top{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:32px;
+}
+.cr-back{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:.875rem;font-weight:500;color:var(--txt-3);
+  transition:color var(--dur-fast) var(--ease),gap var(--dur-fast) var(--ease);
+}
+.cr-back:hover{color:var(--ind);gap:4px}
+.cr-back svg{width:15px;height:15px;transition:transform var(--dur-fast) var(--ease)}
+.cr-back:hover svg{transform:translateX(-3px)}
+.cr-top-login{
+  font-size:.8125rem;color:var(--txt-3);
+}
+.cr-top-login a{color:var(--ind);font-weight:600;transition:color var(--dur-fast)}
+.cr-top-login a:hover{color:var(--ind-d)}
+
+/* Form heading */
+.cr-heading{
+  font-family:var(--fh);font-weight:700;
+  font-size:clamp(1.625rem,2.5vw,2.125rem);
+  color:var(--txt);letter-spacing:-.025em;
+  line-height:1.18;margin-bottom:8px;
+}
+.cr-sub{font-size:.9375rem;color:var(--txt-2);line-height:1.6;margin-bottom:40px}
+
+/* Category selector */
+.cat-label{font-size:.8rem;font-weight:600;color:var(--txt-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.cat-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.cat-pill{
+  display:none; /* radio input hidden */
+}
+.cat-pill+label{
+  display:inline-flex;align-items:center;gap:7px;
+  border:1.5px solid var(--bdr);border-radius:20px;
+  padding:7px 14px;font-size:.8125rem;font-weight:500;color:var(--txt-2);
+  cursor:pointer;
+  transition:border-color var(--dur-fast),background var(--dur-fast),color var(--dur-fast),box-shadow var(--dur-fast);
+  user-select:none;
+  background:var(--white);
+}
+.cat-pill+label svg{width:14px;height:14px;flex-shrink:0;opacity:.6;transition:opacity var(--dur-fast)}
+.cat-pill+label:hover{border-color:var(--ind-m);color:var(--ind);background:var(--ind-pale)}
+.cat-pill:checked+label{
+  border-color:var(--ind);background:var(--ind-pale);
+  color:var(--ind);font-weight:600;
+  box-shadow:0 0 0 3px rgba(79,70,184,.1);
+}
+.cat-pill:checked+label svg{opacity:1}
+
+/* Form */
+.cf{display:flex;flex-direction:column;gap:24px}
+
+/* Field group */
+.cf-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cf-field{display:flex;flex-direction:column;gap:6px}
+
+/* Labels */
+.cf-field label{
+  font-family:var(--fh);font-size:.8125rem;font-weight:600;
+  color:var(--txt);
+}
+
+/* Inputs & textarea */
+.cf-field input,
+.cf-field textarea{
+  display:block;width:100%;
+  height:46px;padding:0 14px;
+  border:1.5px solid var(--bdr);border-radius:var(--r-sm);
+  font-family:var(--fb);font-size:.9375rem;color:var(--txt);
+  background:var(--white);outline:none;resize:none;
+  transition:border-color .18s,box-shadow .18s;
+}
+.cf-field input::placeholder,.cf-field textarea::placeholder{color:var(--txt-3)}
+.cf-field textarea{height:auto;min-height:120px;padding:12px 14px;line-height:1.6}
+.cf-field input:focus,
+.cf-field textarea:focus{
+  border-color:var(--ind);
+  box-shadow:0 0 0 3px rgba(79,70,184,.1);
+}
+
+/* Required asterisk */
+.cf-req{color:var(--amb);margin-left:2px}
+
+/* Char counter */
+.cf-counter{
+  text-align:right;font-size:.75rem;color:var(--txt-4);
+  margin-top:4px;transition:color var(--dur-fast);
+}
+.cf-counter.warn{color:#E07A30}
+.cf-counter.full{color:#E24B4A}
+
+/* Error message */
+.cf-error-msg{
+  display:flex;align-items:center;gap:7px;
+  background:#FEF0F0;border:1px solid #FCCFCF;border-radius:var(--r-xs);
+  padding:10px 14px;font-size:.875rem;color:#C0392B;font-weight:500;
+}
+.cf-error-msg svg{width:15px;height:15px;flex-shrink:0}
+
+/* Submit button */
+.cf-submit-wrap{margin-top:8px}
+.cf-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  background:var(--ind);color:#fff;
+  font-family:var(--fh);font-weight:700;font-size:.9375rem;
+  padding:15px 32px;border-radius:var(--r-sm);
+  box-shadow:0 4px 14px rgba(79,70,184,.35);
+  transition:background var(--dur),transform var(--dur-fast),box-shadow var(--dur),opacity var(--dur);
+  width:100%;
+}
+.cf-btn svg{width:17px;height:17px;transition:transform var(--dur-fast)}
+.cf-btn:hover:not(:disabled){background:var(--ind-m);transform:translateY(-2px);box-shadow:0 8px 24px rgba(79,70,184,.45)}
+.cf-btn:hover svg{transform:translateX(3px)}
+.cf-btn:active:not(:disabled){transform:translateY(0)}
+.cf-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+/* Loading state */
+.cf-btn .btn-spinner{
+  display:none;width:17px;height:17px;
+  border:2px solid rgba(255,255,255,.4);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .6s linear infinite;
+}
+.cf-btn.loading .btn-text,.cf-btn.loading svg.send-icon{display:none}
+.cf-btn.loading .btn-spinner{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Legal micro */
+.cf-legal{font-size:.75rem;color:var(--txt-4);line-height:1.6;margin-top:8px}
+.cf-legal a{color:var(--txt-3);border-bottom:1px dotted var(--bdr-2);transition:color var(--dur-fast)}
+.cf-legal a:hover{color:var(--ind)}
+
+/* ── SUCCESS STATE ── */
+.cr-success{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;flex:1;padding:40px 0;
+}
+.cr-success.show{display:flex}
+.success-circle{
+  width:80px;height:80px;border-radius:50%;
+  background:var(--grn-pale);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:24px;
+  animation:popIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.success-check{
+  width:36px;height:36px;stroke-dasharray:60;stroke-dashoffset:60;
+  animation:drawCheck .6s .3s ease forwards;
+}
+@keyframes drawCheck{to{stroke-dashoffset:0}}
+.cr-success h2{
+  font-family:var(--fh);font-size:1.5rem;font-weight:700;
+  color:var(--txt);letter-spacing:-.02em;margin-bottom:10px;
+}
+.cr-success p{font-size:.9375rem;color:var(--txt-2);line-height:1.65;max-width:380px}
+.success-timer{
+  display:flex;align-items:center;gap:6px;
+  margin:24px 0;background:var(--grn-pale);border:1px solid rgba(29,158,117,.2);
+  border-radius:20px;padding:7px 16px;
+  font-size:.8125rem;font-weight:600;color:var(--grn);
+}
+.success-timer-dot{width:7px;height:7px;border-radius:50%;background:var(--grn);animation:blink 2s ease-in-out infinite}
+.success-cta{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--ind);color:#fff;
+  font-family:var(--fh);font-weight:600;font-size:.875rem;
+  padding:11px 24px;border-radius:var(--r-sm);
+  box-shadow:0 4px 14px rgba(79,70,184,.3);
+  transition:background var(--dur),transform var(--dur-fast);
+}
+.success-cta:hover{background:var(--ind-m);transform:translateY(-1px)}
+.success-cta svg{width:15px;height:15px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .cw{grid-template-columns:1fr}
+  .cp-left{
+    padding:32px;min-height:auto;
+    flex-direction:row;flex-wrap:wrap;align-items:center;gap:20px;
+  }
+  .cl-copy{margin-top:0;margin-bottom:0;flex:1;min-width:260px}
+  .cl-cards{display:none}
+  .cl-trust{display:none}
+  .deco-bubble{display:none}
+  .orb-1{width:200px;height:200px;top:-50px;right:-40px}
+  .orb-2{display:none}
+  .cp-right{padding:32px 24px 48px}
+  .cr-top{margin-bottom:24px}
+  .cf-row{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .cp-right{padding:24px 20px 36px}
+  .cat-grid{gap:6px}
+  .cat-pill+label{font-size:.75rem;padding:6px 11px}
+}
+
+/* ── ENTRY ANIMATIONS ── */
+.fade-up{
+  opacity:0;transform:translateY(18px);
+  transition:opacity .5s var(--ease),transform .5s var(--ease);
+}
+.fade-up.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<div class="cw">
+
+  <!-- ── LEFT PANEL ── -->
+  <aside class="cp-left">
+    <!-- Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Giant decorative bubble -->
+    <svg class="deco-bubble" viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" fill="white">
+      <path d="M20 24 a20 20 0 0 1 20-20 h140 a20 20 0 0 1 20 20 v100 a20 20 0 0 1-20 20 h-80 l-30 30 v-30 h-30 a20 20 0 0 1-20-20 z"/>
+    </svg>
+
+    <div class="cp-left-inner">
+      <!-- Logo -->
+      <a href="/" class="cl-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64">
+          <path d="M10 14 a10 10 0 0 1 10-10 h24 a10 10 0 0 1 10 10 v20 a10 10 0 0 1-10 10 h-14 l-9 9 v-9 h-1 a10 10 0 0 1-10-10 z" fill="#fff" fill-opacity=".9"/>
+          <path d="M32 12 l3.4 6.9 7.6 1.1 -5.5 5.4 1.3 7.6 -6.8-3.6 -6.8 3.6 1.3-7.6 -5.5-5.4 7.6-1.1 z" fill="#F2A93B"/>
+          <text x="68" y="40" font-size="28" font-weight="600" fill="#fff" fill-opacity=".9" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
+        </svg>
+      </a>
+
+      <!-- Copy block -->
+      <div class="cl-copy">
+        <div class="cl-eyebrow">
+          <span class="cl-eyebrow-dot"></span>
+          Nous sommes disponibles
+        </div>
+        <h1 class="cl-heading">On est là<br>pour <em>vous.</em></h1>
+        <p class="cl-sub">Une question, un projet, un partenariat — notre équipe vous répond avec soin.</p>
+      </div>
+
+      <!-- Info cards -->
+      <div class="cl-cards">
+        <div class="cl-card">
+          <div class="cl-card-icon indigo">
+            <svg viewBox="0 0 20 20" fill="none" stroke="rgba(167,163,230,1)" stroke-width="1.5">
+              <path d="M3 5h14c.6 0 1 .4 1 1v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6c0-.6.4-1 1-1z" stroke-linecap="round"/>
+              <path d="M16 6l-6 5L4 6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="cl-card-body">
+            <div class="cl-card-label">Email</div>
+            <div class="cl-card-value">contact@vozavi.com</div>
+          </div>
+        </div>
+
+        <div class="cl-card">
+          <div class="cl-card-icon green">
+            <svg viewBox="0 0 20 20" fill="none" stroke="rgba(104,207,175,1)" stroke-width="1.5">
+              <circle cx="10" cy="10" r="8"/>
+              <path d="M10 6v4l2.5 2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="cl-card-body">
+            <div class="cl-card-label">Temps de réponse</div>
+            <div class="cl-card-value">Moins de 24 heures</div>
+          </div>
+        </div>
+
+        <div class="cl-card">
+          <div class="cl-card-icon amber">
+            <svg viewBox="0 0 20 20" fill="none" stroke="rgba(242,200,105,1)" stroke-width="1.5">
+              <path d="M10 2a6 6 0 0 1 6 6c0 4-6 10-6 10S4 12 4 8a6 6 0 0 1 6-6z" stroke-linecap="round"/>
+              <circle cx="10" cy="8" r="2"/>
+            </svg>
+          </div>
+          <div class="cl-card-body">
+            <div class="cl-card-label">Présence</div>
+            <div class="cl-card-value">Afrique · Paris · Remote</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trust row -->
+      <div class="cl-trust">
+        <span class="cl-trust-badge">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7l3.5 3.5L12 3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          100% gratuit
+        </span>
+        <span class="cl-trust-sep"></span>
+        <span class="cl-trust-badge">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7l3.5 3.5L12 3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Données protégées
+        </span>
+        <span class="cl-trust-sep"></span>
+        <span class="cl-trust-badge">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7l3.5 3.5L12 3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          500+ entreprises
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── RIGHT PANEL ── -->
+  <main class="cp-right">
+
+    <!-- Top bar -->
+    <div class="cr-top fade-up" style="transition-delay:.05s">
+      <a href="/" class="cr-back">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Retour à l'accueil
+      </a>
+      <span class="cr-top-login">Déjà client ? <a href="{% url 'login' %}">Se connecter</a></span>
+    </div>
+
+    <!-- Success state (shown after submit) -->
+    <div class="cr-success{% if sent %} show{% endif %}" id="successBlock">
+      <div class="success-circle">
+        <svg class="success-check" viewBox="0 0 40 40" fill="none" stroke="#1D9E75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 20l8 8 16-16"/>
+        </svg>
+      </div>
+      <h2>Message envoyé !</h2>
+      <p>Merci de nous avoir contactés. Notre équipe vous répondra dans les plus brefs délais.</p>
+      <div class="success-timer">
+        <span class="success-timer-dot"></span>
+        Réponse attendue sous 24h
+      </div>
+      <a href="{% url 'new_form' %}" class="success-cta">
+        Créer mon formulaire
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Form (hidden after submit) -->
+    <div id="formBlock"{% if sent %} style="display:none"{% endif %}>
+      <h2 class="cr-heading fade-up" style="transition-delay:.08s">Écrivez-nous</h2>
+      <p class="cr-sub fade-up" style="transition-delay:.11s">Notre équipe répond en moins de 24h, du lundi au vendredi.</p>
+
+      {% if error %}
+      <div class="cf-error-msg fade-up" style="transition-delay:.12s;margin-bottom:18px">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6"/>
+          <path d="M8 5v3.5M8 11v.5" stroke-linecap="round"/>
+        </svg>
+        {{ error }}
+      </div>
+      {% endif %}
+
+      <!-- Category -->
+      <div class="fade-up" style="transition-delay:.14s">
+        <div class="cat-label">Sujet de votre demande</div>
+        <div class="cat-grid">
+          <input type="radio" class="cat-pill" name="cat_display" id="cat1" value="support" checked>
+          <label for="cat1">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="8" cy="8" r="6"/>
+              <path d="M6 6.5a2 2 0 1 1 2 2v1" stroke-linecap="round"/>
+              <circle cx="8" cy="11.5" r=".5" fill="currentColor"/>
+            </svg>
+            Support
+          </label>
+
+          <input type="radio" class="cat-pill" name="cat_display" id="cat2" value="demo">
+          <label for="cat2">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="2" y="3" width="12" height="8" rx="1.5"/>
+              <path d="M5.5 14h5M8 11v3" stroke-linecap="round"/>
+            </svg>
+            Démo
+          </label>
+
+          <input type="radio" class="cat-pill" name="cat_display" id="cat3" value="partnership">
+          <label for="cat3">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M2 9l2-2 2 2 4-5 2 2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M14 12H2" stroke-linecap="round"/>
+            </svg>
+            Partenariat
+          </label>
+
+          <input type="radio" class="cat-pill" name="cat_display" id="cat4" value="billing">
+          <label for="cat4">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="2" y="4" width="12" height="9" rx="1.5"/>
+              <path d="M2 7h12" stroke-linecap="round"/>
+              <path d="M5 10.5h2M10 10.5h1" stroke-linecap="round"/>
+            </svg>
+            Facturation
+          </label>
+
+          <input type="radio" class="cat-pill" name="cat_display" id="cat5" value="other">
+          <label for="cat5">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="8" cy="8" r="1.5" fill="currentColor" stroke="none"/>
+              <circle cx="3" cy="8" r="1.5" fill="currentColor" stroke="none"/>
+              <circle cx="13" cy="8" r="1.5" fill="currentColor" stroke="none"/>
+            </svg>
+            Autre
+          </label>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form class="cf" method="post" action="{% url 'contact' %}" id="contactForm" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="category" id="categoryHidden" value="support">
+
+        <div class="cf-row fade-up" style="transition-delay:.17s">
+          <div class="cf-field">
+            <label for="name">Nom complet<span class="cf-req">*</span></label>
+            <input type="text" id="name" name="name" placeholder="Votre nom" required value="{{ request.POST.name|default:'' }}">
+          </div>
+          <div class="cf-field">
+            <label for="email">Adresse e-mail<span class="cf-req">*</span></label>
+            <input type="email" id="email" name="email" placeholder="votre@email.com" required value="{{ request.POST.email|default:'' }}">
+          </div>
+        </div>
+
+        <div class="cf-field fade-up" style="transition-delay:.2s">
+          <label for="subject">Objet (optionnel)</label>
+          <input type="text" id="subject" name="subject" placeholder="Ex : Demande de démo" value="{{ request.POST.subject|default:'' }}">
+        </div>
+
+        <div class="fade-up" style="transition-delay:.23s">
+          <div class="cf-field">
+            <label for="message">Votre message<span class="cf-req">*</span></label>
+            <textarea id="message" name="message" placeholder="Décrivez votre demande…" maxlength="1000" required>{{ request.POST.message|default:'' }}</textarea>
+          </div>
+          <div class="cf-counter" id="charCounter">0 / 1000</div>
+        </div>
+
+        <div class="cf-submit-wrap fade-up" style="transition-delay:.26s">
+          <button type="submit" class="cf-btn" id="submitBtn">
+            <span class="btn-text">Envoyer le message</span>
+            <svg class="send-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.75">
+              <path d="M2 9h14M9 3l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="btn-spinner"></span>
+          </button>
+          <p class="cf-legal">En envoyant ce message, vous acceptez notre <a href="/confidentialite">Politique de confidentialité</a>. Vos données ne seront jamais vendues.</p>
+        </div>
+      </form>
+    </div>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  // Reveal animations
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:.05});
+  document.querySelectorAll('.fade-up').forEach(function(el){ io.observe(el); });
+
+  // Category sync to hidden input
+  document.querySelectorAll('.cat-pill').forEach(function(r){
+    r.addEventListener('change',function(){ document.getElementById('categoryHidden').value = this.value; });
+  });
+
+  // Char counter
+  var ta = document.getElementById('message');
+  var ctr = document.getElementById('charCounter');
+  if(ta && ctr){
+    function updateCtr(){
+      var n = ta.value.length;
+      ctr.textContent = n + ' / 1000';
+      ctr.className = 'cf-counter' + (n>900?' warn':'') + (n>=1000?' full':'');
+    }
+    ta.addEventListener('input', updateCtr);
+    updateCtr();
+  }
+
+  // Loading state on submit
+  var form = document.getElementById('contactForm');
+  var btn = document.getElementById('submitBtn');
+  if(form && btn){
+    form.addEventListener('submit', function(){
+      btn.classList.add('loading');
+      btn.disabled = true;
+    });
+  }
+})();
+</script>
+</body>
+</html>

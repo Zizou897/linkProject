@@ -4,9 +4,9 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'change-me-in-production'
-#DEBUG = True
-#ALLOWED_HOSTS = ['*']
-#CSRF_TRUSTED_ORIGINS = ['https://e967-160-155-75-250.ngrok-free.app']
+# DEBUG = True
+# ALLOWED_HOSTS = ['*']
+# CSRF_TRUSTED_ORIGINS = ['https://e967-160-155-75-250.ngrok-free.app']
 
 DEBUG = False
 ALLOWED_HOSTS = ['76.13.61.236','monapplidegestion.online','www.monapplidegestion.online']
@@ -63,7 +63,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
-
 
 DATABASES = {
     'default': {

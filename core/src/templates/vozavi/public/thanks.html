@@ -1,0 +1,139 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<title>Merci — {{ vform.title }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand:{{ vform.brand_color|default:'#4F46B8' }};
+  --brand-pale: color-mix(in srgb, var(--brand) 12%, white);
+  --lavender:#F4F3FB;
+  --white:#fff; --text:#2C2C3A; --text-2:#5C5C72; --text-3:#9B9BB5;
+  --border:#E2E1F0;
+  --green:#1D9E75; --green-pale:#E5F8F2;
+  --shadow:0 2px 8px rgba(44,44,58,.08);
+  --shadow-md:0 8px 24px rgba(44,44,58,.12);
+  --radius:12px;
+  --f-head:'Poppins',sans-serif; --f-body:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--f-body);font-size:15px;color:var(--text);background:var(--lavender);-webkit-font-smoothing:antialiased;min-height:100dvh;display:flex;flex-direction:column}
+a{text-decoration:none;color:inherit}
+
+/* ── HEADER ── */
+.hdr{
+  background:var(--white);border-bottom:1px solid var(--border);
+  padding:16px 24px;
+  display:flex;align-items:center;gap:14px;
+}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-logo-img{width:36px;height:36px;border-radius:8px;object-fit:cover}
+.hdr-brand-name{font-family:var(--f-head);font-weight:700;font-size:1rem;color:var(--text)}
+.hdr-vozavi{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--text-3)}
+.hdr-vozavi svg{height:16px;width:auto;opacity:.6}
+
+/* ── THANKS HERO ── */
+.thanks-wrap{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:40px 20px 80px;
+}
+.thanks-card{
+  background:var(--white);border-radius:var(--radius);
+  box-shadow:var(--shadow-md);
+  padding:52px 40px;max-width:480px;width:100%;
+  text-align:center;
+}
+.thanks-icon{
+  width:72px;height:72px;border-radius:50%;
+  background:var(--brand-pale,#E5F8F2);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 24px;
+  font-size:2.25rem;
+  animation:popIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popIn{
+  from{transform:scale(0);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+@media(prefers-reduced-motion:reduce){.thanks-icon{animation:none}}
+
+.thanks-title{
+  font-family:var(--f-head);font-weight:700;font-size:clamp(1.375rem,3vw,1.75rem);
+  color:var(--text);letter-spacing:-.025em;margin-bottom:12px;line-height:1.25;text-wrap:balance;
+}
+.thanks-msg{
+  font-size:.9375rem;color:var(--text-2);line-height:1.72;margin-bottom:28px;
+  max-width:360px;margin-left:auto;margin-right:auto;
+}
+.thanks-brand{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:.8125rem;color:var(--text-3);
+  padding-top:24px;border-top:1px solid var(--border);margin-top:8px;width:100%;justify-content:center;
+  transition:color .2s,opacity .2s;
+}
+.thanks-brand:hover{color:var(--text-2)}
+.thanks-brand svg.main-logo{height:14px;width:auto;opacity:.5;transition:opacity .2s}
+.thanks-brand:hover svg.main-logo{opacity:.8}
+.thanks-brand-arrow{
+  width:12px;height:12px;flex-shrink:0;
+  opacity:0;transform:translateX(-5px);
+  transition:opacity .22s,transform .22s;
+}
+.thanks-brand:hover .thanks-brand-arrow{opacity:.55;transform:translateX(0)}
+
+@media(max-width:480px){
+  .thanks-card{padding:36px 24px}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-brand">
+    {% if vform.logo %}
+      <img class="hdr-logo-img" src="{{ vform.logo.url }}" alt="{{ vform.brand_name }}">
+    {% endif %}
+    {% if vform.brand_name %}
+      <span class="hdr-brand-name">{{ vform.brand_name }}</span>
+    {% endif %}
+  </div>
+  <div class="hdr-vozavi">
+    <span>Propulsé par</span>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64">
+      <path d="M10 14 a10 10 0 0 1 10-10 h24 a10 10 0 0 1 10 10 v20 a10 10 0 0 1-10 10 h-14 l-9 9 v-9 h-1 a10 10 0 0 1-10-10 z" fill="#4F46B8"/>
+      <path d="M32 12 l3.4 6.9 7.6 1.1 -5.5 5.4 1.3 7.6 -6.8-3.6 -6.8 3.6 1.3-7.6 -5.5-5.4 7.6-1.1 z" fill="#F2A93B"/>
+      <text x="68" y="40" font-size="28" font-weight="600" fill="#4F46B8" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
+    </svg>
+  </div>
+</header>
+
+<div class="thanks-wrap">
+  <div class="thanks-card">
+    <div class="thanks-icon">🙏</div>
+    <h1 class="thanks-title">Merci pour votre avis !</h1>
+    <p class="thanks-msg">
+      Votre réponse a bien été enregistrée.
+      {% if vform.brand_name %}Merci à vous de faire confiance à <strong>{{ vform.brand_name }}</strong>.{% endif %}
+      Votre avis nous aide à améliorer notre service au quotidien.
+    </p>
+    <a href="{% url 'home' %}" class="thanks-brand" target="_blank" rel="noopener" aria-label="Découvrir Vozavi — créez votre propre formulaire gratuitement">
+      <span>Formulaire créé avec</span>
+      <svg class="main-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64">
+        <path d="M10 14 a10 10 0 0 1 10-10 h24 a10 10 0 0 1 10 10 v20 a10 10 0 0 1-10 10 h-14 l-9 9 v-9 h-1 a10 10 0 0 1-10-10 z" fill="#4F46B8"/>
+        <path d="M32 12 l3.4 6.9 7.6 1.1 -5.5 5.4 1.3 7.6 -6.8-3.6 -6.8 3.6 1.3-7.6 -5.5-5.4 7.6-1.1 z" fill="#F2A93B"/>
+        <text x="68" y="40" font-size="28" font-weight="600" fill="#4F46B8" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
+      </svg>
+      <svg class="thanks-brand-arrow" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+</div>
+
+</body>
+</html>

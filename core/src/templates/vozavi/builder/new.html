@@ -1,0 +1,295 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<title>Nouveau formulaire — Vozavi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --indigo:#4F46B8; --indigo-d:#3D35A0; --indigo-pale:#EEEDFB; --indigo-mid:#E4E2F8;
+  --amber:#F2A93B; --amber-pale:#FEF6E7;
+  --green:#1D9E75; --green-pale:#E5F8F2;
+  --lavender:#F4F3FB; --lavender-d:#ECEAF7;
+  --white:#fff; --text:#2C2C3A; --text-2:#5C5C72; --text-3:#9B9BB5;
+  --border:#E2E1F0; --border-2:#EDECED;
+  --shadow-sm:0 1px 4px rgba(44,44,58,.07);
+  --shadow:0 2px 8px rgba(44,44,58,.08);
+  --shadow-md:0 8px 24px rgba(44,44,58,.12);
+  --radius:12px; --radius-sm:8px;
+  --f-head:'Poppins',sans-serif; --f-body:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--f-body);font-size:15px;color:var(--text);background:var(--lavender);-webkit-font-smoothing:antialiased;min-height:100dvh}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+
+/* ── HEADER ── */
+.hdr{
+  position:sticky;top:0;z-index:200;
+  height:60px;background:var(--white);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:12px;
+}
+.hdr-logo{display:flex;align-items:center;gap:8px;flex-shrink:0;color:var(--text)}
+.hdr-logo svg{height:22px;width:auto}
+.hdr-back{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--f-head);font-size:.8125rem;font-weight:500;
+  color:var(--text-2);padding:6px 11px;border-radius:var(--radius-sm);
+  transition:background .14s,color .14s;margin-left:auto;
+}
+.hdr-back:hover{background:var(--lavender);color:var(--indigo)}
+.hdr-back svg{width:14px;height:14px}
+
+/* ── PROGRESS STEPPER ── */
+.stepper{
+  display:flex;align-items:center;justify-content:center;
+  gap:0;padding:28px 24px 0;
+  max-width:560px;margin:0 auto;
+}
+.step{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--f-head);font-size:.8125rem;font-weight:500;
+  color:var(--text-3);flex-shrink:0;
+}
+.step-num{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:700;
+  background:#F0EFF8;color:var(--text-3);
+  transition:all .2s;
+}
+.step.active .step-num{background:var(--indigo);color:var(--white)}
+.step.active{color:var(--text)}
+.step.done .step-num{background:var(--green);color:var(--white)}
+.step.done{color:var(--text-2)}
+.step-line{flex:1;height:2px;background:var(--border);min-width:32px;max-width:80px}
+.step-line.done{background:var(--green)}
+
+/* ── PAGE CONTENT ── */
+.page{max-width:860px;margin:0 auto;padding:32px 24px 72px}
+.page-head{text-align:center;margin-bottom:36px}
+.page-title{
+  font-family:var(--f-head);font-weight:700;font-size:clamp(1.375rem,3vw,1.75rem);
+  color:var(--text);letter-spacing:-.025em;line-height:1.25;margin-bottom:10px;
+  text-wrap:balance;
+}
+.page-sub{font-size:.9375rem;color:var(--text-2);line-height:1.65}
+
+/* ── TEMPLATE GRID ── */
+.tpl-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:14px;
+}
+@media(min-width:600px){.tpl-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:820px){.tpl-grid{grid-template-columns:repeat(3,1fr)}}
+
+.tpl-form{display:contents}
+.tpl-card{
+  position:relative;
+  background:var(--white);border-radius:var(--radius);
+  border:2px solid var(--border);
+  padding:24px 22px 22px;
+  cursor:pointer;
+  transition:border-color .18s,box-shadow .18s,transform .15s;
+  display:flex;flex-direction:column;gap:10px;
+}
+.tpl-card:hover{
+  border-color:var(--indigo);
+  box-shadow:var(--shadow-md);
+  transform:translateY(-2px);
+}
+.tpl-card.scratch{
+  border-style:dashed;
+  border-color:var(--border);
+  background:var(--lavender);
+}
+.tpl-card.scratch:hover{
+  border-color:var(--indigo);
+  background:var(--indigo-pale);
+}
+.tpl-em{font-size:2rem;line-height:1;margin-bottom:4px}
+.tpl-name{
+  font-family:var(--f-head);font-weight:600;font-size:.9375rem;
+  color:var(--text);line-height:1.3;
+}
+.tpl-desc{font-size:.8125rem;color:var(--text-2);line-height:1.6}
+.tpl-qs{
+  margin-top:auto;
+  display:flex;align-items:center;gap:5px;
+  font-size:.75rem;color:var(--text-3);font-weight:500;
+}
+.tpl-qs svg{width:12px;height:12px;flex-shrink:0}
+
+.tpl-select-btn{
+  position:absolute;inset:0;border-radius:var(--radius);
+  opacity:0;
+}
+.u-menu{position:relative}
+.u-av{width:34px;height:34px;border-radius:50%;background:var(--indigo);color:var(--white);font-family:var(--f-head);font-weight:700;font-size:.75rem;display:flex;align-items:center;justify-content:center;cursor:pointer;outline:2px solid transparent;outline-offset:2px;transition:outline-color .15s;border:none}
+.u-av:hover,.u-menu.open .u-av{outline-color:#E4E2F8}
+.u-drop{position:absolute;right:0;top:calc(100% + 8px);background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:6px;min-width:190px;box-shadow:var(--shadow-md);display:none;z-index:300}
+.u-menu.open .u-drop{display:block}
+.u-drop-head{padding:8px 10px 10px;border-bottom:1px solid var(--border);margin-bottom:6px}
+.u-drop-name{font-family:var(--f-head);font-weight:600;font-size:.875rem;color:var(--text)}
+.u-drop-email{font-size:.75rem;color:var(--text-3);margin-top:1px}
+.d-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;font-size:.875rem;color:var(--text-2);transition:background .12s,color .12s;width:100%}
+.d-item:hover{background:var(--lavender);color:var(--text)}
+.d-item.danger:hover{background:#FEF2F2;color:#E24B4A}
+.d-sep{height:1px;background:var(--border);margin:4px 0}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="{% url 'dashboard' %}" class="hdr-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64">
+      <path d="M10 14 a10 10 0 0 1 10-10 h24 a10 10 0 0 1 10 10 v20 a10 10 0 0 1-10 10 h-14 l-9 9 v-9 h-1 a10 10 0 0 1-10-10 z" fill="#4F46B8"/>
+      <path d="M32 12 l3.4 6.9 7.6 1.1 -5.5 5.4 1.3 7.6 -6.8-3.6 -6.8 3.6 1.3-7.6 -5.5-5.4 7.6-1.1 z" fill="#F2A93B"/>
+      <text x="68" y="40" font-size="28" font-weight="600" fill="#4F46B8" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
+    </svg>
+  </a>
+  <a href="{% url 'dashboard' %}" class="hdr-back">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Retour au tableau de bord
+  </a>
+  <div class="u-menu" id="user-menu">
+    <button class="u-av" onclick="document.getElementById('user-menu').classList.toggle('open')" aria-label="Menu utilisateur">{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}{% if not request.user.first_name %}{{ request.user.username|slice:":2"|upper }}{% endif %}</button>
+    <div class="u-drop">
+      <div class="u-drop-head">
+        <div class="u-drop-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+        <div class="u-drop-email">{{ request.user.email }}</div>
+      </div>
+      <div class="d-sep"></div>
+      <a href="{% url 'logout' %}" class="d-item danger">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M5 7h7M9 4.5L12 7l-3 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Se déconnecter
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="stepper">
+  <div class="step active">
+    <span class="step-num">1</span>
+    <span>Modèle</span>
+  </div>
+  <div class="step-line"></div>
+  <div class="step">
+    <span class="step-num">2</span>
+    <span>Personnaliser</span>
+  </div>
+  <div class="step-line"></div>
+  <div class="step">
+    <span class="step-num">3</span>
+    <span>Partager</span>
+  </div>
+</div>
+
+<main class="page">
+  <div class="page-head">
+    <h1 class="page-title">Quel type d'avis voulez-vous recueillir ?</h1>
+    <p class="page-sub">Choisissez un modèle prérempli ou partez de zéro pour créer votre formulaire.</p>
+  </div>
+
+  <div class="tpl-grid">
+
+    <form method="post" action="{% url 'new_form' %}" class="tpl-form">
+      {% csrf_token %}
+      <input type="hidden" name="template_key" value="restaurant">
+      <button type="submit" class="tpl-card" title="Utiliser le modèle Restaurant">
+        <div class="tpl-em">🍽️</div>
+        <div class="tpl-name">Restaurant</div>
+        <div class="tpl-desc">Expérience globale, repas, ambiance, service et rapport qualité/prix.</div>
+        <div class="tpl-qs">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          4 questions
+        </div>
+      </button>
+    </form>
+
+    <form method="post" action="{% url 'new_form' %}" class="tpl-form">
+      {% csrf_token %}
+      <input type="hidden" name="template_key" value="service">
+      <button type="submit" class="tpl-card" title="Utiliser le modèle Prestation">
+        <div class="tpl-em">💼</div>
+        <div class="tpl-name">Prestation de service</div>
+        <div class="tpl-desc">Qualité du travail, délais, communication et recommandation.</div>
+        <div class="tpl-qs">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          4 questions
+        </div>
+      </button>
+    </form>
+
+    <form method="post" action="{% url 'new_form' %}" class="tpl-form">
+      {% csrf_token %}
+      <input type="hidden" name="template_key" value="boutique">
+      <button type="submit" class="tpl-card" title="Utiliser le modèle Boutique">
+        <div class="tpl-em">🛍️</div>
+        <div class="tpl-name">Boutique</div>
+        <div class="tpl-desc">Expérience d'achat, accueil, disponibilité des produits et propreté.</div>
+        <div class="tpl-qs">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          4 questions
+        </div>
+      </button>
+    </form>
+
+    <form method="post" action="{% url 'new_form' %}" class="tpl-form">
+      {% csrf_token %}
+      <input type="hidden" name="template_key" value="livraison">
+      <button type="submit" class="tpl-card" title="Utiliser le modèle Livraison">
+        <div class="tpl-em">🚚</div>
+        <div class="tpl-name">Livraison</div>
+        <div class="tpl-desc">État du colis, respect des délais et satisfaction de la livraison.</div>
+        <div class="tpl-qs">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          4 questions
+        </div>
+      </button>
+    </form>
+
+    <form method="post" action="{% url 'new_form' %}" class="tpl-form">
+      {% csrf_token %}
+      <input type="hidden" name="template_key" value="employes">
+      <button type="submit" class="tpl-card" title="Utiliser le modèle Feedback employés">
+        <div class="tpl-em">🏢</div>
+        <div class="tpl-name">Feedback employés</div>
+        <div class="tpl-desc">Satisfaction au travail, ambiance d'équipe, charge et reconnaissance.</div>
+        <div class="tpl-qs">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          4 questions
+        </div>
+      </button>
+    </form>
+
+    <form method="post" action="{% url 'new_form' %}" class="tpl-form">
+      {% csrf_token %}
+      <input type="hidden" name="template_key" value="scratch">
+      <button type="submit" class="tpl-card scratch" title="Créer un formulaire de zéro">
+        <div class="tpl-em">➕</div>
+        <div class="tpl-name">Partir de zéro</div>
+        <div class="tpl-desc">Formulaire vierge — ajoutez vos propres questions librement.</div>
+        <div class="tpl-qs">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          2 questions de départ
+        </div>
+      </button>
+    </form>
+
+  </div>
+</main>
+
+<script>
+document.addEventListener('click',function(e){if(!e.target.closest('.u-menu'))document.querySelectorAll('.u-menu.open').forEach(function(m){m.classList.remove('open')});});
+</script>
+</body>
+</html>

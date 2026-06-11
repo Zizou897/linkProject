@@ -1,0 +1,716 @@
+{% load static custom_tags %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<title>Résultats —{{ vform.title }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --indigo:#4F46B8;--indigo-pale:#EEEDF9;--indigo-mid:#6B63C8;
+  --amber:#F2A93B;--amber-pale:#FEF5E4;
+  --green:#1D9E75;--green-pale:#E5F8F2;
+  --red:#E24B4A;--red-pale:#FDEAEA;
+  --orange:#E07A30;
+  --lavender:#F4F3FB;--white:#fff;
+  --text:#2C2C3A;--text-2:#5C5C72;--text-3:#9B9BB5;
+  --border:#E2E1F0;--border-2:#D0CEEB;
+  --shadow:0 1px 4px rgba(44,44,58,.07);
+  --shadow-md:0 4px 16px rgba(44,44,58,.10);
+  --shadow-lg:0 8px 32px rgba(44,44,58,.13);
+  --radius:12px;--radius-sm:8px;--radius-xs:6px;
+  --f-head:'Poppins',sans-serif;--f-body:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--f-body);font-size:15px;color:var(--text);background:var(--lavender);-webkit-font-smoothing:antialiased;min-height:100dvh}
+a{text-decoration:none;color:inherit}
+button{font-family:var(--f-body);cursor:pointer;border:none;background:none}
+
+/* ── HEADER ───────────────────────────────────────────────────────────────── */
+.hdr{
+  position:sticky;top:0;z-index:100;
+  background:var(--white);border-bottom:1px solid var(--border);
+  height:60px;display:flex;align-items:center;gap:12px;padding:0 20px;
+}
+.hdr-logo{display:flex;align-items:center;flex-shrink:0}
+.hdr-logo svg{height:22px;width:auto}
+.hdr-div{width:1px;height:24px;background:var(--border);flex-shrink:0}
+.hdr-title{
+  font-family:var(--f-head);font-weight:600;font-size:.875rem;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px;
+}
+.hdr-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:.6875rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  background:var(--indigo-pale);color:var(--indigo);
+  padding:3px 8px;border-radius:20px;flex-shrink:0;
+}
+.hdr-space{flex:1}
+.hdr-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  height:34px;padding:0 14px;border-radius:var(--radius-xs);
+  font-size:.8125rem;font-weight:500;transition:background .15s,color .15s;
+  white-space:nowrap;flex-shrink:0;
+}
+.hdr-btn-ghost{border:1px solid var(--border-2);color:var(--text-2)}
+.hdr-btn-ghost:hover{background:var(--lavender)}
+.hdr-btn-ghost svg{width:14px;height:14px;opacity:.7}
+
+/* Export dropdown */
+.exp-wrap{position:relative;flex-shrink:0}
+.exp-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  height:34px;padding:0 14px;border-radius:var(--radius-xs);
+  background:var(--indigo);color:var(--white);
+  font-size:.8125rem;font-weight:500;transition:background .15s;
+}
+.exp-btn:hover{background:var(--indigo-mid)}
+.exp-btn svg{width:14px;height:14px}
+.exp-drop{
+  position:absolute;right:0;top:calc(100% + 6px);
+  background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);
+  box-shadow:var(--shadow-lg);min-width:160px;
+  opacity:0;visibility:hidden;transform:translateY(-4px);
+  transition:opacity .15s,transform .15s,visibility .15s;z-index:200;
+}
+.exp-drop.open{opacity:1;visibility:visible;transform:translateY(0)}
+.exp-drop a{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;font-size:.8125rem;color:var(--text);transition:background .1s;
+}
+.exp-drop a:hover{background:var(--lavender)}
+.exp-drop a svg{width:15px;height:15px;color:var(--text-3)}
+.exp-drop a:not(:last-child){border-bottom:1px solid var(--border)}
+
+/* User avatar */
+.u-menu{position:relative;flex-shrink:0}
+.u-av{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--indigo);color:var(--white);
+  font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:opacity .15s;border:none;text-transform:uppercase;
+}
+.u-av:hover{opacity:.85}
+.u-drop{
+  position:absolute;right:0;top:calc(100% + 8px);
+  background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);
+  box-shadow:var(--shadow-lg);min-width:200px;
+  opacity:0;visibility:hidden;transform:translateY(-4px);
+  transition:opacity .15s,transform .15s,visibility .15s;z-index:200;
+}
+.u-drop.open{opacity:1;visibility:visible;transform:translateY(0)}
+.u-drop-info{padding:12px 14px;border-bottom:1px solid var(--border)}
+.u-drop-name{font-weight:600;font-size:.8125rem;color:var(--text)}
+.u-drop-email{font-size:.75rem;color:var(--text-3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.u-drop-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;font-size:.8125rem;color:var(--text);
+  transition:background .1s;cursor:pointer;
+}
+.u-drop-item:hover{background:var(--lavender)}
+.u-drop-item svg{width:15px;height:15px;color:var(--text-3)}
+
+/* ── ALERT BANNER ─────────────────────────────────────────────────────────── */
+.alert-neg{
+  background:#FFF3CD;border-bottom:2px solid var(--amber);
+  display:flex;align-items:center;gap:10px;
+  padding:12px 24px;font-size:.875rem;color:#7A5000;
+}
+.alert-neg svg{width:18px;height:18px;color:var(--amber);flex-shrink:0}
+.alert-neg strong{font-weight:600}
+
+/* ── PAGE BODY ────────────────────────────────────────────────────────────── */
+.page{max-width:900px;margin:0 auto;padding:32px 20px 80px}
+
+/* ── KPI ROW ──────────────────────────────────────────────────────────────── */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.kpi-card{
+  background:var(--white);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px 22px;position:relative;overflow:hidden;
+}
+.kpi-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--indigo);
+}
+.kpi-label{font-size:.75rem;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.kpi-val{font-family:var(--f-head);font-size:2rem;font-weight:700;color:var(--text);line-height:1}
+.kpi-sub{font-size:.75rem;color:var(--text-3);margin-top:4px}
+.kpi-avg .kpi-val{color:var(--indigo)}
+.kpi-last .kpi-val{font-size:1rem;font-weight:600;margin-top:4px}
+
+/* Stars in KPI */
+.kpi-stars{
+  font-size:1.1rem;margin-top:6px;
+  background:linear-gradient(90deg,var(--amber) var(--pct),#E2E1F0 var(--pct));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* ── EMPTY STATE ──────────────────────────────────────────────────────────── */
+.empty-state{
+  background:var(--white);border:1px solid var(--border);border-radius:var(--radius);
+  padding:60px 40px;text-align:center;
+}
+.empty-icon{font-size:2.5rem;margin-bottom:16px}
+.empty-title{font-family:var(--f-head);font-weight:600;font-size:1.125rem;color:var(--text);margin-bottom:8px}
+.empty-msg{font-size:.9rem;color:var(--text-2);max-width:360px;margin:0 auto 24px;line-height:1.65}
+.share-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  height:38px;padding:0 18px;border-radius:var(--radius-sm);
+  background:var(--indigo);color:var(--white);font-size:.875rem;font-weight:500;
+  transition:background .15s;
+}
+.share-btn:hover{background:var(--indigo-mid)}
+
+/* ── QUESTION CARDS ───────────────────────────────────────────────────────── */
+.q-section{display:flex;flex-direction:column;gap:18px}
+.q-card{
+  background:var(--white);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;
+}
+.q-card-head{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:18px 22px;border-bottom:1px solid var(--border);
+}
+.q-num{
+  width:26px;height:26px;border-radius:6px;background:var(--indigo-pale);
+  color:var(--indigo);font-size:.75rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+}
+.q-label{font-weight:600;font-size:.9375rem;color:var(--text);line-height:1.4;flex:1}
+.q-type-badge{
+  font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;
+  padding:3px 8px;border-radius:20px;flex-shrink:0;
+}
+.q-type-badge.rating{background:var(--amber-pale);color:#8A5A00}
+.q-type-badge.single_choice,.q-type-badge.multiple_choice{background:var(--indigo-pale);color:var(--indigo)}
+.q-type-badge.text{background:var(--green-pale);color:#0F6B50}
+.q-type-badge.grid{background:#F0F0F5;color:var(--text-2)}
+.q-count{font-size:.8rem;color:var(--text-3);flex-shrink:0;white-space:nowrap;align-self:center}
+.q-card-body{padding:22px}
+
+/* ── RATING STATS ─────────────────────────────────────────────────────────── */
+.rating-top{display:flex;align-items:center;gap:24px;margin-bottom:20px}
+.rating-big{text-align:center;flex-shrink:0}
+.rating-big-num{font-family:var(--f-head);font-size:3rem;font-weight:700;color:var(--indigo);line-height:1}
+.rating-big-max{font-size:.875rem;color:var(--text-3);margin-top:2px}
+.rating-big-stars{
+  font-size:1.4rem;margin-top:8px;
+  background:linear-gradient(90deg,var(--amber) var(--pct),#E2E1F0 var(--pct));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.rating-qual{
+  display:inline-block;margin-top:8px;
+  font-size:.75rem;font-weight:600;letter-spacing:.03em;
+  padding:3px 10px;border-radius:20px;
+}
+.qual-excellent,.qual-très-bien{background:var(--green-pale);color:#0F6B50}
+.qual-bien{background:var(--amber-pale);color:#8A5A00}
+.qual-passable{background:#FEE9DC;color:#8A3A00}
+.qual-à-améliorer{background:var(--red-pale);color:#8A1A1A}
+
+.dist-rows{flex:1;min-width:0}
+.dist-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.dist-row:last-child{margin-bottom:0}
+.dist-star-label{
+  font-size:.8125rem;color:var(--text-2);white-space:nowrap;
+  display:flex;align-items:center;gap:3px;width:36px;flex-shrink:0;
+}
+.dist-star-icon{color:var(--amber);font-size:.85rem}
+.dist-bar-wrap{flex:1;height:10px;background:var(--lavender);border-radius:6px;overflow:hidden;min-width:0}
+.dist-bar{height:100%;border-radius:6px;transition:width .4s ease;min-width:2px}
+.dist-bar[data-star="5"]{background:var(--green)}
+.dist-bar[data-star="4"]{background:#3BB67D}
+.dist-bar[data-star="3"]{background:var(--amber)}
+.dist-bar[data-star="2"]{background:var(--orange)}
+.dist-bar[data-star="1"]{background:var(--red)}
+.dist-cnt{font-size:.75rem;color:var(--text-3);width:28px;text-align:right;flex-shrink:0}
+.dist-pct{font-size:.75rem;color:var(--text-3);width:34px;text-align:right;flex-shrink:0}
+
+/* ── CHOICE BARS ──────────────────────────────────────────────────────────── */
+.choice-rows{display:flex;flex-direction:column;gap:10px}
+.choice-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.choice-lbl{font-size:.875rem;color:var(--text);margin-bottom:4px}
+.choice-bar-outer{
+  display:flex;align-items:center;gap:8px;
+}
+.choice-bar-wrap{flex:1;height:10px;background:var(--lavender);border-radius:6px;overflow:hidden}
+.choice-bar{height:100%;background:var(--indigo);border-radius:6px;transition:width .4s ease;min-width:2px}
+.choice-meta{font-size:.75rem;color:var(--text-3);white-space:nowrap}
+
+/* ── TEXT COMMENTS ────────────────────────────────────────────────────────── */
+.comments-list{display:flex;flex-direction:column;gap:10px;max-height:320px;overflow-y:auto}
+.comments-list::-webkit-scrollbar{width:4px}
+.comments-list::-webkit-scrollbar-track{background:var(--lavender);border-radius:2px}
+.comments-list::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:2px}
+.comment-item{
+  background:var(--lavender);border-radius:var(--radius-sm);
+  padding:12px 14px;font-size:.875rem;color:var(--text-2);line-height:1.6;
+  border-left:3px solid var(--indigo-pale);
+  position:relative;
+}
+.comment-item::before{
+  content:'"';position:absolute;top:6px;right:12px;
+  font-family:Georgia,serif;font-size:1.5rem;color:var(--border-2);line-height:1;
+}
+.comments-empty{
+  text-align:center;padding:32px 20px;color:var(--text-3);font-size:.875rem;
+}
+
+/* ── GRID ─────────────────────────────────────────────────────────────────── */
+.grid-info{
+  font-size:.875rem;color:var(--text-2);line-height:1.6;
+}
+.grid-criteria{
+  display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;
+}
+.grid-chip{
+  background:var(--lavender);border:1px solid var(--border);
+  border-radius:20px;padding:4px 12px;font-size:.8rem;color:var(--text-2);
+}
+
+/* ── CONTACT TABLE ─────────────────────────────────────────────────────────── */
+.contact-tbl{width:100%;border-collapse:collapse;font-size:.875rem;min-width:480px}
+.contact-tbl th{
+  text-align:left;padding:8px 12px;
+  font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--text-3);border-bottom:2px solid var(--border);
+  font-family:var(--f-head);white-space:nowrap;
+}
+.contact-tbl td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.contact-tbl tr:last-child td{border-bottom:none}
+.contact-tbl tr:hover td{background:var(--lavender)}
+
+/* ── NO DATA (0 responses for a question) ──────────────────────────────────── */
+.q-no-data{
+  text-align:center;padding:32px;color:var(--text-3);font-size:.875rem;
+}
+
+/* ── SECTION HEADER ───────────────────────────────────────────────────────── */
+.section-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.section-title{
+  font-family:var(--f-head);font-size:.8125rem;font-weight:600;
+  color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;
+}
+
+/* ── INDIVIDUAL RESPONSES ─────────────────────────────────────────────────── */
+.resp-section{margin-top:40px}
+
+.resp-card{
+  background:var(--white);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;margin-bottom:12px;transition:box-shadow .15s;
+}
+.resp-card:hover{box-shadow:var(--shadow-md)}
+
+.resp-card-head{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 20px;border-bottom:1px solid var(--border);
+  background:var(--lavender);
+}
+.resp-num{
+  font-family:var(--f-head);font-size:.75rem;font-weight:700;color:var(--indigo);
+  background:var(--indigo-pale);padding:3px 9px;border-radius:20px;flex-shrink:0;
+}
+.resp-date{font-size:.8rem;color:var(--text-3);margin-left:auto}
+.resp-neg-flag{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:.6875rem;font-weight:600;color:#8A1A1A;
+  background:var(--red-pale);border-radius:20px;padding:2px 8px;flex-shrink:0;
+}
+
+.resp-card-body{padding:0}
+.resp-qa-row{
+  display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);
+  gap:12px;align-items:start;
+  padding:12px 20px;border-bottom:1px solid var(--border);
+}
+.resp-qa-row:last-child{border-bottom:none}
+.resp-q{font-size:.8125rem;color:var(--text-3);line-height:1.5}
+.resp-a{font-size:.875rem;color:var(--text);line-height:1.5;word-break:break-word}
+.resp-a-empty{color:var(--text-3);font-style:italic}
+
+/* Rating cell */
+.resp-rating-wrap{display:flex;align-items:center;gap:8px}
+.resp-stars{
+  font-size:1rem;
+  background:linear-gradient(90deg,var(--amber) var(--pct),#E2E1F0 var(--pct));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1;
+}
+.resp-rating-num{
+  font-family:var(--f-head);font-weight:700;font-size:.875rem;color:var(--text-2);
+}
+
+/* Choice cell */
+.resp-choice-tag{
+  display:inline-block;background:var(--indigo-pale);color:var(--indigo);
+  border-radius:20px;padding:2px 10px;font-size:.8125rem;font-weight:500;
+  margin:2px 4px 2px 0;
+}
+.resp-choice-tag.multi{background:var(--green-pale);color:#0F6B50}
+
+/* ── PAGINATION ───────────────────────────────────────────────────────────── */
+.pager{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  margin-top:24px;flex-wrap:wrap;
+}
+.pager-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:36px;height:36px;padding:0 10px;
+  border:1px solid var(--border);border-radius:var(--radius-xs);
+  font-size:.8125rem;color:var(--text-2);background:var(--white);
+  transition:all .13s;text-decoration:none;
+}
+.pager-btn:hover{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-pale)}
+.pager-btn.active{background:var(--indigo);color:var(--white);border-color:var(--indigo);font-weight:600;pointer-events:none}
+.pager-btn.disabled{opacity:.35;pointer-events:none}
+.pager-info{font-size:.8rem;color:var(--text-3);padding:0 8px}
+
+/* ── RESPONSIVE ───────────────────────────────────────────────────────────── */
+@media(max-width:680px){
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .kpi-card:nth-child(3){grid-column:span 2}
+  .hdr-title{max-width:140px}
+  .rating-top{flex-direction:column;gap:16px;align-items:flex-start}
+  .dist-rows{width:100%}
+  .resp-qa-row{grid-template-columns:1fr;gap:4px}
+  .resp-q{color:var(--text-2);font-weight:500}
+}
+@media(max-width:420px){
+  .kpi-row{grid-template-columns:1fr}
+  .kpi-card:nth-child(3){grid-column:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="hdr">
+  <div class="hdr-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64" aria-label="Vozavi">
+      <path d="M10 14 a10 10 0 0 1 10-10 h24 a10 10 0 0 1 10 10 v20 a10 10 0 0 1-10 10 h-14 l-9 9 v-9 h-1 a10 10 0 0 1-10-10 z" fill="#4F46B8"/>
+      <path d="M32 12 l3.4 6.9 7.6 1.1 -5.5 5.4 1.3 7.6 -6.8-3.6 -6.8 3.6 1.3-7.6 -5.5-5.4 7.6-1.1 z" fill="#F2A93B"/>
+      <text x="68" y="40" font-size="28" font-weight="600" fill="#4F46B8" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
+    </svg>
+  </div>
+  <div class="hdr-div"></div>
+  <span class="hdr-title" title="{{ vform.title }}">{{ vform.title }}</span>
+  <span class="hdr-tag">Résultats</span>
+  <div class="hdr-space"></div>
+  <a href="{% url 'form_responses' vform.pk %}" class="hdr-btn hdr-btn-ghost">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H9l-3 3v-3H3a1 1 0 0 1-1-1V4z"/></svg>
+    Avis
+  </a>
+  <a href="{% url 'edit_form' vform.pk %}" class="hdr-btn hdr-btn-ghost">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg>
+    Éditer
+  </a>
+  {% if vform.status == 'active' %}
+  <a href="{% url 'share_form' vform.pk %}" class="hdr-btn hdr-btn-ghost">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="4" r="1.5"/><circle cx="4" cy="8" r="1.5"/><circle cx="12" cy="12" r="1.5"/><path d="M5.5 7.2l5-2.4M5.5 8.8l5 2.4"/></svg>
+    Partager
+  </a>
+  {% endif %}
+  <!-- Export dropdown -->
+  <div class="exp-wrap">
+    <button class="exp-btn" id="expBtn" aria-expanded="false" aria-haspopup="true">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8M5 7l3 3 3-3"/><path d="M3 11v2a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-2"/></svg>
+      Exporter
+      <svg viewBox="0 0 10 6" fill="currentColor" style="width:10px;height:6px;opacity:.7"><path d="M0 0l5 6 5-6z"/></svg>
+    </button>
+    <div class="exp-drop" id="expDrop" role="menu">
+      <a href="{% url 'export_results_csv' vform.pk %}" role="menuitem">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M5 8h6M5 5h6M5 11h4"/></svg>
+        Exporter CSV
+      </a>
+      <a href="{% url 'export_results_excel' vform.pk %}" role="menuitem">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M5.5 5.5L8 8m0 0l2.5 2.5M8 8L5.5 10.5M8 8l2.5-2.5"/></svg>
+        Exporter Excel
+      </a>
+    </div>
+  </div>
+  <!-- User avatar -->
+  <div class="u-menu">
+    <button class="u-av" id="uBtn" aria-expanded="false" aria-haspopup="true">
+      {{ request.user.username|slice:":2"|upper }}
+    </button>
+    <div class="u-drop" id="uDrop" role="menu">
+      <div class="u-drop-info">
+        <div class="u-drop-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+        <div class="u-drop-email">{{ request.user.email }}</div>
+      </div>
+      <a href="{% url 'dashboard' %}" class="u-drop-item">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+        Tableau de bord
+      </a>
+      <a href="{% url 'logout' %}" class="u-drop-item">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 4l4 4-4 4M14 8H6"/><path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>
+        Déconnexion
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ── ALERT BANNER ── -->
+{% if negative_count %}
+<div class="alert-neg" role="alert">
+  <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.645-1.743-2.98l5.58-9.92zM11 13a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-1-3a1 1 0 0 1-1-1V7a1 1 0 1 1 2 0v2a1 1 0 0 1-1 1z" clip-rule="evenodd"/></svg>
+  <span><strong>{{ negative_count }} avis négatif{{ negative_count|pluralize }}</strong> (note ≤ 2) reçu{{ negative_count|pluralize }} au cours des 7 derniers jours.</span>
+</div>
+{% endif %}
+
+<!-- ── PAGE BODY ── -->
+<main class="page">
+
+  <!-- KPI row -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">Réponses totales</div>
+      <div class="kpi-val">{{ total }}</div>
+      <div class="kpi-sub">
+        {% if total == 0 %}Aucune réponse pour l'instant
+        {% elif total == 1 %}répondant
+        {% else %}répondants
+        {% endif %}
+      </div>
+    </div>
+    <div class="kpi-card kpi-avg">
+      <div class="kpi-label">Note moyenne</div>
+      {% if global_avg %}
+        <div class="kpi-val">{{ global_avg }}</div>
+        <div class="kpi-stars" style="--pct:{{ global_avg_pct }}%">★★★★★</div>
+      {% else %}
+        <div class="kpi-val" style="font-size:1.25rem;color:var(--text-3)">—</div>
+        <div class="kpi-sub">Aucune question de note</div>
+      {% endif %}
+    </div>
+    <div class="kpi-card kpi-last">
+      <div class="kpi-label">Dernière réponse</div>
+      {% if last_response %}
+        <div class="kpi-val">{{ last_response|date:"d M Y" }}</div>
+        <div class="kpi-sub">{{ last_response|date:"H:i" }}</div>
+      {% else %}
+        <div class="kpi-val" style="font-size:1rem;color:var(--text-3);margin-top:8px">Aucune</div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if total == 0 %}
+  <!-- Empty state -->
+  <div class="empty-state">
+    <div class="empty-icon">📋</div>
+    <h2 class="empty-title">Aucune réponse pour le moment</h2>
+    <p class="empty-msg">
+      {% if vform.status == 'active' %}
+        Votre formulaire est actif. Partagez le lien pour commencer à collecter des avis.
+      {% else %}
+        Publiez votre formulaire pour commencer à recevoir des réponses.
+      {% endif %}
+    </p>
+    {% if vform.status == 'active' %}
+      <a href="{% url 'share_form' vform.pk %}" class="share-btn">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:15px;height:15px"><circle cx="12" cy="4" r="1.5"/><circle cx="4" cy="8" r="1.5"/><circle cx="12" cy="12" r="1.5"/><path d="M5.5 7.2l5-2.4M5.5 8.8l5 2.4"/></svg>
+        Partager le formulaire
+      </a>
+    {% else %}
+      <a href="{% url 'edit_form' vform.pk %}" class="share-btn">Publier le formulaire</a>
+    {% endif %}
+  </div>
+  {% else %}
+  <!-- Questions analysis -->
+  <div class="section-hdr">
+    <span class="section-title">Analyse par question</span>
+  </div>
+  <div class="q-section">
+    {% for item in questions_data %}
+    {% with q=item.q stats=item.stats %}
+    <div class="q-card">
+      <div class="q-card-head">
+        <span class="q-num">{{ forloop.counter }}</span>
+        <span class="q-label">{{ q.label }}</span>
+        <span class="q-type-badge {{ q.type }}">
+          {% if q.type == 'rating' %}Note
+          {% elif q.type == 'single_choice' %}Choix unique
+          {% elif q.type == 'multiple_choice' %}Choix multiple
+          {% elif q.type == 'text' %}Texte libre
+          {% elif q.type == 'grid' %}Grille
+          {% elif q.type == 'contact' %}Coordonnées
+          {% endif %}
+        </span>
+        <span class="q-count">{{ stats.count }} rép.</span>
+      </div>
+      <div class="q-card-body">
+
+        {% if stats.count == 0 %}
+          <div class="q-no-data">
+            <svg viewBox="0 0 20 20" fill="currentColor" style="width:20px;height:20px;color:var(--border-2);margin-bottom:8px;display:block;margin-left:auto;margin-right:auto"><path fill-rule="evenodd" d="M3 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z" clip-rule="evenodd"/></svg>
+            Aucune réponse pour cette question.
+          </div>
+
+        {% elif stats.type == 'rating' %}
+          <div class="rating-top">
+            <div class="rating-big">
+              <div class="rating-big-num">{{ stats.avg }}</div>
+              <div class="rating-big-max">sur {{ stats.max }}</div>
+              <div class="rating-big-stars" style="--pct:{{ stats.avg_pct }}%">★★★★★</div>
+              <span class="rating-qual qual-{{ stats.label|lower }}">{{ stats.label }}</span>
+            </div>
+            <div class="dist-rows">
+              {% for d in stats.dist %}
+              <div class="dist-row">
+                <span class="dist-star-label">
+                  <span class="dist-star-icon">★</span>{{ d.star }}
+                </span>
+                <div class="dist-bar-wrap">
+                  <div class="dist-bar" data-star="{{ d.star }}" style="width:{{ d.pct }}%"></div>
+                </div>
+                <span class="dist-cnt">{{ d.count }}</span>
+                <span class="dist-pct">{{ d.pct }}%</span>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+        {% elif stats.type == 'single_choice' or stats.type == 'multiple_choice' %}
+          <div class="choice-rows">
+            {% for c in stats.choices %}
+            <div>
+              <div class="choice-lbl">{{ c.label }}</div>
+              <div class="choice-bar-outer">
+                <div class="choice-bar-wrap">
+                  <div class="choice-bar" style="width:{{ c.pct }}%"></div>
+                </div>
+                <span class="choice-meta">{{ c.pct }}% &middot; {{ c.count }}</span>
+              </div>
+            </div>
+            {% empty %}
+            <div class="q-no-data">Aucune option définie.</div>
+            {% endfor %}
+          </div>
+
+        {% elif stats.type == 'text' %}
+          <div class="comments-list">
+            {% for txt in stats.texts %}
+            <div class="comment-item">{{ txt }}</div>
+            {% empty %}
+            <div class="comments-empty">Aucun commentaire pour l'instant.</div>
+            {% endfor %}
+          </div>
+
+        {% elif stats.type == 'grid' %}
+          <div class="grid-info">
+            {{ stats.count }} réponse{{ stats.count|pluralize }} — critères évalués :
+            <div class="grid-criteria">
+              {% for c in stats.criteria %}
+              <span class="grid-chip">{{ c }}</span>
+              {% empty %}
+              <span style="color:var(--text-3)">Aucun critère</span>
+              {% endfor %}
+            </div>
+          </div>
+
+        {% elif stats.type == 'contact' %}
+          {% if stats.count == 0 %}
+          <p style="color:var(--text-3);font-size:.875rem">Aucune coordonnée collectée pour l'instant.</p>
+          {% else %}
+          <div style="overflow-x:auto">
+            <table class="contact-tbl">
+              <thead>
+                <tr>
+                  {% for key in stats.fields %}
+                  <th>
+                    {% if key == 'first_name' %}Prénom
+                    {% elif key == 'last_name' %}Nom
+                    {% elif key == 'email' %}Email
+                    {% elif key == 'phone' %}Téléphone
+                    {% elif key == 'company' %}Entreprise
+                    {% elif key == 'job_title' %}Poste
+                    {% else %}{{ key }}{% endif %}
+                  </th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in stats.rows %}
+                <tr>
+                  {% for key in stats.fields %}
+                  <td>{{ row|get_item:key|default:"—" }}</td>
+                  {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+        {% endif %}
+
+      </div>
+    </div>
+    {% endwith %}
+    {% empty %}
+    <div class="empty-state">
+      <div class="empty-icon">❓</div>
+      <h2 class="empty-title">Aucune question</h2>
+      <p class="empty-msg">Ajoutez des questions à votre formulaire pour voir les résultats ici.</p>
+      <a href="{% url 'edit_form' vform.pk %}" class="share-btn">Éditer le formulaire</a>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- CTA vers les avis individuels -->
+  {% if total > 0 %}
+  <div style="margin-top:32px;text-align:center">
+    <a href="{% url 'form_responses' vform.pk %}" style="
+      display:inline-flex;align-items:center;gap:8px;
+      height:42px;padding:0 22px;border-radius:var(--radius-sm);
+      border:1.5px solid var(--border-2);color:var(--text-2);
+      font-size:.875rem;font-weight:500;background:var(--white);
+      transition:border-color .15s,color .15s,background .15s;
+    " onmouseover="this.style.borderColor='var(--indigo)';this.style.color='var(--indigo)';this.style.background='var(--indigo-pale)'"
+       onmouseout="this.style.borderColor='var(--border-2)';this.style.color='var(--text-2)';this.style.background='var(--white)'">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" style="width:15px;height:15px"><path d="M2 4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H9l-3 3v-3H3a1 1 0 0 1-1-1V4z"/></svg>
+      Voir les {{ total }} avis individuels
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:13px;height:13px;opacity:.5"><path d="M6 4l4 4-4 4"/></svg>
+    </a>
+  </div>
+  {% endif %}
+
+</main>
+
+<script>
+// Export dropdown toggle
+const expBtn = document.getElementById('expBtn');
+const expDrop = document.getElementById('expDrop');
+expBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const open = expDrop.classList.toggle('open');
+  expBtn.setAttribute('aria-expanded', open);
+});
+
+// User avatar dropdown toggle
+const uBtn = document.getElementById('uBtn');
+const uDrop = document.getElementById('uDrop');
+uBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const open = uDrop.classList.toggle('open');
+  uBtn.setAttribute('aria-expanded', open);
+  if (open) expDrop.classList.remove('open');
+});
+
+// Close all dropdowns on outside click
+document.addEventListener('click', () => {
+  expDrop.classList.remove('open');
+  uDrop.classList.remove('open');
+  expBtn.setAttribute('aria-expanded', 'false');
+  uBtn.setAttribute('aria-expanded', 'false');
+});
+</script>
+</body>
+</html>

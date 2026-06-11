@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<title>Merci d'avoir testé Vozavi !</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --indigo:#4F46B8;--indigo-d:#3D35A0;--indigo-pale:#EEEDF9;--indigo-mid:#6B63C8;
+  --amber:#F2A93B;--amber-pale:#FEF5E4;
+  --green:#1D9E75;--green-pale:#E5F8F2;
+  --brand:#C65D2A;--brand-pale:#FEF0E8;
+  --bg:#F4F3FB;--white:#fff;
+  --text:#2C2C3A;--text-2:#5C5C72;--text-3:#9B9BB5;
+  --border:#E2E1F0;--border-2:#D0CEEB;
+  --shadow:0 2px 8px rgba(44,44,58,.08);
+  --shadow-md:0 8px 24px rgba(44,44,58,.12);
+  --shadow-lg:0 16px 48px rgba(44,44,58,.16);
+  --radius:14px;--radius-sm:10px;
+  --f-head:'Poppins',sans-serif;--f-body:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f-body);font-size:15px;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+
+/* ── HEADER ── */
+.hdr{
+  background:var(--white);border-bottom:1px solid var(--border);
+  padding:14px 24px;display:flex;align-items:center;justify-content:center;
+}
+.hdr svg{height:22px;width:auto}
+
+/* ── PAGE ── */
+.page{max-width:700px;margin:0 auto;padding:40px 16px 80px}
+
+/* ── THANKS HERO ── */
+.thanks-hero{
+  background:var(--white);border-radius:var(--radius);
+  padding:40px 32px 32px;text-align:center;
+  box-shadow:var(--shadow);margin-bottom:24px;
+}
+.thanks-icon{
+  width:72px;height:72px;border-radius:50%;
+  background:var(--green-pale);margin:0 auto 20px;
+  display:flex;align-items:center;justify-content:center;font-size:2.25rem;
+  animation:popIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.thanks-icon{animation:none}}
+.thanks-title{
+  font-family:var(--f-head);font-weight:700;font-size:clamp(1.375rem,3vw,1.75rem);
+  color:var(--text);margin-bottom:10px;
+}
+.thanks-sub{font-size:.9375rem;color:var(--text-2);line-height:1.65;max-width:460px;margin:0 auto}
+
+/* ── TRANSITION LABEL ── */
+.section-label{
+  text-align:center;margin:28px 0 14px;
+  font-size:.8125rem;font-weight:600;color:var(--text-3);
+  text-transform:uppercase;letter-spacing:.07em;
+  display:flex;align-items:center;gap:10px;justify-content:center;
+}
+.section-label::before,.section-label::after{content:'';flex:1;max-width:60px;height:1px;background:var(--border)}
+
+/* ── FAKE DASHBOARD PREVIEW ── */
+.preview-card{
+  background:var(--white);border-radius:var(--radius);
+  box-shadow:var(--shadow-md);overflow:hidden;
+  margin-bottom:24px;position:relative;
+}
+.preview-hdr{
+  padding:14px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;background:var(--bg);
+}
+.preview-hdr-title{font-family:var(--f-head);font-size:.875rem;font-weight:600;color:var(--text)}
+.preview-hdr-tag{
+  font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;
+  background:var(--indigo-pale);color:var(--indigo);padding:2px 8px;border-radius:20px;
+}
+
+/* KPI row */
+.preview-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px 20px}
+.pkpi{
+  background:var(--bg);border-radius:var(--radius-sm);padding:14px 12px;text-align:center;
+}
+.pkpi-val{font-family:var(--f-head);font-size:1.625rem;font-weight:700;color:var(--text);line-height:1}
+.pkpi-val.green{color:var(--green)}
+.pkpi-val.indigo{color:var(--indigo)}
+.pkpi-sub{font-size:.7rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-top:4px}
+
+/* Stars display */
+.preview-stars-section{padding:0 20px 16px}
+.ps-label{font-size:.8125rem;font-weight:600;color:var(--text-2);margin-bottom:10px}
+.ps-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ps-star-label{font-size:.8rem;color:var(--text-3);width:28px;display:flex;align-items:center;gap:3px;flex-shrink:0}
+.ps-star-icon{color:var(--amber)}
+.ps-bar-wrap{flex:1;height:9px;background:var(--bg);border-radius:6px;overflow:hidden}
+.ps-bar{height:100%;border-radius:6px}
+.ps-bar.r5{background:var(--green)}
+.ps-bar.r4{background:#3BB67D}
+.ps-bar.r3{background:var(--amber)}
+.ps-bar.r2{background:#E07A30}
+.ps-bar.r1{background:#E24B4A}
+.ps-pct{font-size:.75rem;color:var(--text-3);width:30px;text-align:right;flex-shrink:0}
+
+/* Comment preview */
+.preview-comments{padding:0 20px 20px}
+.comment-chip{
+  background:var(--bg);border-radius:var(--radius-sm);padding:10px 14px;
+  font-size:.875rem;color:var(--text-2);line-height:1.6;
+  border-left:3px solid var(--indigo-pale);margin-bottom:8px;
+  position:relative;
+}
+.comment-chip::before{
+  content:'"';position:absolute;top:4px;right:10px;
+  font-family:Georgia,serif;font-size:1.25rem;color:var(--border-2);line-height:1;
+}
+
+/* Blur overlay */
+.preview-blur{
+  position:absolute;bottom:0;left:0;right:0;height:180px;
+  background:linear-gradient(transparent 0%, rgba(255,255,255,.92) 40%, rgba(255,255,255,.98) 100%);
+  display:flex;align-items:flex-end;justify-content:center;padding-bottom:20px;
+  pointer-events:none;
+}
+.preview-blur-badge{
+  pointer-events:all;
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:.8rem;font-weight:600;color:var(--text-3);
+  background:var(--white);border:1px solid var(--border);
+  border-radius:20px;padding:6px 14px;box-shadow:var(--shadow);
+}
+.preview-blur-badge svg{width:13px;height:13px;opacity:.5}
+
+/* ── CTA CARD ── */
+.cta-card{
+  background:linear-gradient(135deg,#1A1829 0%,#2D2860 60%,#1A1829 100%);
+  border-radius:var(--radius);padding:40px 32px;text-align:center;
+  box-shadow:var(--shadow-lg);margin-bottom:24px;
+  position:relative;overflow:hidden;
+}
+.cta-card::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.04) 1px,transparent 1px);
+  background-size:24px 24px;pointer-events:none;
+}
+.cta-orb{
+  position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none;
+}
+.cta-orb-1{width:280px;height:280px;background:rgba(79,70,184,.3);top:-80px;right:-60px}
+.cta-orb-2{width:200px;height:200px;background:rgba(29,158,117,.15);bottom:-60px;left:-40px}
+
+.cta-card-inner{position:relative;z-index:1}
+.cta-eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(242,169,59,.15);border:1px solid rgba(242,169,59,.25);
+  border-radius:20px;padding:5px 12px;
+  font-size:.75rem;font-weight:600;color:var(--amber);
+  margin-bottom:18px;letter-spacing:.04em;text-transform:uppercase;
+}
+.cta-title{
+  font-family:var(--f-head);font-weight:800;
+  font-size:clamp(1.375rem,3.5vw,1.875rem);
+  color:#fff;line-height:1.2;letter-spacing:-.02em;margin-bottom:12px;
+}
+.cta-sub{
+  font-size:.9375rem;color:rgba(255,255,255,.6);
+  line-height:1.65;max-width:440px;margin:0 auto 28px;
+}
+.cta-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--indigo);color:#fff;
+  font-family:var(--f-head);font-weight:700;font-size:1rem;
+  padding:15px 32px;border-radius:var(--radius-sm);
+  box-shadow:0 6px 20px rgba(79,70,184,.4);
+  transition:background .18s,transform .13s,box-shadow .18s;
+  border:none;cursor:pointer;
+}
+.cta-btn:hover{background:var(--indigo-mid);transform:translateY(-2px);box-shadow:0 10px 28px rgba(79,70,184,.5)}
+.cta-btn svg{width:18px;height:18px}
+.cta-badges{
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  margin-top:16px;flex-wrap:wrap;
+}
+.cta-badge{
+  display:flex;align-items:center;gap:5px;
+  font-size:.8125rem;color:rgba(255,255,255,.5);
+}
+.cta-badge svg{width:13px;height:13px;color:var(--green)}
+
+/* ── SOCIAL PROOF ── */
+.proof-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.proof-card{
+  background:var(--white);border-radius:var(--radius-sm);
+  padding:16px 14px;box-shadow:var(--shadow);
+}
+.proof-stars{color:var(--amber);font-size:.8rem;letter-spacing:1px;margin-bottom:8px}
+.proof-quote{font-size:.8125rem;color:var(--text-2);line-height:1.55;margin-bottom:10px;font-style:italic}
+.proof-person{font-size:.75rem;font-weight:600;color:var(--text-3)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:580px){
+  .preview-kpis{grid-template-columns:repeat(3,1fr);gap:8px}
+  .pkpi{padding:10px 8px}
+  .pkpi-val{font-size:1.25rem}
+  .cta-card{padding:28px 20px}
+  .proof-row{grid-template-columns:1fr}
+}
+@media(max-width:400px){
+  .proof-row{grid-template-columns:1fr 1fr}
+  .proof-row .proof-card:last-child{display:none}
+}
+
+/* Animation */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
+.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="/" aria-label="Vozavi — Accueil">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64">
+      <path d="M10 14 a10 10 0 0 1 10-10 h24 a10 10 0 0 1 10 10 v20 a10 10 0 0 1-10 10 h-14 l-9 9 v-9 h-1 a10 10 0 0 1-10-10 z" fill="#4F46B8"/>
+      <path d="M32 12 l3.4 6.9 7.6 1.1 -5.5 5.4 1.3 7.6 -6.8-3.6 -6.8 3.6 1.3-7.6 -5.5-5.4 7.6-1.1 z" fill="#F2A93B"/>
+      <text x="68" y="40" font-size="28" font-weight="600" fill="#4F46B8" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
+    </svg>
+  </a>
+</header>
+
+<main class="page">
+
+  <!-- Thanks hero -->
+  <div class="thanks-hero reveal">
+    <div class="thanks-icon">🙌</div>
+    <h1 class="thanks-title">Merci d'avoir essayé Vozavi !</h1>
+    <p class="thanks-sub">
+      Vous venez de vivre exactement ce que <strong>vos clients</strong> ressentiraient en remplissant l'un de vos formulaires.
+      Maintenant, imaginez voir leurs réponses dans votre tableau de bord…
+    </p>
+  </div>
+
+  <!-- Transition label -->
+  <div class="section-label reveal" style="transition-delay:.1s">Ce que vous verriez dans votre tableau de bord</div>
+
+  <!-- Fake dashboard preview -->
+  <div class="preview-card reveal" style="transition-delay:.15s">
+    <div class="preview-hdr">
+      <span class="preview-hdr-title">Café Savane — Résultats</span>
+      <span class="preview-hdr-tag">Exemple</span>
+    </div>
+
+    <div class="preview-kpis">
+      <div class="pkpi">
+        <div class="pkpi-val">127</div>
+        <div class="pkpi-sub">Réponses</div>
+      </div>
+      <div class="pkpi">
+        <div class="pkpi-val indigo">4.3</div>
+        <div class="pkpi-sub">Note moy.</div>
+      </div>
+      <div class="pkpi">
+        <div class="pkpi-val green">94%</div>
+        <div class="pkpi-sub">Satisfaits</div>
+      </div>
+    </div>
+
+    <div class="preview-stars-section">
+      <div class="ps-label">Distribution des notes</div>
+      <div class="ps-row">
+        <span class="ps-star-label"><span class="ps-star-icon">★</span>5</span>
+        <div class="ps-bar-wrap"><div class="ps-bar r5" style="width:52%;animation:grow .8s .3s ease both"></div></div>
+        <span class="ps-pct">52%</span>
+      </div>
+      <div class="ps-row">
+        <span class="ps-star-label"><span class="ps-star-icon">★</span>4</span>
+        <div class="ps-bar-wrap"><div class="ps-bar r4" style="width:28%;animation:grow .8s .4s ease both"></div></div>
+        <span class="ps-pct">28%</span>
+      </div>
+      <div class="ps-row">
+        <span class="ps-star-label"><span class="ps-star-icon">★</span>3</span>
+        <div class="ps-bar-wrap"><div class="ps-bar r3" style="width:12%;animation:grow .8s .5s ease both"></div></div>
+        <span class="ps-pct">12%</span>
+      </div>
+      <div class="ps-row">
+        <span class="ps-star-label"><span class="ps-star-icon">★</span>2</span>
+        <div class="ps-bar-wrap"><div class="ps-bar r2" style="width:5%;animation:grow .8s .6s ease both"></div></div>
+        <span class="ps-pct">5%</span>
+      </div>
+      <div class="ps-row">
+        <span class="ps-star-label"><span class="ps-star-icon">★</span>1</span>
+        <div class="ps-bar-wrap"><div class="ps-bar r1" style="width:3%;animation:grow .8s .7s ease both"></div></div>
+        <span class="ps-pct">3%</span>
+      </div>
+    </div>
+
+    <div class="preview-comments">
+      <div class="ps-label">Derniers commentaires</div>
+      <div class="comment-chip">"Excellente cuisine, le thiéboudienne était parfait. Je reviendrai !"</div>
+      <div class="comment-chip">"Service rapide et personnel très aimable. Bravo !"</div>
+    </div>
+
+    <!-- Blur overlay -->
+    <div class="preview-blur">
+      <span class="preview-blur-badge">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>
+        Créez un compte pour accéder à vos vrais résultats
+      </span>
+    </div>
+  </div>
+
+  <!-- CTA card -->
+  <div class="cta-card reveal" style="transition-delay:.2s">
+    <div class="cta-orb cta-orb-1"></div>
+    <div class="cta-orb cta-orb-2"></div>
+    <div class="cta-card-inner">
+      <div class="cta-eyebrow">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.8 3.6L14 5.4l-3 2.9.7 4.1L8 10.6l-3.7 1.8.7-4.1-3-2.9 4.2-.8z"/></svg>
+        100 % gratuit · Sans carte bancaire
+      </div>
+      <h2 class="cta-title">Prêt à créer votre propre formulaire ?</h2>
+      <p class="cta-sub">
+        En 2 minutes, vous obtenez un lien partageable et un tableau de bord comme celui que vous venez de voir — avec vos vraies données.
+      </p>
+      <a href="{% url 'new_form' %}" class="cta-btn">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
+        Créer mon formulaire gratuitement
+      </a>
+      <div class="cta-badges">
+        <span class="cta-badge">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8l3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Prêt en 2 minutes
+        </span>
+        <span class="cta-badge">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8l3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Lien & QR code inclus
+        </span>
+        <span class="cta-badge">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8l3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Résultats en temps réel
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social proof -->
+  <div class="proof-row reveal" style="transition-delay:.25s">
+    <div class="proof-card">
+      <div class="proof-stars">★★★★★</div>
+      <p class="proof-quote">"En 3 jours j'avais 40 réponses. Je sais enfin ce que mes clients pensent vraiment."</p>
+      <div class="proof-person">Amara K. · Restaurant, Dakar</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-stars">★★★★★</div>
+      <p class="proof-quote">"Mes 80 employés répondent en 2 min. Les vrais sujets remontent enfin."</p>
+      <div class="proof-person">Yao M. · DRH, Abidjan</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-stars">★★★★★</div>
+      <p class="proof-quote">"Le QR code sur la table, c'est génial. On a collecté 200 avis en 1 semaine."</p>
+      <div class="proof-person">Fatou D. · Hôtel, Lomé</div>
+    </div>
+  </div>
+
+</main>
+
+<style>
+@keyframes grow{from{width:0}to{/* kept by inline width */}}
+/* Override: bars animate in */
+.ps-bar{width:0;transition:width .9s ease}
+</style>
+<script>
+// Intersection observer for reveal animations
+var obs = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); } });
+}, {threshold:.08});
+document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+
+// Trigger bar animation when visible
+var barsTriggered = false;
+var barsObs = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting && !barsTriggered){
+      barsTriggered = true;
+      var widths = ['52%','28%','12%','5%','3%'];
+      document.querySelectorAll('.ps-bar').forEach(function(b,i){
+        setTimeout(function(){ b.style.width = widths[i]; }, i*80);
+      });
+    }
+  });
+}, {threshold:.3});
+var previewCard = document.querySelector('.preview-card');
+if(previewCard) barsObs.observe(previewCard);
+</script>
+</body>
+</html>

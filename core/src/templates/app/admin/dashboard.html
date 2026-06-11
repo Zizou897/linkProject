@@ -1,184 +1,469 @@
-{% extends 'app/base/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<title>Tableau de bord — Vozavi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --indigo:#4F46B8; --indigo-d:#433CA0; --indigo-pale:#EEEDFB; --indigo-mid:#E4E2F8;
+  --amber:#F2A93B;  --amber-pale:#FFF8EC;
+  --green:#1D9E75;  --green-pale:#E8F8F3;
+  --red:#E24B4A;    --red-pale:#FEF2F2;
+  --lavender:#F4F3FB;
+  --white:#fff; --text:#2C2C3A; --text-2:#5C5C72; --text-3:#9B9BB5;
+  --border:#E2E1F0; --border-2:#EDECED;
+  --shadow-sm:0 1px 4px rgba(44,44,58,.07);
+  --shadow:0 2px 8px rgba(44,44,58,.08);
+  --shadow-md:0 8px 24px rgba(44,44,58,.12);
+  --radius:12px; --radius-sm:8px;
+  --f-head:'Poppins',sans-serif; --f-body:'Inter',sans-serif;
+  --hdr:60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--f-body);font-size:15px;color:var(--text);background:var(--lavender);-webkit-font-smoothing:antialiased;min-height:100dvh}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+ul{list-style:none}
 
-{% block title %}Dashboard — Bediakon Formation{% endblock %}
+/* ── HEADER ── */
+.hdr{
+  position:sticky;top:0;z-index:200;
+  height:var(--hdr);background:var(--white);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:12px;
+}
+.hdr-logo{display:flex;align-items:center;flex-shrink:0}
+.hdr-logo svg{height:22px;width:auto}
+.hdr-divider{width:1px;height:20px;background:var(--border);flex-shrink:0}
+.hdr-nav{display:flex;align-items:center;gap:2px}
+.hdr-nav a{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--f-head);font-size:.8125rem;font-weight:500;
+  color:var(--text-2);padding:6px 11px;border-radius:7px;
+  transition:background .14s,color .14s;
+}
+.hdr-nav a:hover{background:var(--lavender);color:var(--indigo)}
+.hdr-nav a.on{background:var(--indigo-pale);color:var(--indigo);font-weight:600}
+.hdr-nav a svg{width:13px;height:13px;flex-shrink:0}
+.hdr-space{flex:1}
+.hdr-actions{display:flex;align-items:center;gap:8px}
 
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-    <div>
-        <div class="section-label">Vue d'ensemble</div>
-        <h3 class="mb-0">Tableau de bord</h3>
-    </div>
-    <div class="d-flex gap-2 flex-wrap">
-        <div class="dropdown">
-            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
-                <i class="bi bi-download me-1"></i>Exporter
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li><div class="dropdown-header">Excel</div></li>
-                <li><a class="dropdown-item" href="{% url 'export_avis_excel' %}">
-                    <i class="bi bi-file-earmark-spreadsheet me-2" style="color:var(--green);"></i>Avis collectés
-                </a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><div class="dropdown-header">PDF</div></li>
-                <li><a class="dropdown-item" href="{% url 'export_rapport_pdf' %}">
-                    <i class="bi bi-file-earmark-pdf me-2" style="color:var(--red);"></i>Rapport analytique
-                </a></li>
-            </ul>
+/* Avatar + dropdown */
+.u-menu{position:relative}
+.u-av{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--indigo);color:var(--white);
+  font-family:var(--f-head);font-weight:700;font-size:.75rem;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  outline:2px solid transparent;outline-offset:2px;
+  transition:outline-color .15s;
+}
+.u-av:hover,.u-menu.open .u-av{outline-color:var(--indigo-mid)}
+.u-drop{
+  position:absolute;right:0;top:calc(100% + 8px);
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--radius);padding:6px;
+  min-width:200px;box-shadow:var(--shadow-md);
+  display:none;z-index:300;
+}
+.u-menu.open .u-drop{display:block}
+.u-drop-head{
+  padding:8px 10px 10px;
+  border-bottom:1px solid var(--border);margin-bottom:6px;
+}
+.u-drop-name{font-family:var(--f-head);font-weight:600;font-size:.875rem;color:var(--text)}
+.u-drop-email{font-size:.75rem;color:var(--text-3);margin-top:1px}
+.d-item{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 10px;border-radius:7px;
+  font-size:.875rem;color:var(--text-2);
+  transition:background .12s,color .12s;width:100%;
+}
+.d-item:hover{background:var(--lavender);color:var(--text)}
+.d-item.danger:hover{background:var(--red-pale);color:var(--red)}
+.d-item svg{width:14px;height:14px;flex-shrink:0}
+.d-sep{height:1px;background:var(--border);margin:4px 0}
+.mob-nav-btn{display:none;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--radius-sm);color:var(--text-2)}
+.mob-nav-btn:hover{background:var(--lavender)}
+.mob-nav-btn svg{width:18px;height:18px}
+
+/* ── LAYOUT ── */
+.page{max-width:1140px;margin:0 auto;padding:32px 24px 72px}
+
+/* ── GREETING ── */
+.greeting{margin-bottom:28px}
+.greeting-title{
+  font-family:var(--f-head);font-weight:700;
+  font-size:clamp(1.375rem,3vw,1.875rem);
+  color:var(--text);letter-spacing:-.02em;line-height:1.2;
+}
+.greeting-date{font-size:.875rem;color:var(--text-3);margin-top:4px}
+
+/* ── KPI ── */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+.kpi{
+  background:var(--white);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:22px 22px 20px;
+  transition:box-shadow .2s;
+}
+.kpi:hover{box-shadow:var(--shadow-md)}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.kpi-lbl{font-size:.8rem;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em}
+.kpi-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kpi-icon svg{width:18px;height:18px}
+.kpi-icon.indigo{background:var(--indigo-pale);color:var(--indigo)}
+.kpi-icon.amber{background:var(--amber-pale);color:var(--amber)}
+.kpi-icon.green{background:var(--green-pale);color:var(--green)}
+.kpi-val{font-family:var(--f-head);font-weight:700;font-size:2rem;color:var(--text);line-height:1;margin-bottom:6px}
+.kpi-sub{font-size:.8125rem;color:var(--text-3)}
+
+/* ── CTA ── */
+.cta-new{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  width:100%;padding:14px 24px;border-radius:var(--radius);
+  background:var(--indigo);color:var(--white);
+  font-family:var(--f-head);font-weight:600;font-size:1rem;
+  box-shadow:0 4px 14px rgba(79,70,184,.28);
+  transition:background .18s,box-shadow .18s,transform .14s;
+  margin-bottom:36px;
+}
+.cta-new:hover{background:var(--indigo-d);box-shadow:0 6px 20px rgba(79,70,184,.38);transform:translateY(-1px)}
+.cta-new svg{width:18px;height:18px;flex-shrink:0}
+
+/* ── SECTION ── */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-title{font-family:var(--f-head);font-weight:600;font-size:.9375rem;color:var(--text)}
+
+/* ── FORM CARDS ── */
+.forms-grid{display:grid;grid-template-columns:1fr;gap:12px}
+.fc{
+  background:var(--white);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:20px 24px;
+  transition:box-shadow .2s,transform .15s;
+}
+.fc:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.fc-row1{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.fc-info{flex:1;min-width:0}
+.fc-name{
+  font-family:var(--f-head);font-weight:600;font-size:.9375rem;
+  color:var(--text);margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.fc-date{font-size:.8rem;color:var(--text-3)}
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-family:var(--f-head);font-size:.6875rem;font-weight:700;
+  padding:3px 9px;border-radius:99px;
+  text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;
+}
+.badge-active{background:var(--green-pale);color:var(--green)}
+.badge-draft{background:#F0F0F6;color:var(--text-3)}
+.badge-closed{background:var(--amber-pale);color:#B07A10}
+
+.fc-stats{
+  display:flex;align-items:center;gap:20px;
+  background:var(--lavender);border-radius:8px;
+  padding:11px 16px;margin-bottom:16px;
+}
+.fc-stat{display:flex;flex-direction:column;gap:2px}
+.fc-stat-v{font-family:var(--f-head);font-weight:700;font-size:1.125rem;color:var(--text);line-height:1}
+.fc-stat-l{font-size:.7rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.fc-stat-sep{width:1px;height:28px;background:var(--border-2);flex-shrink:0}
+
+.fc-actions{display:flex;align-items:center;gap:8px}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--f-head);font-weight:600;font-size:.8125rem;
+  padding:8px 16px;border-radius:var(--radius-sm);
+  transition:all .15s;cursor:pointer;border:none;
+}
+.btn-primary{background:var(--indigo);color:var(--white)}
+.btn-primary:hover{background:var(--indigo-d)}
+.btn-ghost{background:transparent;color:var(--text-2);border:1.5px solid var(--border)}
+.btn-ghost:hover{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-pale)}
+.btn svg{width:13px;height:13px;flex-shrink:0}
+
+/* ── EMPTY ── */
+.empty{
+  background:var(--white);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:52px 32px;text-align:center;
+}
+.empty-ico{margin:0 auto 20px;opacity:.12}
+.empty-t{font-family:var(--f-head);font-weight:700;font-size:1.125rem;color:var(--text);margin-bottom:8px}
+.empty-s{font-size:.9rem;color:var(--text-2);line-height:1.65;max-width:340px;margin:0 auto 28px}
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;text-align:left;margin-top:20px}
+.tpl-card{
+  border:1.5px solid var(--border);border-radius:10px;
+  padding:16px 14px;
+  transition:border-color .15s,background .15s;
+}
+.tpl-em{font-size:1.375rem;margin-bottom:8px}
+.tpl-n{font-family:var(--f-head);font-weight:600;font-size:.8rem;color:var(--text);line-height:1.4}
+
+/* ── RESPONSIVE ── */
+@media(min-width:900px){.forms-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){
+  .page{padding:20px 16px 56px}
+  .hdr{padding:0 16px}
+  .hdr-nav{display:none}
+  .mob-nav-btn{display:flex}
+  .kpi-row{gap:10px}
+  .kpi{padding:16px 14px 14px}
+  .kpi-val{font-size:1.625rem}
+  .cta-new{font-size:.9375rem}
+  .fc{padding:16px}
+  .fc-stats{gap:12px;padding:10px 12px}
+}
+@media(max-width:360px){
+  .kpi-row{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}
+  .kpi-row .kpi:last-child{grid-column:1/-1}
+}
+
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .4s ease,transform .4s ease}
+.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header class="hdr">
+  <a href="{% url 'home' %}" class="hdr-logo" aria-label="Vozavi — Accueil">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64">
+      <path d="M10 14 a10 10 0 0 1 10-10 h24 a10 10 0 0 1 10 10 v20 a10 10 0 0 1-10 10 h-14 l-9 9 v-9 h-1 a10 10 0 0 1-10-10 z" fill="#4F46B8"/>
+      <path d="M32 12 l3.4 6.9 7.6 1.1 -5.5 5.4 1.3 7.6 -6.8-3.6 -6.8 3.6 1.3-7.6 -5.5-5.4 7.6-1.1 z" fill="#F2A93B"/>
+      <text x="68" y="40" font-size="28" font-weight="600" fill="#4F46B8" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
+    </svg>
+  </a>
+
+  <div class="hdr-divider" aria-hidden="true"></div>
+
+  <nav class="hdr-nav" aria-label="Navigation principale">
+    <a href="{% url 'dashboard' %}" class="on">
+      <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+      Tableau de bord
+    </a>
+    <a href="{% url 'new_form' %}">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Nouveau formulaire
+    </a>
+  </nav>
+
+  <div class="hdr-space"></div>
+
+  <div class="hdr-actions">
+    <button class="mob-nav-btn" id="mob-btn" aria-label="Menu">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+
+    <div class="u-menu" id="user-menu">
+      <button class="u-av" onclick="toggleMenu('user-menu')" aria-label="Menu utilisateur">
+        {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}{% if not request.user.first_name %}{{ request.user.username|slice:":2"|upper }}{% endif %}
+      </button>
+      <div class="u-drop">
+        <div class="u-drop-head">
+          <div class="u-drop-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+          <div class="u-drop-email">{{ request.user.email }}</div>
         </div>
+        <div class="d-sep"></div>
+        <a href="{% url 'logout' %}" class="d-item danger">
+          <svg viewBox="0 0 14 14" fill="none"><path d="M5 7h7M9 4.5L12 7l-3 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Se déconnecter
+        </a>
+      </div>
     </div>
+  </div>
+</header>
+
+<!-- mobile nav -->
+<div id="mob-nav" style="display:none;position:fixed;inset:var(--hdr) 0 0 0;background:rgba(44,44,58,.4);z-index:150" onclick="closeMobNav()">
+  <nav style="background:var(--white);padding:16px;display:flex;flex-direction:column;gap:4px;border-bottom:1px solid var(--border)" onclick="event.stopPropagation()">
+    <a href="{% url 'dashboard' %}" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;font-family:var(--f-head);font-weight:600;font-size:.9rem;background:var(--indigo-pale);color:var(--indigo)">Tableau de bord</a>
+    <a href="{% url 'new_form' %}" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;font-family:var(--f-head);font-size:.9rem;color:var(--text-2)">Nouveau formulaire</a>
+    <div style="height:1px;background:var(--border);margin:4px 0"></div>
+    <a href="{% url 'logout' %}" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;font-family:var(--f-head);font-size:.9rem;color:var(--red)">Se déconnecter</a>
+  </nav>
 </div>
 
-<!-- Stat cards -->
-<div class="row g-3 mb-4">
-    <div class="col-sm-6 col-xl-3">
-        <div class="card p-4 position-relative overflow-hidden" style="border-top:3px solid var(--blue) !important;">
-            <div class="stat-label">Total formations</div>
-            <div class="stat-value text-blue">{{ total_formations_all }}</div>
-            <div class="text-muted small mt-1">dans le catalogue</div>
-            <i class="bi bi-collection-fill stat-bg-icon" style="color:var(--blue);"></i>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card p-4 position-relative overflow-hidden" style="border-top:3px solid var(--green) !important;">
-            <div class="stat-label">Formations</div>
-            <div class="stat-value text-green">{{ total_formations }}</div>
-            <div class="text-muted small mt-1">non archivées</div>
-            <i class="bi bi-collection stat-bg-icon" style="color:var(--green);"></i>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card p-4 position-relative overflow-hidden" style="border-top:3px solid var(--amber) !important;">
-            <div class="stat-label">Avis</div>
-            <div class="stat-value text-amber">{{ total_avis }}</div>
-            <div class="text-muted small mt-1">collectés</div>
-            <i class="bi bi-chat-square-text stat-bg-icon" style="color:var(--amber);"></i>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="card p-4 position-relative overflow-hidden" style="border-top:3px solid var(--gray-400) !important;">
-            <div class="stat-label">Sessions</div>
-            <div class="stat-value" style="color:var(--gray-700);">{{ total_sessions }}</div>
-            <div class="text-muted small mt-1">planifiées</div>
-            <i class="bi bi-calendar-event stat-bg-icon" style="color:var(--gray-400);"></i>
-        </div>
-    </div>
-</div>
+<!-- ══ PAGE ══ -->
+<main class="page">
 
-<!-- Data panels -->
-<div class="row g-3">
-    <div class="col-lg-7">
-        <div class="card h-100">
-            <div class="p-4 pb-0">
-                <div class="section-head">
-                    <div>
-                        <div class="section-label">Popularité</div>
-                        <h5 class="mb-0">Formations les plus demandées</h5>
-                    </div>
-                </div>
-            </div>
-            {% if formations %}
-            <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th style="padding-left:1.5rem;">Formation</th>
-                            <th class="text-end" style="padding-right:1.5rem;">Avis</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for f in formations %}
-                        <tr>
-                            <td style="padding-left:1.5rem;">
-                                <a href="{% url 'formation_detail' pk=f.pk %}"
-                                   class="text-decoration-none fw-500" style="color:var(--gray-900);">
-                                    {{ f.libelle }}
-                                </a>
-                            </td>
-                            <td class="text-end" style="padding-right:1.5rem;">
-                                <span class="badge bg-primary">{{ f.nb_avis }}</span>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="empty-state p-4">
-                <span class="empty-icon bi bi-collection"></span>
-                <p>Aucune formation.</p>
-            </div>
-            {% endif %}
+  <!-- Greeting -->
+  <section class="greeting reveal">
+    <h1 class="greeting-title">Bonjour{% if request.user.first_name %}, {{ request.user.first_name }}{% endif %}&nbsp;👋</h1>
+    <p class="greeting-date">Voici l'état de votre activité</p>
+  </section>
+
+  <!-- KPI -->
+  <div class="kpi-row reveal" style="transition-delay:.05s">
+    <div class="kpi">
+      <div class="kpi-top">
+        <span class="kpi-lbl">Formulaires</span>
+        <div class="kpi-icon indigo">
+          <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h6M7 10h4M7 13h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </div>
+      </div>
+      <div class="kpi-val">{{ total_forms }}</div>
+      <div class="kpi-sub">créés au total</div>
     </div>
 
-    <div class="col-lg-5">
-        <div class="card h-100">
-            <div class="p-4 pb-0">
-                <div class="section-head">
-                    <div>
-                        <div class="section-label">Géographie</div>
-                        <h5 class="mb-0">Répartition par zone</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4 pt-0">
-                {% if geo %}
-                <ul class="list-unstyled mb-0">
-                    {% for g in geo %}
-                    <li class="d-flex justify-content-between align-items-center py-2"
-                        style="border-bottom:1px solid var(--gray-200);">
-                        <span style="font-size:.875rem;color:var(--gray-700);">
-                            {{ g.zone_geographique|default:"Non renseigné" }}
-                        </span>
-                        <span class="badge badge-blue">{{ g.total }}</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <div class="empty-state p-2">
-                    <span class="empty-icon bi bi-geo-alt"></span>
-                    <p>Aucune donnée géographique.</p>
-                </div>
-                {% endif %}
-            </div>
+    <div class="kpi">
+      <div class="kpi-top">
+        <span class="kpi-lbl">Actifs</span>
+        <div class="kpi-icon green">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4.5 4.5 7.5-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
+      </div>
+      <div class="kpi-val">{{ total_active }}</div>
+      <div class="kpi-sub">en ligne actuellement</div>
     </div>
 
-    <div class="col-12">
-        <div class="card">
-            <div class="p-4 pb-0">
-                <div class="section-head">
-                    <div>
-                        <div class="section-label">Activité récente</div>
-                        <h5 class="mb-0">Derniers avis collectés</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th style="padding-left:1.5rem;">Participant</th>
-                            <th class="d-none d-md-table-cell">Formation</th>
-                            <th class="d-none d-lg-table-cell">Structure</th>
-                            <th class="text-end" style="padding-right:1.5rem;">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for a in avis_recents %}
-                        <tr>
-                            <td style="padding-left:1.5rem;" class="fw-500">{{ a.prenom }} {{ a.nom }}</td>
-                            <td class="text-muted small d-none d-md-table-cell">{{ a.session.formation.libelle }}</td>
-                            <td class="text-muted small d-none d-lg-table-cell">{{ a.structure }}</td>
-                            <td class="text-end text-muted small" style="padding-right:1.5rem;">{{ a.created_at|date:"d/m/Y" }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="4" class="text-muted p-4">Aucun avis collecté.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <div class="kpi">
+      <div class="kpi-top">
+        <span class="kpi-lbl">Réponses</span>
+        <div class="kpi-icon amber">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 2C5.6 2 2 5.2 2 9.1c0 2 .9 3.8 2.4 5.1L3 18l4.2-1.4c.9.3 1.8.5 2.8.5 4.4 0 8-3.2 8-7.1S14.4 2 10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
         </div>
+      </div>
+      <div class="kpi-val">{{ total_responses }}</div>
+      <div class="kpi-sub">collectées au total</div>
     </div>
-</div>
-{% endblock %}
+  </div>
+
+  <!-- CTA -->
+  <a href="{% url 'new_form' %}" class="cta-new reveal" style="transition-delay:.1s">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    Nouveau formulaire
+  </a>
+
+  <!-- Formulaires -->
+  <section>
+    <div class="sec-head reveal" style="transition-delay:.12s">
+      <h2 class="sec-title">Mes formulaires
+        <span style="font-weight:400;color:var(--text-3);font-size:.875rem;margin-left:6px">({{ total_forms }})</span>
+      </h2>
+    </div>
+
+    {% if recent_forms %}
+    <div class="forms-grid">
+      {% for f in recent_forms %}
+      <article class="fc reveal" style="transition-delay:{{ forloop.counter0|add:2 }}00ms">
+        <div class="fc-row1">
+          <div class="fc-info">
+            <div class="fc-name" title="{{ f.title }}">{{ f.title }}</div>
+            <div class="fc-date">Modifié {{ f.updated_at|timesince }} · {{ f.get_status_display }}</div>
+          </div>
+          {% if f.status == 'active' %}
+            <span class="badge badge-active">Actif</span>
+          {% elif f.status == 'closed' %}
+            <span class="badge badge-closed">Fermé</span>
+          {% else %}
+            <span class="badge badge-draft">Brouillon</span>
+          {% endif %}
+        </div>
+
+        <div class="fc-stats">
+          <div class="fc-stat">
+            <span class="fc-stat-v">{{ f.nb_responses }}</span>
+            <span class="fc-stat-l">Réponses</span>
+          </div>
+          <div class="fc-stat-sep"></div>
+          <div class="fc-stat">
+            <span class="fc-stat-v">{{ f.questions.count }}</span>
+            <span class="fc-stat-l">Questions</span>
+          </div>
+        </div>
+
+        <div class="fc-actions">
+          <a href="{% url 'edit_form' f.pk %}" class="btn btn-primary">
+            <svg viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+            Éditer
+          </a>
+          <a href="{% url 'form_results' f.pk %}" class="btn btn-ghost">
+            <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="8" width="3" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="5.5" y="5" width="3" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="2" width="3" height="11" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+            Résultats
+          </a>
+          <a href="{% url 'form_responses' f.pk %}" class="btn btn-ghost">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1.5 3a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H8L5.5 11.5V9H2.5a1 1 0 0 1-1-1V3z"/></svg>
+            Avis
+          </a>
+          {% if f.status == 'active' %}
+          <a href="{% url 'share_form' f.pk %}" class="btn btn-ghost">
+            <svg viewBox="0 0 14 14" fill="none"><circle cx="11" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="3" cy="7" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="11" cy="11" r="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.4 8l5.2 2M9.6 4L4.4 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Partager
+          </a>
+          {% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- État vide -->
+    <div class="empty reveal" style="transition-delay:.15s">
+      <svg class="empty-ico" width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <path d="M20 28 a14 14 0 0 1 14-14 h32 a14 14 0 0 1 14 14 v20 a14 14 0 0 1-14 14 H52 l-12 12 v-12 h-6 a14 14 0 0 1-14-14 z" fill="#4F46B8"/>
+        <path d="M44 22 l4.5 9.5 10.5 1.5 -7.6 7.4 1.8 10.5 -9.2-4.9 -9.2 4.9 1.8-10.5 -7.6-7.4 10.5-1.5 z" fill="#F2A93B"/>
+      </svg>
+      <p class="empty-t">Créez votre premier formulaire</p>
+      <p class="empty-s">Choisissez un modèle et obtenez votre lien de collecte en moins de 2 minutes.</p>
+      <a href="{% url 'new_form' %}" class="btn btn-primary" style="display:inline-flex;padding:11px 24px;font-size:.9375rem">
+        <svg viewBox="0 0 14 14" fill="none" style="width:14px;height:14px"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Créer un formulaire
+      </a>
+      <div class="tpl-grid">
+        <div class="tpl-card"><div class="tpl-em">🍽️</div><div class="tpl-n">Restaurant &amp; commerce</div></div>
+        <div class="tpl-card"><div class="tpl-em">💼</div><div class="tpl-n">Prestation de service</div></div>
+        <div class="tpl-card"><div class="tpl-em">🏢</div><div class="tpl-n">Feedback employés</div></div>
+        <div class="tpl-card"><div class="tpl-em">🚚</div><div class="tpl-n">Livraison</div></div>
+        <div class="tpl-card" style="border-style:dashed"><div class="tpl-em">✦</div><div class="tpl-n">Partir de zéro</div></div>
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+</main>
+
+<script>
+(function(){
+  function toggleMenu(id){
+    var el=document.getElementById(id);
+    var isOpen=el.classList.contains('open');
+    document.querySelectorAll('.u-menu.open').forEach(function(m){m.classList.remove('open')});
+    if(!isOpen) el.classList.add('open');
+  }
+  window.toggleMenu=toggleMenu;
+
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.u-menu')){
+      document.querySelectorAll('.u-menu.open').forEach(function(m){m.classList.remove('open')});
+    }
+  });
+
+  var mobBtn=document.getElementById('mob-btn');
+  var mobNav=document.getElementById('mob-nav');
+  if(mobBtn&&mobNav){
+    mobBtn.addEventListener('click',function(){
+      mobNav.style.display=mobNav.style.display==='none'?'block':'none';
+    });
+  }
+  function closeMobNav(){ if(mobNav) mobNav.style.display='none'; }
+  window.closeMobNav=closeMobNav;
+
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}
+    });
+  },{threshold:.08});
+  document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el);});
+})();
+</script>
+</body>
+</html>

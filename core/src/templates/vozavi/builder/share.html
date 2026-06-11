@@ -1,0 +1,285 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<title>Partager — {{ vform.title }} — Vozavi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --indigo:#4F46B8; --indigo-d:#3D35A0; --indigo-pale:#EEEDFB; --indigo-mid:#E4E2F8;
+  --amber:#F2A93B; --amber-pale:#FEF6E7;
+  --green:#1D9E75; --green-pale:#E5F8F2;
+  --lavender:#F4F3FB;
+  --white:#fff; --text:#2C2C3A; --text-2:#5C5C72; --text-3:#9B9BB5;
+  --border:#E2E1F0;
+  --shadow-sm:0 1px 4px rgba(44,44,58,.07);
+  --shadow:0 2px 8px rgba(44,44,58,.08);
+  --shadow-md:0 8px 24px rgba(44,44,58,.12);
+  --radius:12px; --radius-sm:8px;
+  --f-head:'Poppins',sans-serif; --f-body:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--f-body);font-size:15px;color:var(--text);background:var(--lavender);-webkit-font-smoothing:antialiased;min-height:100dvh}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+
+.hdr{
+  position:sticky;top:0;z-index:200;
+  height:60px;background:var(--white);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:12px;
+}
+.hdr-logo{display:flex;align-items:center;flex-shrink:0}
+.hdr-logo svg{height:22px;width:auto}
+.hdr-back{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--f-head);font-size:.8125rem;font-weight:500;
+  color:var(--text-2);padding:6px 11px;border-radius:8px;
+  margin-left:auto;transition:background .14s,color .14s;
+}
+.hdr-back:hover{background:var(--lavender);color:var(--indigo)}
+.hdr-back svg{width:14px;height:14px}
+
+/* Stepper */
+.stepper{display:flex;align-items:center;justify-content:center;gap:0;padding:24px 24px 0;max-width:560px;margin:0 auto}
+.step{display:flex;align-items:center;gap:8px;font-family:var(--f-head);font-size:.8125rem;font-weight:500;color:var(--text-3);flex-shrink:0}
+.step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;background:#F0EFF8;color:var(--text-3)}
+.step.done .step-num{background:var(--green);color:var(--white)}
+.step.done{color:var(--text-2)}
+.step.active .step-num{background:var(--indigo);color:var(--white)}
+.step.active{color:var(--text)}
+.step-line{flex:1;height:2px;background:var(--border);min-width:32px;max-width:80px}
+.step-line.done{background:var(--green)}
+
+.page{max-width:680px;margin:0 auto;padding:32px 24px 72px}
+
+/* Hero success */
+.success-hero{text-align:center;margin-bottom:36px;padding:36px 24px}
+.success-check{
+  width:64px;height:64px;background:var(--green-pale);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
+}
+.success-check svg{width:28px;height:28px;color:var(--green)}
+.success-title{
+  font-family:var(--f-head);font-weight:700;font-size:clamp(1.375rem,3vw,1.75rem);
+  color:var(--text);letter-spacing:-.025em;margin-bottom:10px;
+}
+.success-sub{font-size:.9375rem;color:var(--text-2);line-height:1.65}
+
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border);font-family:var(--f-head);font-weight:600;font-size:.875rem;color:var(--text);display:flex;align-items:center;gap:8px}
+.card-head svg{width:14px;height:14px;color:var(--indigo);flex-shrink:0}
+.card-body{padding:20px}
+
+/* URL row */
+.url-row{display:flex;gap:8px}
+.url-input{
+  flex:1;min-width:0;
+  padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  font-size:.875rem;color:var(--text-2);background:var(--lavender);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--f-head);font-weight:600;font-size:.8125rem;
+  padding:8px 16px;border-radius:var(--radius-sm);
+  transition:all .15s;cursor:pointer;border:none;white-space:nowrap;
+}
+.btn-primary{background:var(--indigo);color:var(--white)}
+.btn-primary:hover{background:var(--indigo-d)}
+.btn-ghost{background:transparent;color:var(--text-2);border:1.5px solid var(--border)}
+.btn-ghost:hover{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-pale)}
+.btn-green{background:#25D366;color:var(--white)}
+.btn-green:hover{background:#1eb659}
+.btn svg{width:13px;height:13px;flex-shrink:0}
+.copy-feedback{
+  font-size:.75rem;color:var(--green);font-weight:600;margin-top:8px;
+  min-height:18px;transition:opacity .3s;
+}
+
+/* QR section */
+.qr-wrap{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+.qr-img{border-radius:10px;border:2px solid var(--border);padding:8px;background:var(--white)}
+.qr-img img{display:block;width:140px;height:140px}
+.qr-actions{display:flex;flex-direction:column;gap:8px;flex:1;min-width:180px}
+.qr-desc{font-size:.875rem;color:var(--text-2);line-height:1.6;margin-bottom:8px}
+
+/* Share actions */
+.share-actions{display:flex;flex-direction:column;gap:8px}
+
+.dashboard-link{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:.875rem;color:var(--text-2);font-weight:500;
+  padding:10px 0;transition:color .15s;
+}
+.dashboard-link:hover{color:var(--indigo)}
+.dashboard-link svg{width:14px;height:14px}
+
+@media(max-width:520px){
+  .url-row{flex-direction:column}
+  .qr-wrap{flex-direction:column;align-items:center}
+}
+.u-menu{position:relative}
+.u-av{width:34px;height:34px;border-radius:50%;background:var(--indigo);color:var(--white);font-family:var(--f-head);font-weight:700;font-size:.75rem;display:flex;align-items:center;justify-content:center;cursor:pointer;outline:2px solid transparent;outline-offset:2px;transition:outline-color .15s;border:none}
+.u-av:hover,.u-menu.open .u-av{outline-color:#E4E2F8}
+.u-drop{position:absolute;right:0;top:calc(100% + 8px);background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:6px;min-width:190px;box-shadow:var(--shadow-md);display:none;z-index:300}
+.u-menu.open .u-drop{display:block}
+.u-drop-head{padding:8px 10px 10px;border-bottom:1px solid var(--border);margin-bottom:6px}
+.u-drop-name{font-family:var(--f-head);font-weight:600;font-size:.875rem;color:var(--text)}
+.u-drop-email{font-size:.75rem;color:var(--text-3);margin-top:1px}
+.d-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;font-size:.875rem;color:var(--text-2);transition:background .12s,color .12s;width:100%}
+.d-item:hover{background:var(--lavender);color:var(--text)}
+.d-item.danger:hover{background:#FEF2F2;color:#E24B4A}
+.d-sep{height:1px;background:var(--border);margin:4px 0}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="{% url 'dashboard' %}" class="hdr-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64">
+      <path d="M10 14 a10 10 0 0 1 10-10 h24 a10 10 0 0 1 10 10 v20 a10 10 0 0 1-10 10 h-14 l-9 9 v-9 h-1 a10 10 0 0 1-10-10 z" fill="#4F46B8"/>
+      <path d="M32 12 l3.4 6.9 7.6 1.1 -5.5 5.4 1.3 7.6 -6.8-3.6 -6.8 3.6 1.3-7.6 -5.5-5.4 7.6-1.1 z" fill="#F2A93B"/>
+      <text x="68" y="40" font-size="28" font-weight="600" fill="#4F46B8" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
+    </svg>
+  </a>
+  <a href="{% url 'dashboard' %}" class="hdr-back">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Tableau de bord
+  </a>
+  <div class="u-menu" id="user-menu">
+    <button class="u-av" onclick="document.getElementById('user-menu').classList.toggle('open')" aria-label="Menu utilisateur">{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}{% if not request.user.first_name %}{{ request.user.username|slice:":2"|upper }}{% endif %}</button>
+    <div class="u-drop">
+      <div class="u-drop-head">
+        <div class="u-drop-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+        <div class="u-drop-email">{{ request.user.email }}</div>
+      </div>
+      <div class="d-sep"></div>
+      <a href="{% url 'logout' %}" class="d-item danger">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M5 7h7M9 4.5L12 7l-3 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Se déconnecter
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="stepper">
+  <div class="step done">
+    <span class="step-num">
+      <svg viewBox="0 0 16 16" fill="none" width="12" height="12"><path d="M3 8l3.5 3.5L13 5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    <span>Modèle</span>
+  </div>
+  <div class="step-line done"></div>
+  <div class="step done">
+    <span class="step-num">
+      <svg viewBox="0 0 16 16" fill="none" width="12" height="12"><path d="M3 8l3.5 3.5L13 5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    <span>Personnaliser</span>
+  </div>
+  <div class="step-line done"></div>
+  <div class="step active">
+    <span class="step-num">3</span>
+    <span>Partager</span>
+  </div>
+</div>
+
+<main class="page">
+
+  <div class="success-hero">
+    <div class="success-check">
+      <svg viewBox="0 0 28 28" fill="none"><path d="M5 14l6.5 6.5L23 8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h1 class="success-title">Votre formulaire est en ligne 🎉</h1>
+    <p class="success-sub">Partagez le lien ou le QR code — vos réponses arriveront en temps réel.</p>
+  </div>
+
+  <!-- Lien public -->
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M7 5H4a3 3 0 000 6h3M9 11h3a3 3 0 000-6H9M6 8h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Lien public
+    </div>
+    <div class="card-body">
+      <div class="url-row">
+        <input class="url-input" type="text" readonly value="{{ public_url }}" id="public-url">
+        <button type="button" class="btn btn-primary" onclick="copyUrl()">
+          <svg viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M3 11V3h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Copier
+        </button>
+      </div>
+      <div class="copy-feedback" id="copy-feedback"></div>
+    </div>
+  </div>
+
+  <!-- QR Code -->
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M9 9h2v2H9zM11 11h3M11 13v2M13 9v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      QR Code
+    </div>
+    <div class="card-body">
+      <div class="qr-wrap">
+        <div class="qr-img">
+          <img src="{% url 'qr_code' vform.pk %}" alt="QR Code du formulaire {{ vform.title }}">
+        </div>
+        <div class="qr-actions">
+          <p class="qr-desc">Imprimez ou affichez ce QR code — vos clients le scannent et accèdent directement au formulaire.</p>
+          <a href="{% url 'qr_code' vform.pk %}" download="{{ vform.title|slugify }}-qrcode.png" class="btn btn-ghost">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v8M5 8l3 3 3-3M3 14h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Télécharger le QR code
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions de partage -->
+  <div class="card">
+    <div class="card-head">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M11 1a3 3 0 110 6 3 3 0 010-6zM5 5a3 3 0 110 6 3 3 0 010-6zM11 9a3 3 0 110 6 3 3 0 010-6zM7.7 6.7l.6-.3M7.7 9.3l.6.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Partager via
+    </div>
+    <div class="card-body">
+      <div class="share-actions">
+        <a href="https://wa.me/?text={{ public_url|urlencode }}" target="_blank" rel="noopener" class="btn btn-green" style="justify-content:center">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.13.558 4.131 1.535 5.863L.057 23.7a.75.75 0 00.918.953l6.075-1.592A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.93 0-3.74-.5-5.31-1.378l-.38-.22-3.942 1.034 1.05-3.831-.243-.392A9.956 9.956 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          Envoyer par WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <a href="{% url 'dashboard' %}" class="dashboard-link">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Retour au tableau de bord
+  </a>
+
+</main>
+
+<script>
+function copyUrl(){
+  const url = document.getElementById('public-url').value;
+  const fb = document.getElementById('copy-feedback');
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(()=>{
+      fb.textContent='Copié ✓';
+      setTimeout(()=>{fb.textContent=''},2000);
+    });
+  } else {
+    document.getElementById('public-url').select();
+    document.execCommand('copy');
+    fb.textContent='Copié ✓';
+    setTimeout(()=>{fb.textContent=''},2000);
+  }
+}
+document.addEventListener('click',function(e){if(!e.target.closest('.u-menu'))document.querySelectorAll('.u-menu.open').forEach(function(m){m.classList.remove('open')});});
+</script>
+</body>
+</html>

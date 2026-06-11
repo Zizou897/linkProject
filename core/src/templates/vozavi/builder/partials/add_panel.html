@@ -1,0 +1,97 @@
+{% load static %}
+<div class="add-panel">
+  <div class="add-panel-title">Choisissez un type de question</div>
+  <div class="add-panel-btns">
+
+    <form method="post" action="{% url 'add_question' vform.pk %}" style="display:contents">
+      {% csrf_token %}
+      <input type="hidden" name="type" value="rating">
+      <button type="submit" class="add-type-btn"
+        hx-post="{% url 'add_question' vform.pk %}"
+        hx-include="this"
+        hx-target="#questions-list"
+        hx-swap="innerHTML"
+        hx-on::after-request="$dispatch('close-panel')">
+        <span class="add-type-icon">⭐</span>
+        <span class="add-type-name">Note</span>
+        <span class="add-type-desc">Étoiles de 1 à 5</span>
+      </button>
+    </form>
+
+    <form method="post" action="{% url 'add_question' vform.pk %}" style="display:contents">
+      {% csrf_token %}
+      <input type="hidden" name="type" value="single_choice">
+      <button type="submit" class="add-type-btn"
+        hx-post="{% url 'add_question' vform.pk %}"
+        hx-include="this"
+        hx-target="#questions-list"
+        hx-swap="innerHTML"
+        hx-on::after-request="$dispatch('close-panel')">
+        <span class="add-type-icon">🔘</span>
+        <span class="add-type-name">Choix unique</span>
+        <span class="add-type-desc">Une seule réponse</span>
+      </button>
+    </form>
+
+    <form method="post" action="{% url 'add_question' vform.pk %}" style="display:contents">
+      {% csrf_token %}
+      <input type="hidden" name="type" value="multiple_choice">
+      <button type="submit" class="add-type-btn"
+        hx-post="{% url 'add_question' vform.pk %}"
+        hx-include="this"
+        hx-target="#questions-list"
+        hx-swap="innerHTML"
+        hx-on::after-request="$dispatch('close-panel')">
+        <span class="add-type-icon">☑️</span>
+        <span class="add-type-name">Cases à cocher</span>
+        <span class="add-type-desc">Plusieurs réponses</span>
+      </button>
+    </form>
+
+    <form method="post" action="{% url 'add_question' vform.pk %}" style="display:contents">
+      {% csrf_token %}
+      <input type="hidden" name="type" value="text">
+      <button type="submit" class="add-type-btn"
+        hx-post="{% url 'add_question' vform.pk %}"
+        hx-include="this"
+        hx-target="#questions-list"
+        hx-swap="innerHTML"
+        hx-on::after-request="$dispatch('close-panel')">
+        <span class="add-type-icon">💬</span>
+        <span class="add-type-name">Texte libre</span>
+        <span class="add-type-desc">Réponse longue</span>
+      </button>
+    </form>
+
+    <form method="post" action="{% url 'add_question' vform.pk %}" style="display:contents">
+      {% csrf_token %}
+      <input type="hidden" name="type" value="grid">
+      <button type="submit" class="add-type-btn"
+        hx-post="{% url 'add_question' vform.pk %}"
+        hx-include="this"
+        hx-target="#questions-list"
+        hx-swap="innerHTML"
+        hx-on::after-request="$dispatch('close-panel')">
+        <span class="add-type-icon">📊</span>
+        <span class="add-type-name">Grille de critères</span>
+        <span class="add-type-desc">Évaluation multi-critères</span>
+      </button>
+    </form>
+
+    <form method="post" action="{% url 'add_question' vform.pk %}" style="display:contents">
+      {% csrf_token %}
+      <input type="hidden" name="type" value="contact">
+      <button type="submit" class="add-type-btn"
+        hx-post="{% url 'add_question' vform.pk %}"
+        hx-include="this"
+        hx-target="#questions-list"
+        hx-swap="innerHTML"
+        hx-on::after-request="$dispatch('close-panel')">
+        <span class="add-type-icon">👤</span>
+        <span class="add-type-name">Infos personnelles</span>
+        <span class="add-type-desc">Coordonnées prospect</span>
+      </button>
+    </form>
+
+  </div>
+</div>

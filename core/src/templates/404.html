@@ -1,35 +1,331 @@
-{% extends 'app/base/base.html' %}
-{% block title %}Page introuvable — Bediakon Formation{% endblock %}
-{% block navbar %}{% endblock %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<title>404 — Page introuvable · Vozavi</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ind:#4F46B8;--ind-m:#6B63C8;
+  --amb:#F2A93B;
+  --grn:#1D9E75;
+  --bg:#0F0D1E;
+  --sf:rgba(255,255,255,.04);
+  --sf-h:rgba(255,255,255,.07);
+  --bd:rgba(255,255,255,.08);
+  --bd-h:rgba(79,70,184,.5);
+  --txt:#fff;--txt-2:rgba(255,255,255,.55);--txt-3:rgba(255,255,255,.25);
+  --fh:'Poppins',sans-serif;--fb:'Inter',sans-serif;
+  --r:14px;--r-sm:10px;
+  --t:220ms;--ease:cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
+body{
+  font-family:var(--fb);font-size:15px;color:var(--txt);
+  background:var(--bg);min-height:100vh;
+  display:flex;flex-direction:column;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+a{text-decoration:none;color:inherit}
 
-{% block content %}
-<div class="d-flex align-items-center justify-content-center" style="min-height:75vh;">
-    <div class="text-center" style="max-width:420px;">
+/* ── GRID LINES ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(79,70,184,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(79,70,184,.05) 1px,transparent 1px);
+  background-size:52px 52px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%);
+}
 
-        <div style="font-size:6rem;font-weight:700;line-height:1;
-                    color:var(--gray-200);letter-spacing:-.04em;
-                    font-family:var(--font);user-select:none;">
-            404
-        </div>
+/* ── FLOATING GHOST BUBBLES ── */
+.bubbles{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.b{position:absolute;color:var(--ind)}
+.b svg{display:block}
 
-        <div style="width:40px;height:3px;background:var(--blue);
-                    border-radius:99px;margin:.75rem auto 1.5rem;"></div>
+.b:nth-child(1){width:54px;top:7%;left:5%;  animation:d1 24s ease-in-out infinite;        opacity:.07}
+.b:nth-child(2){width:30px;top:16%;left:80%; animation:d2 18s ease-in-out infinite;        opacity:.045}
+.b:nth-child(3){width:76px;top:52%;left:2%;  animation:d1 30s ease-in-out infinite reverse;opacity:.05}
+.b:nth-child(4){width:22px;top:72%;left:89%; animation:d3 20s ease-in-out infinite;        opacity:.08}
+.b:nth-child(5){width:46px;top:84%;left:44%; animation:d2 25s ease-in-out infinite;        opacity:.042}
+.b:nth-child(6){width:34px;top:32%;left:93%; animation:d1 21s ease-in-out infinite;        opacity:.06}
+.b:nth-child(7){width:18px;top:11%;left:55%; animation:d3 16s ease-in-out infinite reverse;opacity:.055}
+.b:nth-child(8){width:62px;top:44%;left:65%; animation:d2 28s ease-in-out infinite;        opacity:.038}
 
-        <h4 class="mb-2" style="color:var(--gray-900);">Page introuvable</h4>
-        <p class="text-muted mb-4" style="font-size:.9rem;">
-            La page que vous recherchez n'existe pas ou a été déplacée.
-        </p>
+@keyframes d1{0%,100%{transform:translateY(0)  rotate(0deg)} 35%{transform:translateY(-26px) rotate(4deg)}  70%{transform:translateY(13px)  rotate(-3deg)}}
+@keyframes d2{0%,100%{transform:translateY(0)  rotate(0deg)} 42%{transform:translateY(24px)  rotate(-5deg)} 72%{transform:translateY(-18px) rotate(3deg)}}
+@keyframes d3{0%,100%{transform:translateY(0)  rotate(0deg)} 50%{transform:translateY(-30px) rotate(6deg)}}
+@media(prefers-reduced-motion:reduce){.b{animation:none}}
 
-        {% if user.is_staff %}
-        <a href="{% url 'dashboard' %}" class="btn btn-primary btn-sm px-4">
-            <i class="bi bi-speedometer2 me-1"></i>Retour au tableau de bord
-        </a>
-        {% else %}
-        <a href="{% url 'login' %}" class="btn btn-primary btn-sm px-4">
-            <i class="bi bi-arrow-left me-1"></i>Retour à l'accueil
-        </a>
-        {% endif %}
+/* ── HEADER ── */
+.hdr{
+  position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:28px 44px;
+  animation:sDown .55s var(--ease) both;
+}
+@keyframes sDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+.hdr-logo svg{height:22px;width:auto;opacity:.88}
+.hdr-nav{display:flex;align-items:center;gap:22px}
+.hdr-link{font-size:.8rem;font-weight:500;color:var(--txt-3);transition:color var(--t)}
+.hdr-link:hover{color:var(--txt-2)}
+.hdr-btn{
+  font-size:.8rem;font-weight:600;
+  background:var(--sf);border:1px solid var(--bd);
+  color:var(--txt-2);border-radius:var(--r-sm);padding:8px 16px;
+  transition:background var(--t),border-color var(--t),color var(--t);
+}
+.hdr-btn:hover{background:var(--sf-h);border-color:var(--bd-h);color:var(--txt)}
 
-    </div>
+/* ── MAIN ── */
+.main{
+  position:relative;z-index:5;flex:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:0 24px 64px;text-align:center;
+}
+
+/* Radial glow bloom */
+.bloom{
+  position:absolute;
+  width:640px;height:320px;
+  background:radial-gradient(ellipse at 50% 55%,rgba(79,70,184,.2) 0%,transparent 68%);
+  top:50%;left:50%;transform:translate(-50%,-52%);
+  pointer-events:none;z-index:0;
+  animation:breathe 7s ease-in-out infinite;
+}
+@keyframes breathe{
+  0%,100%{opacity:.8;transform:translate(-50%,-52%) scale(1)}
+  50%{opacity:1;transform:translate(-50%,-52%) scale(1.08)}
+}
+
+/* 404 */
+.num-wrap{
+  position:relative;z-index:1;
+  animation:numIn .75s cubic-bezier(.16,1,.3,1) .1s both;
+}
+@keyframes numIn{from{opacity:0;transform:scale(.9) translateY(22px)}to{opacity:1;transform:none}}
+
+.num{
+  font-family:var(--fh);font-weight:800;
+  font-size:clamp(108px,19vw,240px);
+  line-height:.9;letter-spacing:-.055em;
+  color:transparent;
+  -webkit-text-stroke:1.5px rgba(79,70,184,.45);
+  background:linear-gradient(155deg,rgba(79,70,184,.18) 0%,rgba(79,70,184,.05) 100%);
+  -webkit-background-clip:text;background-clip:text;
+  user-select:none;
+}
+
+/* Amber separator */
+.sep{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin:10px 0 26px;
+  animation:fUp .5s var(--ease) .32s both;
+}
+.sep-bar{width:36px;height:1.5px;background:rgba(255,255,255,.09);border-radius:2px}
+.sep-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--amb);
+  box-shadow:0 0 10px rgba(242,169,59,.7),0 0 20px rgba(242,169,59,.3);
+}
+
+/* Copy */
+.head{
+  font-family:var(--fh);font-weight:700;
+  font-size:clamp(1.25rem,2.4vw,1.625rem);
+  color:var(--txt);letter-spacing:-.02em;
+  margin-bottom:10px;
+  animation:fUp .5s var(--ease) .38s both;
+}
+.sub{
+  font-size:.9375rem;color:var(--txt-2);line-height:1.72;
+  max-width:400px;margin-bottom:44px;
+  animation:fUp .5s var(--ease) .44s both;
+}
+.sub strong{color:rgba(255,255,255,.78)}
+
+@keyframes fUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* Nav cards */
+.cards{
+  display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
+  animation:fUp .5s var(--ease) .52s both;
+}
+.nc{
+  display:flex;align-items:center;gap:13px;
+  background:var(--sf);border:1px solid var(--bd);
+  border-radius:var(--r);padding:15px 18px;
+  min-width:196px;text-align:left;
+  position:relative;overflow:hidden;
+  transition:background var(--t),border-color var(--t),transform var(--t),box-shadow var(--t);
+}
+.nc::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(79,70,184,.1) 0%,transparent 55%);
+  opacity:0;transition:opacity var(--t);
+}
+.nc:hover{background:var(--sf-h);border-color:var(--bd-h);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.3)}
+.nc:hover::after{opacity:1}
+.nc:active{transform:translateY(-1px)}
+
+.nc.hi{border-color:rgba(79,70,184,.38);background:rgba(79,70,184,.1)}
+.nc.hi:hover{border-color:var(--ind-m);background:rgba(79,70,184,.18)}
+
+.nc-ico{
+  width:38px;height:38px;border-radius:var(--r-sm);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform var(--t);
+}
+.nc:hover .nc-ico{transform:scale(1.1)}
+.nc-ico.home{background:rgba(255,255,255,.06)}
+.nc-ico.form{background:rgba(79,70,184,.28)}
+.nc-ico.help{background:rgba(29,158,117,.2)}
+.nc-ico svg{width:17px;height:17px}
+
+.nc-body{flex:1;min-width:0;position:relative;z-index:1}
+.nc-t{display:block;font-family:var(--fh);font-weight:600;font-size:.875rem;color:var(--txt);margin-bottom:2px}
+.nc-s{display:block;font-size:.72rem;color:var(--txt-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.nc-arr{
+  width:15px;height:15px;flex-shrink:0;color:var(--txt-3);
+  position:relative;z-index:1;
+  transition:transform var(--t),color var(--t);
+}
+.nc:hover .nc-arr{transform:translateX(4px);color:var(--txt-2)}
+
+/* Footer */
+footer{
+  position:relative;z-index:5;
+  padding:20px 40px;text-align:center;
+  font-size:.72rem;color:var(--txt-3);
+  animation:fUp .5s var(--ease) .62s both;
+  letter-spacing:.02em;
+}
+footer a{color:rgba(255,255,255,.18);transition:color var(--t)}
+footer a:hover{color:var(--txt-3)}
+
+/* Responsive */
+@media(max-width:640px){
+  .hdr{padding:20px 20px}
+  .hdr-link{display:none}
+  .cards{flex-direction:column;align-items:stretch;width:100%;max-width:300px}
+  .nc{min-width:auto}
+  .bloom{width:320px;height:200px}
+}
+</style>
+</head>
+<body>
+
+<!-- Ghost bubbles -->
+<div class="bubbles" aria-hidden="true">
+  <div class="b"><svg viewBox="0 0 48 44" fill="currentColor"><path d="M6 7a6 6 0 0 1 6-6h24a6 6 0 0 1 6 6v18a6 6 0 0 1-6 6H28l-8 8v-8H12a6 6 0 0 1-6-6V7z"/></svg></div>
+  <div class="b"><svg viewBox="0 0 48 44" fill="currentColor"><path d="M6 7a6 6 0 0 1 6-6h24a6 6 0 0 1 6 6v18a6 6 0 0 1-6 6H28l-8 8v-8H12a6 6 0 0 1-6-6V7z"/></svg></div>
+  <div class="b"><svg viewBox="0 0 48 44" fill="currentColor"><path d="M6 7a6 6 0 0 1 6-6h24a6 6 0 0 1 6 6v18a6 6 0 0 1-6 6H28l-8 8v-8H12a6 6 0 0 1-6-6V7z"/></svg></div>
+  <div class="b"><svg viewBox="0 0 48 44" fill="currentColor"><path d="M6 7a6 6 0 0 1 6-6h24a6 6 0 0 1 6 6v18a6 6 0 0 1-6 6H28l-8 8v-8H12a6 6 0 0 1-6-6V7z"/></svg></div>
+  <div class="b"><svg viewBox="0 0 48 44" fill="currentColor"><path d="M6 7a6 6 0 0 1 6-6h24a6 6 0 0 1 6 6v18a6 6 0 0 1-6 6H28l-8 8v-8H12a6 6 0 0 1-6-6V7z"/></svg></div>
+  <div class="b"><svg viewBox="0 0 48 44" fill="currentColor"><path d="M6 7a6 6 0 0 1 6-6h24a6 6 0 0 1 6 6v18a6 6 0 0 1-6 6H28l-8 8v-8H12a6 6 0 0 1-6-6V7z"/></svg></div>
+  <div class="b"><svg viewBox="0 0 48 44" fill="currentColor"><path d="M6 7a6 6 0 0 1 6-6h24a6 6 0 0 1 6 6v18a6 6 0 0 1-6 6H28l-8 8v-8H12a6 6 0 0 1-6-6V7z"/></svg></div>
+  <div class="b"><svg viewBox="0 0 48 44" fill="currentColor"><path d="M6 7a6 6 0 0 1 6-6h24a6 6 0 0 1 6 6v18a6 6 0 0 1-6 6H28l-8 8v-8H12a6 6 0 0 1-6-6V7z"/></svg></div>
 </div>
-{% endblock %}
+
+<!-- Header -->
+<header class="hdr">
+  <a href="/" aria-label="Vozavi">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64">
+      <path d="M10 14 a10 10 0 0 1 10-10 h24 a10 10 0 0 1 10 10 v20 a10 10 0 0 1-10 10 h-14 l-9 9 v-9 h-1 a10 10 0 0 1-10-10 z" fill="#fff" fill-opacity=".88"/>
+      <path d="M32 12 l3.4 6.9 7.6 1.1 -5.5 5.4 1.3 7.6 -6.8-3.6 -6.8 3.6 1.3-7.6 -5.5-5.4 7.6-1.1 z" fill="#F2A93B"/>
+      <text x="68" y="40" font-size="28" font-weight="600" fill="#fff" fill-opacity=".88" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
+    </svg>
+  </a>
+  <nav class="hdr-nav">
+    <a href="/contact/" class="hdr-link">Aide</a>
+    <a href="/connexion/" class="hdr-btn">Se connecter</a>
+  </nav>
+</header>
+
+<!-- Main -->
+<main class="main">
+  <div class="bloom" aria-hidden="true"></div>
+
+  <div class="num-wrap" aria-label="Erreur 404 — Page introuvable">
+    <div class="num" aria-hidden="true">404</div>
+  </div>
+
+  <div class="sep" aria-hidden="true">
+    <div class="sep-bar"></div>
+    <div class="sep-dot"></div>
+    <div class="sep-bar"></div>
+  </div>
+
+  <h1 class="head">Cette page s'est perdue.</h1>
+  <p class="sub">
+    L'adresse que vous cherchez n'existe pas ou a été déplacée.<br>
+    <strong>Repartez sur une bonne piste.</strong>
+  </p>
+
+  <nav class="cards" aria-label="Pages suggérées">
+
+    <a href="/" class="nc">
+      <div class="nc-ico home">
+        <svg viewBox="0 0 20 20" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.5">
+          <path d="M3 9.5 10 3l7 6.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5 8v8a1 1 0 0 0 1 1h3v-4h2v4h3a1 1 0 0 0 1-1V8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="nc-body">
+        <span class="nc-t">Accueil</span>
+        <span class="nc-s">Page principale Vozavi</span>
+      </div>
+      <svg class="nc-arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+
+    <a href="/dashboard/new/" class="nc hi">
+      <div class="nc-ico form">
+        <svg viewBox="0 0 20 20" fill="none" stroke="rgba(167,163,230,.9)" stroke-width="1.5">
+          <rect x="4" y="3" width="12" height="14" rx="2"/>
+          <path d="M7 7h6M7 10h6M7 13h4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="nc-body">
+        <span class="nc-t">Créer un formulaire</span>
+        <span class="nc-s">Gratuit · Prêt en 2 min</span>
+      </div>
+      <svg class="nc-arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+
+    <a href="/contact/" class="nc">
+      <div class="nc-ico help">
+        <svg viewBox="0 0 20 20" fill="none" stroke="rgba(104,207,175,.88)" stroke-width="1.5">
+          <path d="M4 6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H9l-4 3V6z" stroke-linejoin="round"/>
+          <path d="M8 9h4M8 11.5h2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="nc-body">
+        <span class="nc-t">Nous contacter</span>
+        <span class="nc-s">Réponse sous 24h</span>
+      </div>
+      <svg class="nc-arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+
+  </nav>
+</main>
+
+<footer>
+  © 2025 Vozavi &nbsp;·&nbsp; <a href="/confidentialite/">Confidentialité</a> &nbsp;·&nbsp; <a href="/conditions/">CGU</a>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="340" height="64" viewBox="0 0 170 32">
+  <rect width="170" height="32" rx="16" fill="#F4F3FB"/>
+  <rect x="8" y="6" width="20" height="20" rx="5" fill="#4F46B8"/>
+  <path d="M18 9.5 l1.5 3 3.3 0.5 -2.4 2.3 0.6 3.3 -3 -1.6 -3 1.6 0.6 -3.3 -2.4 -2.3 3.3 -0.5 z" fill="#F2A93B"/>
+  <text x="36" y="21" font-size="12" fill="#3C3489" font-family="Inter, 'Segoe UI', Arial, sans-serif">Créé avec <tspan font-weight="600">Vozavi</tspan></text>
+</svg>

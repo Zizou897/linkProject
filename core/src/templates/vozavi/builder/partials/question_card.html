@@ -1,0 +1,180 @@
+{% load static custom_tags %}
+<div class="q-card" id="q-{{ q.pk }}" x-data="{ editing: false, reqChecked: {{ q.required|lower }} }">
+
+  {# Bouton save caché — déclenché par JS (blur option, suppression option) #}
+  <button
+    id="save-q-{{ q.pk }}"
+    type="button"
+    style="position:absolute;visibility:hidden;pointer-events:none;width:0;height:0;overflow:hidden"
+    hx-post="{% url 'update_question' vform.pk q.pk %}"
+    hx-include="#q-{{ q.pk }}"
+    hx-target="#q-{{ q.pk }}"
+    hx-swap="outerHTML">
+  </button>
+
+  <div class="q-card-inner">
+    <div class="q-type-icon">
+      {% if q.type == 'rating' %}⭐{% elif q.type == 'single_choice' %}🔘{% elif q.type == 'multiple_choice' %}☑️{% elif q.type == 'grid' %}📊{% else %}💬{% endif %}
+    </div>
+    <div class="q-body">
+
+      {# Label — clic pour éditer, blur/entrée pour sauvegarder #}
+      <div class="q-label-wrap">
+        <span class="q-label-text" @click="editing=true" x-show="!editing">{{ q.label }}</span>
+        <input
+          class="q-label-input"
+          x-show="editing"
+          name="label"
+          value="{{ q.label }}"
+          x-init="$watch('editing', v => v && $nextTick(() => $el.focus()))"
+          @blur="editing=false"
+          @keydown.enter.prevent="editing=false"
+          hx-post="{% url 'update_question' vform.pk q.pk %}"
+          hx-target="#q-{{ q.pk }}"
+          hx-swap="outerHTML"
+          hx-trigger="blur, keydown[keyCode==13]"
+          hx-include="#q-{{ q.pk }}"
+        >
+      </div>
+      <div class="q-type-badge">{{ q.get_type_display }}</div>
+
+      {# ── CHOIX UNIQUE / CASES À COCHER ── rendu côté serveur, JS pour add/del #}
+      {% if q.type in 'single_choice,multiple_choice' %}
+      <div class="q-choices">
+        {% for choice in q.options.choices %}
+        <div class="q-choice-row">
+          {% if q.type == 'single_choice' %}
+            <span class="q-choice-dot"></span>
+          {% else %}
+            <span class="q-choice-check"></span>
+          {% endif %}
+          <input
+            type="text"
+            name="choices"
+            value="{{ choice }}"
+            class="q-choice-input"
+            placeholder="Saisissez une option…"
+            onblur="saveQuestion({{ q.pk }})"
+          >
+          <button
+            type="button"
+            class="q-del-opt"
+            title="Supprimer cette option"
+            style="visibility:{% if q.options.choices|length <= 1 %}hidden{% else %}visible{% endif %}"
+            onclick="delItem(this, {{ q.pk }})">
+            <svg viewBox="0 0 12 12" fill="none" width="10" height="10">
+              <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        {% endfor %}
+        <button type="button" class="q-add-choice" onclick="addItem(this, {{ q.pk }})">
+          + Ajouter une option
+        </button>
+      </div>
+      {% endif %}
+
+      {# ── GRILLE DE CRITÈRES ── rendu côté serveur, JS pour add/del #}
+      {% if q.type == 'grid' %}
+      <div class="q-criteria">
+        {% for cr in q.options.criteria %}
+        <div class="q-choice-row">
+          <span class="q-crit-bullet">—</span>
+          <input
+            type="text"
+            name="criteria"
+            value="{{ cr }}"
+            class="q-choice-input"
+            placeholder="Saisissez un critère…"
+            onblur="saveQuestion({{ q.pk }})"
+          >
+          <button
+            type="button"
+            class="q-del-opt"
+            title="Supprimer ce critère"
+            style="visibility:{% if q.options.criteria|length <= 1 %}hidden{% else %}visible{% endif %}"
+            onclick="delItem(this, {{ q.pk }})">
+            <svg viewBox="0 0 12 12" fill="none" width="10" height="10">
+              <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        {% endfor %}
+        <button type="button" class="q-add-choice" onclick="addItem(this, {{ q.pk }})">
+          + Ajouter un critère
+        </button>
+      </div>
+      {% endif %}
+
+      {# ── INFOS PERSONNELLES ── cases à cocher pour choisir les champs #}
+      {% if q.type == 'contact' %}
+      {% get_contact_fields as cfields %}
+      <p class="q-cf-hint">Champs à collecter :</p>
+      <div class="q-contact-fields">
+        {% for f in cfields %}
+        <label class="q-cf-pill">
+          <input
+            type="checkbox"
+            name="contact_fields"
+            value="{{ f.key }}"
+            {% if f.key in q.options.fields %}checked{% endif %}
+            onchange="saveQuestion({{ q.pk }})"
+          >
+          <span class="q-cf-check">{% if f.key in q.options.fields %}✓{% endif %}</span>
+          <span>{{ f.label }}</span>
+        </label>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <div class="q-actions">
+
+    {# Toggle obligatoire #}
+    <label class="q-req-toggle" :class="reqChecked && 'active'">
+      <input
+        type="checkbox"
+        name="required"
+        :checked="reqChecked"
+        @change="reqChecked=$event.target.checked"
+        hx-post="{% url 'update_question' vform.pk q.pk %}"
+        hx-include="#q-{{ q.pk }}"
+        hx-trigger="change"
+        hx-target="#q-{{ q.pk }}"
+        hx-swap="outerHTML"
+      >
+      <span class="q-req-slider"></span>
+      <span class="q-req-lbl">Obligatoire</span>
+    </label>
+
+    {# Monter / Descendre #}
+    <div class="q-move-btns">
+      <button type="button" class="q-btn-move" title="Monter"
+        hx-post="{% url 'move_question' vform.pk q.pk %}"
+        hx-vals='{"direction":"up"}'
+        hx-target="#questions-list"
+        hx-swap="innerHTML">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M4 10l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button type="button" class="q-btn-move" title="Descendre"
+        hx-post="{% url 'move_question' vform.pk q.pk %}"
+        hx-vals='{"direction":"down"}'
+        hx-target="#questions-list"
+        hx-swap="innerHTML">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    {# Supprimer la question #}
+    <button type="button" class="q-btn-del" title="Supprimer cette question"
+      hx-post="{% url 'delete_question' vform.pk q.pk %}"
+      hx-target="#q-{{ q.pk }}"
+      hx-swap="outerHTML"
+      hx-confirm="Supprimer cette question ?">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M3 4h10M6 4V2.5h4V4M5.5 4l.5 8M10.5 4l-.5 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
+  </div>
+</div>

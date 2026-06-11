@@ -1,0 +1,12 @@
+{% load static %}
+{% for q in questions %}
+  {% include 'vozavi/builder/partials/question_card.html' %}
+{% empty %}
+  <div class="q-empty">
+    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="8" y="8" width="32" height="32" rx="6" stroke="#9B9BB5" stroke-width="2" stroke-dasharray="4 3"/>
+      <path d="M24 18v12M18 24h12" stroke="#9B9BB5" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <p>Aucune question pour l'instant — ajoutez-en une ci-dessous.</p>
+  </div>
+{% endfor %}

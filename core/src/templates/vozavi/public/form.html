@@ -1,0 +1,378 @@
+{% load static custom_tags %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<title>{% if vform.brand_name %}{{ vform.brand_name }} — {% endif %}{{ vform.title }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand:{{ vform.brand_color|default:'#4F46B8' }};
+  --brand-pale: color-mix(in srgb, var(--brand) 12%, white);
+  --indigo:#4F46B8; --indigo-pale:#EEEDFB;
+  --lavender:#F4F3FB;
+  --white:#fff; --text:#2C2C3A; --text-2:#5C5C72; --text-3:#9B9BB5;
+  --border:#E2E1F0;
+  --green:#1D9E75; --green-pale:#E5F8F2;
+  --red:#E24B4A; --red-pale:#FEF2F2;
+  --shadow-sm:0 1px 4px rgba(44,44,58,.07);
+  --shadow:0 2px 8px rgba(44,44,58,.08);
+  --shadow-md:0 8px 24px rgba(44,44,58,.12);
+  --radius:12px; --radius-sm:8px;
+  --f-head:'Poppins',sans-serif; --f-body:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--f-body);font-size:15px;color:var(--text);background:var(--lavender);-webkit-font-smoothing:antialiased;min-height:100dvh}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+input,textarea,select{font-family:inherit}
+
+/* ── HEADER ── */
+.hdr{
+  background:var(--white);border-bottom:1px solid var(--border);
+  padding:16px 24px;
+  display:flex;align-items:center;gap:14px;
+}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-logo-img{width:36px;height:36px;border-radius:8px;object-fit:cover}
+.hdr-brand-name{font-family:var(--f-head);font-weight:700;font-size:1rem;color:var(--text)}
+.hdr-vozavi{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--text-3)}
+.hdr-vozavi svg{height:16px;width:auto;opacity:.6}
+
+/* ── PREVIEW BANNER ── */
+.preview-banner{
+  background:var(--brand-pale,#EEEDFB);
+  border-bottom:2px solid var(--brand,#4F46B8);
+  padding:10px 24px;
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--f-head);font-size:.8125rem;font-weight:600;color:var(--text);
+}
+.preview-banner svg{width:15px;height:15px;flex-shrink:0;color:var(--brand,#4F46B8)}
+
+/* ── FORM PAGE ── */
+.page{max-width:640px;margin:0 auto;padding:32px 20px 72px}
+
+.form-header{margin-bottom:32px}
+.form-brand{font-size:.875rem;color:var(--text-3);margin-bottom:6px;font-weight:500}
+.form-title{
+  font-family:var(--f-head);font-weight:700;font-size:clamp(1.375rem,3vw,1.75rem);
+  color:var(--text);letter-spacing:-.025em;line-height:1.25;text-wrap:balance;
+}
+.form-desc{
+  margin-top:10px;font-size:.9375rem;color:var(--text-2);
+  line-height:1.65;white-space:pre-line;
+}
+
+/* ── QUESTIONS ── */
+.questions{display:flex;flex-direction:column;gap:20px}
+.q-block{
+  background:var(--white);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:22px 22px 20px;
+}
+.q-label{
+  font-family:var(--f-head);font-weight:600;font-size:.9375rem;
+  color:var(--text);margin-bottom:14px;line-height:1.4;
+  display:flex;align-items:flex-start;gap:6px;
+}
+.q-required{color:var(--brand,#4F46B8);font-size:.875rem}
+.q-err{
+  font-size:.8125rem;color:var(--red);font-weight:500;
+  margin-top:8px;display:flex;align-items:center;gap:5px;
+}
+.q-err::before{content:'⚠';font-size:.875rem}
+
+/* Rating stars */
+.star-row{display:flex;gap:6px}
+.star{
+  width:40px;height:40px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.75rem;line-height:1;
+  transition:transform .12s;filter:grayscale(1);opacity:.4;
+}
+.star:hover,.star.active{filter:none;opacity:1;transform:scale(1.08)}
+.star-input{display:none}
+@media(max-width:400px){.star{width:34px;height:34px;font-size:1.5rem}}
+
+/* Single / multiple choice */
+.choice-list{display:flex;flex-direction:column;gap:8px}
+.choice-item{
+  display:flex;align-items:center;gap:11px;
+  padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;
+  cursor:pointer;transition:border-color .15s,background .15s;
+  font-size:.9375rem;color:var(--text);
+}
+.choice-item:hover{border-color:var(--brand,#4F46B8);background:var(--brand-pale,#EEEDFB)}
+.choice-item input[type=radio],.choice-item input[type=checkbox]{display:none}
+.choice-mark{
+  width:18px;height:18px;flex-shrink:0;
+  border:2px solid var(--border);border-radius:50%;
+  transition:border-color .15s,background .15s;
+}
+.choice-item.check .choice-mark{border-radius:4px}
+.choice-item.selected{border-color:var(--brand,#4F46B8);background:var(--brand-pale,#EEEDFB)}
+.choice-item.selected .choice-mark{background:var(--brand,#4F46B8);border-color:var(--brand,#4F46B8)}
+.choice-item.selected .choice-mark::after{content:'✓';display:flex;align-items:center;justify-content:center;color:white;font-size:.65rem;font-weight:700;height:100%;width:100%}
+
+/* Text */
+.q-textarea{
+  width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  font-size:.9375rem;color:var(--text);resize:vertical;min-height:96px;
+  transition:border-color .15s;line-height:1.6;
+}
+.q-textarea:focus{outline:none;border-color:var(--brand,#4F46B8)}
+.q-textarea::placeholder{color:var(--text-3)}
+
+/* Grid */
+.grid-table{width:100%;border-collapse:collapse}
+.grid-table th{
+  font-size:.75rem;font-weight:700;color:var(--text-3);text-align:center;
+  padding:8px 6px;border-bottom:1.5px solid var(--border);
+  font-family:var(--f-head);text-transform:uppercase;letter-spacing:.04em;
+}
+.grid-table th:first-child{text-align:left}
+.grid-table td{padding:10px 6px;border-bottom:1px solid var(--border-2,#EDECED);vertical-align:middle}
+.grid-table tr:last-child td{border-bottom:none}
+.grid-table td:first-child{font-size:.9rem;color:var(--text-2);padding-left:0}
+.grid-table td:not(:first-child){text-align:center}
+.grid-radio{
+  width:20px;height:20px;border:2px solid var(--border);border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:all .15s;
+}
+.grid-radio.active{background:var(--brand,#4F46B8);border-color:var(--brand,#4F46B8)}
+.grid-radio.active::after{content:'';width:7px;height:7px;border-radius:50%;background:white;display:block}
+@media(max-width:480px){
+  .grid-table{font-size:.8rem}
+  .grid-table th,.grid-table td{padding:7px 4px}
+}
+
+/* Contact fields */
+.contact-fields{display:flex;flex-direction:column;gap:12px}
+.cf-field{display:flex;flex-direction:column;gap:5px}
+.cf-label{font-size:.8125rem;font-weight:600;color:var(--text-2);letter-spacing:.01em}
+.cf-input{
+  width:100%;padding:10px 13px;
+  border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  font-size:.9375rem;color:var(--text);background:var(--white);
+  transition:border-color .15s;
+}
+.cf-input:focus{outline:none;border-color:var(--brand,#4F46B8)}
+.cf-input::placeholder{color:var(--text-3)}
+@media(min-width:480px){
+  .contact-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .cf-field.full{grid-column:1/-1}
+}
+
+/* Submit */
+.submit-row{margin-top:28px}
+.btn-submit{
+  width:100%;padding:14px 24px;border-radius:var(--radius);
+  background:var(--brand,#4F46B8);color:var(--white);
+  font-family:var(--f-head);font-weight:700;font-size:1rem;
+  border:none;cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,.18);
+  transition:filter .18s,transform .14s;
+}
+.btn-submit:hover{filter:brightness(1.08);transform:translateY(-1px)}
+
+@media(max-width:480px){
+  .page{padding:20px 16px 60px}
+  .q-block{padding:18px 16px 16px}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-brand">
+    {% if vform.logo %}
+      <img class="hdr-logo-img" src="{{ vform.logo.url }}" alt="{{ vform.brand_name }}">
+    {% endif %}
+    {% if vform.brand_name %}
+      <span class="hdr-brand-name">{{ vform.brand_name }}</span>
+    {% endif %}
+  </div>
+  <div class="hdr-vozavi">
+    <span>Propulsé par</span>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64">
+      <path d="M10 14 a10 10 0 0 1 10-10 h24 a10 10 0 0 1 10 10 v20 a10 10 0 0 1-10 10 h-14 l-9 9 v-9 h-1 a10 10 0 0 1-10-10 z" fill="#4F46B8"/>
+      <path d="M32 12 l3.4 6.9 7.6 1.1 -5.5 5.4 1.3 7.6 -6.8-3.6 -6.8 3.6 1.3-7.6 -5.5-5.4 7.6-1.1 z" fill="#F2A93B"/>
+      <text x="68" y="40" font-size="28" font-weight="600" fill="#4F46B8" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
+    </svg>
+  </div>
+</header>
+
+{% if preview %}
+<div class="preview-banner">
+  <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3.5M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  Aperçu — ce formulaire n'est pas encore publié et ne collecte pas de réponses.
+</div>
+{% endif %}
+
+<main class="page">
+  <div class="form-header">
+    {% if vform.brand_name %}<div class="form-brand">{{ vform.brand_name }}</div>{% endif %}
+    <h1 class="form-title">{{ vform.title }}</h1>
+    {% if vform.description %}<p class="form-desc">{{ vform.description }}</p>{% endif %}
+  </div>
+
+  {% if not preview %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+  {% endif %}
+
+    <div class="questions">
+      {% for q in questions %}
+      <div class="q-block">
+        <div class="q-label">
+          {{ q.label }}
+          {% if q.required %}<span class="q-required">*</span>{% endif %}
+        </div>
+
+        {% if q.type == 'rating' %}
+          {% with max_stars=q.options.max|default:5 %}
+          <div class="star-row" id="stars-{{ q.pk }}">
+            {% for i in "12345" %}
+              {% if forloop.counter <= q.options.max|default:5 %}
+              <span class="star" data-val="{{ forloop.counter }}" onclick="setRating({{ q.pk }}, {{ forloop.counter }})">⭐</span>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <input type="hidden" name="q_{{ q.pk }}" id="rating-{{ q.pk }}" value="">
+          {% endwith %}
+
+        {% elif q.type == 'single_choice' %}
+          <div class="choice-list">
+            {% for ch in q.options.choices %}
+            <label class="choice-item" onclick="selectChoice(this)">
+              <input type="radio" name="q_{{ q.pk }}" value="{{ ch }}">
+              <span class="choice-mark"></span>
+              {{ ch }}
+            </label>
+            {% endfor %}
+          </div>
+
+        {% elif q.type == 'multiple_choice' %}
+          <div class="choice-list">
+            {% for ch in q.options.choices %}
+            <label class="choice-item check" onclick="toggleCheck(this)">
+              <input type="checkbox" name="q_{{ q.pk }}" value="{{ ch }}">
+              <span class="choice-mark"></span>
+              {{ ch }}
+            </label>
+            {% endfor %}
+          </div>
+
+        {% elif q.type == 'text' %}
+          <textarea class="q-textarea" name="q_{{ q.pk }}" placeholder="Votre réponse…" rows="4"></textarea>
+
+        {% elif q.type == 'grid' %}
+          {% with max_cols=q.options.max|default:5 %}
+          <div style="overflow-x:auto">
+            <table class="grid-table">
+              <thead>
+                <tr>
+                  <th style="min-width:140px">Critère</th>
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= q.options.max|default:5 %}
+                    <th>{{ forloop.counter }}</th>
+                    {% endif %}
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for cr in q.options.criteria %}
+                <tr>
+                  <td>{{ cr }}</td>
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= q.options.max|default:5 %}
+                    <td>
+                      <span class="grid-radio" onclick="gridSelect(this, 'grid_{{ q.pk }}_{{ forloop.parentloop.counter }}', {{ forloop.counter }})"></span>
+                      <input type="hidden" id="grid_{{ q.pk }}_{{ forloop.parentloop.counter }}" name="q_{{ q.pk }}[]" value="">
+                    </td>
+                    {% endif %}
+                  {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endwith %}
+
+        {% elif q.type == 'contact' %}
+          {% get_contact_fields as cfields %}
+          <div class="contact-fields">
+            {% for f in cfields %}
+              {% if f.key in q.options.fields %}
+              <div class="cf-field{% if f.key == 'company' or f.key == 'email' %} full{% endif %}">
+                <label class="cf-label" for="cf_{{ q.pk }}_{{ f.key }}">
+                  {{ f.label }}{% if q.required %} <span style="color:var(--brand)">*</span>{% endif %}
+                </label>
+                <input
+                  class="cf-input"
+                  type="{{ f.input_type }}"
+                  id="cf_{{ q.pk }}_{{ f.key }}"
+                  name="q_{{ q.pk }}_{{ f.key }}"
+                  placeholder="{{ f.placeholder }}"
+                  {% if q.required %}required{% endif %}
+                >
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+
+        {% endif %}
+
+        {% with err=errors|get_item:q.pk %}{% if err %}<div class="q-err">{{ err }}</div>{% endif %}{% endwith %}
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if not preview %}
+    <div class="submit-row">
+      <button type="submit" class="btn-submit">Envoyer mes réponses</button>
+    </div>
+    {% endif %}
+
+  {% if not preview %}
+  </form>
+  {% endif %}
+
+</main>
+
+<script>
+function setRating(qid, val){
+  const stars = document.querySelectorAll('#stars-'+qid+' .star');
+  stars.forEach((s,i)=>{s.classList.toggle('active',i<val)});
+  document.getElementById('rating-'+qid).value=val;
+}
+
+function selectChoice(label){
+  const row = label.closest('.choice-list');
+  row.querySelectorAll('.choice-item').forEach(l=>l.classList.remove('selected'));
+  label.classList.add('selected');
+  label.querySelector('input').checked=true;
+}
+
+function toggleCheck(label){
+  label.classList.toggle('selected');
+  const inp = label.querySelector('input');
+  inp.checked = label.classList.contains('selected');
+}
+
+function gridSelect(dot, inputId, val){
+  const row = dot.closest('tr');
+  row.querySelectorAll('.grid-radio').forEach(d=>d.classList.remove('active'));
+  dot.classList.add('active');
+  // Find input in this row with the given id
+  const input = document.getElementById(inputId);
+  if(input) input.value=val;
+}
+</script>
+</body>
+</html>

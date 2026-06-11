@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<title>Votre avis — Café Savane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#C65D2A;--brand-d:#A84A1F;--brand-pale:#FEF0E8;--brand-mid:#F4E0D4;
+  --amber:#F2A93B;
+  --indigo:#4F46B8;--indigo-pale:#EEEDF9;
+  --green:#1D9E75;--green-pale:#E5F8F2;
+  --bg:#FDF8F3;--white:#fff;
+  --text:#2C2C3A;--text-2:#5C5C72;--text-3:#9B9BB5;
+  --border:#EDE8E0;--border-2:#D8CFBF;
+  --shadow:0 2px 8px rgba(44,44,58,.08);
+  --shadow-md:0 8px 24px rgba(44,44,58,.12);
+  --radius:14px;--radius-sm:10px;
+  --f-head:'Poppins',sans-serif;--f-body:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--f-body);font-size:15px;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;min-height:100dvh;display:flex;flex-direction:column}
+a{text-decoration:none;color:inherit}
+button{font-family:var(--f-body);cursor:pointer;border:none;background:none}
+
+/* ── DEMO BADGE ── */
+.demo-bar{
+  background:var(--indigo-pale);border-bottom:1px solid #D0CEEB;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:9px 16px;font-size:.8125rem;color:var(--indigo);font-weight:500;
+}
+.demo-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--indigo);
+  animation:pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.75)}}
+.demo-bar a{font-weight:700;color:var(--indigo);text-decoration:underline;text-underline-offset:2px}
+
+/* ── HEADER ── */
+.hdr{
+  background:var(--white);border-bottom:1px solid var(--border);
+  padding:16px 24px;display:flex;align-items:center;gap:14px;
+}
+.brand-icon{
+  width:42px;height:42px;border-radius:10px;
+  background:var(--brand);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.brand-icon svg{width:22px;height:22px;color:#fff}
+.brand-name{font-family:var(--f-head);font-weight:700;font-size:1.0625rem;color:var(--text);line-height:1.2}
+.brand-sub{font-size:.75rem;color:var(--text-3);margin-top:1px}
+.hdr-vozavi{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--text-3)}
+.hdr-vozavi svg{height:16px;width:auto;opacity:.55}
+
+/* ── FORM BODY ── */
+.form-wrap{flex:1;padding:32px 16px 64px;display:flex;flex-direction:column;align-items:center}
+.form-card{
+  background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-md);
+  padding:36px 32px;max-width:560px;width:100%;
+}
+.form-title{
+  font-family:var(--f-head);font-weight:700;font-size:1.25rem;color:var(--text);
+  line-height:1.3;margin-bottom:6px;
+}
+.form-sub{font-size:.875rem;color:var(--text-2);margin-bottom:28px;line-height:1.6}
+.form-divider{height:1px;background:var(--border);margin:24px 0}
+
+/* ── QUESTION BLOCK ── */
+.q-block{margin-bottom:28px}
+.q-block:last-of-type{margin-bottom:0}
+.q-label{
+  font-family:var(--f-head);font-weight:600;font-size:.9375rem;
+  color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;
+}
+.q-label .req{color:var(--brand);margin-left:2px}
+.q-num{
+  width:22px;height:22px;border-radius:6px;background:var(--brand-pale);
+  color:var(--brand);font-size:.7rem;font-weight:700;
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+
+/* ── STAR RATING ── */
+.stars-wrap{display:flex;flex-direction:column;gap:10px}
+.stars-row{display:flex;align-items:center;gap:6px}
+.star{
+  font-size:2.2rem;cursor:pointer;color:#E2E1F0;
+  transition:color .12s,transform .1s;line-height:1;
+  user-select:none;-webkit-user-select:none;
+}
+.star.lit,.star.hover{color:var(--amber);transform:scale(1.1)}
+.stars-hint{font-size:.8125rem;color:var(--text-3);min-height:20px;transition:opacity .15s}
+.stars-hints-map{display:none}
+
+/* ── SINGLE CHOICE ── */
+.choices-list{display:flex;flex-direction:column;gap:8px}
+.choice-opt{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  cursor:pointer;transition:border-color .15s,background .15s;
+  user-select:none;-webkit-user-select:none;
+}
+.choice-opt:hover{border-color:var(--brand-mid);background:var(--brand-pale)}
+.choice-opt.selected{border-color:var(--brand);background:var(--brand-pale)}
+.choice-opt input[type=radio],
+.choice-opt input[type=checkbox]{
+  width:18px;height:18px;accent-color:var(--brand);flex-shrink:0;
+}
+.choice-opt-label{font-size:.9375rem;color:var(--text);flex:1}
+
+/* ── TEXTAREA ── */
+.txt-input{
+  width:100%;min-height:100px;padding:12px 14px;
+  border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  font-family:var(--f-body);font-size:.9375rem;color:var(--text);
+  resize:vertical;outline:none;transition:border-color .15s,box-shadow .15s;
+  background:var(--white);
+}
+.txt-input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(198,93,42,.1)}
+.txt-input::placeholder{color:var(--text-3)}
+
+/* ── SUBMIT ── */
+.submit-wrap{margin-top:28px}
+.btn-submit{
+  width:100%;height:52px;border-radius:var(--radius-sm);
+  background:var(--brand);color:var(--white);
+  font-family:var(--f-head);font-weight:700;font-size:1rem;
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:background .18s,box-shadow .18s,transform .13s;
+  box-shadow:0 4px 14px rgba(198,93,42,.28);
+}
+.btn-submit:hover{background:var(--brand-d);box-shadow:0 6px 20px rgba(198,93,42,.38);transform:translateY(-1px)}
+.btn-submit:active{transform:translateY(0)}
+.btn-submit svg{width:18px;height:18px}
+
+/* ── ERROR ── */
+.q-error{font-size:.8125rem;color:#E24B4A;margin-top:6px}
+.choice-opt.err{border-color:#E24B4A}
+.stars-row.err .star:not(.lit){color:#FDDDD4}
+
+@media(max-width:480px){
+  .form-card{padding:24px 18px;border-radius:var(--radius-sm)}
+  .star{font-size:1.875rem}
+}
+</style>
+</head>
+<body>
+
+<!-- Demo banner -->
+<div class="demo-bar">
+  <span class="demo-dot"></span>
+  <span>Formulaire de démonstration Vozavi · <a href="{% url 'new_form' %}">Créez le vôtre gratuitement en 2 min</a></span>
+</div>
+
+<!-- Header -->
+<header class="hdr">
+  <div class="brand-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+  </div>
+  <div>
+    <div class="brand-name">Café Savane</div>
+    <div class="brand-sub">Abidjan — Cocody</div>
+  </div>
+  <div class="hdr-vozavi">
+    <span>Propulsé par</span>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64">
+      <path d="M10 14 a10 10 0 0 1 10-10 h24 a10 10 0 0 1 10 10 v20 a10 10 0 0 1-10 10 h-14 l-9 9 v-9 h-1 a10 10 0 0 1-10-10 z" fill="#4F46B8"/>
+      <path d="M32 12 l3.4 6.9 7.6 1.1 -5.5 5.4 1.3 7.6 -6.8-3.6 -6.8 3.6 1.3-7.6 -5.5-5.4 7.6-1.1 z" fill="#F2A93B"/>
+      <text x="68" y="40" font-size="28" font-weight="600" fill="#4F46B8" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
+    </svg>
+  </div>
+</header>
+
+<!-- Form -->
+<div class="form-wrap">
+  <form class="form-card" method="post" action="{% url 'demo_form_url' %}" id="demo-form" novalidate>
+    {% csrf_token %}
+
+    <h1 class="form-title">Votre avis nous aide à progresser ☕</h1>
+    <p class="form-sub">2 minutes pour nous aider à vous offrir une meilleure expérience. Merci d'avance !</p>
+
+    <!-- Q1 : Note globale -->
+    <div class="q-block" id="qblock-1">
+      <div class="q-label">
+        <span class="q-num">1</span>
+        Comment évaluez-vous votre expérience globale ?
+        <span class="req" aria-hidden="true">*</span>
+      </div>
+      <div class="stars-wrap">
+        <div class="stars-row" id="stars-row-1">
+          <span class="star" data-val="1" role="radio" aria-label="1 étoile" tabindex="0">★</span>
+          <span class="star" data-val="2" role="radio" aria-label="2 étoiles" tabindex="0">★</span>
+          <span class="star" data-val="3" role="radio" aria-label="3 étoiles" tabindex="0">★</span>
+          <span class="star" data-val="4" role="radio" aria-label="4 étoiles" tabindex="0">★</span>
+          <span class="star" data-val="5" role="radio" aria-label="5 étoiles" tabindex="0">★</span>
+        </div>
+        <div class="stars-hint" id="hint-1">Cliquez pour noter</div>
+      </div>
+      <input type="hidden" name="q_1" id="q_1" value="">
+      <div class="q-error" id="err-1" style="display:none">Veuillez attribuer une note.</div>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <!-- Q2 : Occasion -->
+    <div class="q-block" id="qblock-2">
+      <div class="q-label">
+        <span class="q-num">2</span>
+        Quelle occasion vous a amené chez nous aujourd'hui ?
+        <span class="req" aria-hidden="true">*</span>
+      </div>
+      <div class="choices-list" id="choices-2">
+        <label class="choice-opt">
+          <input type="radio" name="q_2" value="Déjeuner">
+          <span class="choice-opt-label">🍽️&nbsp; Déjeuner</span>
+        </label>
+        <label class="choice-opt">
+          <input type="radio" name="q_2" value="Dîner">
+          <span class="choice-opt-label">🌙&nbsp; Dîner</span>
+        </label>
+        <label class="choice-opt">
+          <input type="radio" name="q_2" value="Café & pause">
+          <span class="choice-opt-label">☕&nbsp; Café & pause</span>
+        </label>
+        <label class="choice-opt">
+          <input type="radio" name="q_2" value="Événement privé">
+          <span class="choice-opt-label">🎉&nbsp; Événement privé</span>
+        </label>
+      </div>
+      <div class="q-error" id="err-2" style="display:none">Veuillez sélectionner une option.</div>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <!-- Q3 : Points forts -->
+    <div class="q-block" id="qblock-3">
+      <div class="q-label">
+        <span class="q-num">3</span>
+        Qu'est-ce qui vous a le plus satisfait ? <span style="font-weight:400;color:var(--text-3);font-size:.875rem">(plusieurs choix)</span>
+      </div>
+      <div class="choices-list">
+        <label class="choice-opt">
+          <input type="checkbox" name="q_3" value="La cuisine">
+          <span class="choice-opt-label">🍲&nbsp; La cuisine</span>
+        </label>
+        <label class="choice-opt">
+          <input type="checkbox" name="q_3" value="Le service">
+          <span class="choice-opt-label">🤝&nbsp; Le service</span>
+        </label>
+        <label class="choice-opt">
+          <input type="checkbox" name="q_3" value="L'ambiance">
+          <span class="choice-opt-label">✨&nbsp; L'ambiance</span>
+        </label>
+        <label class="choice-opt">
+          <input type="checkbox" name="q_3" value="Rapport qualité/prix">
+          <span class="choice-opt-label">💰&nbsp; Rapport qualité/prix</span>
+        </label>
+        <label class="choice-opt">
+          <input type="checkbox" name="q_3" value="La rapidité">
+          <span class="choice-opt-label">⚡&nbsp; La rapidité</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <!-- Q4 : Commentaire -->
+    <div class="q-block" id="qblock-4">
+      <div class="q-label">
+        <span class="q-num">4</span>
+        Un message pour notre équipe ?
+        <span style="font-weight:400;color:var(--text-3);font-size:.875rem">(facultatif)</span>
+      </div>
+      <textarea class="txt-input" name="q_4" placeholder="Votre message ici…" rows="3"></textarea>
+    </div>
+
+    <div class="submit-wrap">
+      <button type="submit" class="btn-submit" id="submit-btn">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10l4.5 4.5 7.5-9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Envoyer mon avis
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+(function(){
+  var hints = ['', 'Pas satisfait', 'Peu satisfait', 'Correct', 'Très bien', 'Excellent !'];
+  var currentVal = 0;
+
+  function initStars(rowId, inputId, hintId) {
+    var row = document.getElementById(rowId);
+    var inp = document.getElementById(inputId);
+    var hint = document.getElementById(hintId);
+    if (!row) return;
+    var stars = row.querySelectorAll('.star');
+
+    function paint(n, hover) {
+      stars.forEach(function(s, i) {
+        s.classList.toggle('lit', i < currentVal);
+        s.classList.toggle('hover', hover && i < n);
+      });
+      hint.textContent = hover ? (hints[n] || '') : (currentVal ? hints[currentVal] : 'Cliquez pour noter');
+    }
+
+    stars.forEach(function(s) {
+      s.addEventListener('mouseenter', function() { paint(+s.dataset.val, true); });
+      s.addEventListener('mouseleave', function() { paint(0, false); });
+      s.addEventListener('click', function() {
+        currentVal = +s.dataset.val;
+        inp.value = currentVal;
+        paint(0, false);
+        row.classList.remove('err');
+        document.getElementById('err-1').style.display = 'none';
+      });
+      s.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); s.click(); }
+      });
+    });
+  }
+  initStars('stars-row-1', 'q_1', 'hint-1');
+
+  // Style selected radio/checkbox options
+  document.querySelectorAll('.choice-opt input').forEach(function(inp) {
+    inp.addEventListener('change', function() {
+      var name = inp.name;
+      var isRadio = inp.type === 'radio';
+      if (isRadio) {
+        document.querySelectorAll('.choice-opt input[name="' + name + '"]').forEach(function(r) {
+          r.closest('.choice-opt').classList.toggle('selected', r.checked);
+          r.closest('.choice-opt').classList.remove('err');
+        });
+        document.getElementById('err-2').style.display = 'none';
+      } else {
+        inp.closest('.choice-opt').classList.toggle('selected', inp.checked);
+      }
+    });
+  });
+
+  // Validation
+  document.getElementById('demo-form').addEventListener('submit', function(e) {
+    var ok = true;
+    // Q1 rating
+    if (!document.getElementById('q_1').value) {
+      document.getElementById('err-1').style.display = 'block';
+      document.getElementById('stars-row-1').classList.add('err');
+      ok = false;
+    }
+    // Q2 single choice
+    if (!document.querySelector('input[name="q_2"]:checked')) {
+      document.getElementById('err-2').style.display = 'block';
+      document.querySelectorAll('#choices-2 .choice-opt').forEach(function(o) { o.classList.add('err'); });
+      ok = false;
+    }
+    if (!ok) {
+      e.preventDefault();
+      document.querySelector('[style*="display:block"],.q-error[style*="block"]').closest('.q-block').scrollIntoView({behavior:'smooth',block:'center'});
+    } else {
+      var btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<svg viewBox="0 0 20 20" fill="none" style="animation:spin .7s linear infinite;width:18px;height:18px"><circle cx="10" cy="10" r="8" stroke="rgba(255,255,255,.3)" stroke-width="2"/><path d="M10 2a8 8 0 0 1 8 8" stroke="white" stroke-width="2" stroke-linecap="round"/></svg> Envoi en cours…';
+    }
+  });
+})();
+</script>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</body>
+</html>
