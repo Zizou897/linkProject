@@ -449,10 +449,10 @@ button{font-family:var(--f-body);cursor:pointer;border:none;background:none}
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
         Tableau de bord
       </a>
-      <a href="{% url 'logout' %}" class="u-drop-item">
+      <form method="post" action="{% url 'logout' %}" style="margin:0">{% csrf_token %}<button type="submit" class="u-drop-item" style="width:100%;background:none;border:none;cursor:pointer;text-align:left;font:inherit;padding:0">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 4l4 4-4 4M14 8H6"/><path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>
         Déconnexion
-      </a>
+      </button></form>
     </div>
   </div>
 </header>

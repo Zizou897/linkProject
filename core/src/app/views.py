@@ -1,12 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.db.models import Count
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.db.models import Count, Q
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.urls import reverse
 from django.db import models as db_models
 from django.utils import timezone
+from django.core.cache import cache
 from datetime import timedelta
 
 from .models import VozaviForm, Question, VozaviResponse, Answer
@@ -17,17 +19,19 @@ from .templates_data import FORM_TEMPLATES
 
 @login_required
 def dashboard(request):
-    forms_qs = VozaviForm.objects.filter(user=request.user).annotate(
-        nb_responses=Count('responses', distinct=True),
+    forms_qs = VozaviForm.objects.filter(user=request.user)
+    agg = forms_qs.aggregate(
+        total=Count('id'),
+        active=Count('id', filter=Q(status='active')),
     )
-    total_forms = forms_qs.count()
-    total_active = forms_qs.filter(status='active').count()
     total_responses = VozaviResponse.objects.filter(form__user=request.user).count()
-    recent_forms = forms_qs.order_by('-updated_at')[:6]
+    recent_forms = forms_qs.annotate(
+        nb_responses=Count('responses', distinct=True),
+    ).order_by('-updated_at')[:6]
 
     return render(request, 'app/admin/dashboard.html', {
-        'total_forms': total_forms,
-        'total_active': total_active,
+        'total_forms': agg['total'],
+        'total_active': agg['active'],
         'total_responses': total_responses,
         'recent_forms': recent_forms,
     })
@@ -41,21 +45,33 @@ def login_view(request):
 
     error = None
     if request.method == 'POST':
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', '')).split(',')[0].strip()
+        rate_key = f'login_attempts_{ip}'
+        attempts = cache.get(rate_key, 0)
+        if attempts >= 5:
+            error = "Trop de tentatives. Réessayez dans 15 minutes."
+            return render(request, 'account/login.html', {'error': error})
+
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
         user = authenticate(request, username=username, password=password)
         if user is not None and user.is_active:
+            cache.delete(rate_key)
             login(request, user)
-            next_url = request.POST.get('next') or request.GET.get('next') or 'dashboard'
+            next_url = request.POST.get('next') or request.GET.get('next')
+            if not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+                next_url = 'dashboard'
             return redirect(next_url)
         else:
+            cache.set(rate_key, attempts + 1, 900)
             error = "Identifiant ou mot de passe incorrect."
 
     return render(request, 'account/login.html', {'error': error})
 
 
 def logout_view(request):
-    logout(request)
+    if request.method == 'POST':
+        logout(request)
     return redirect('login')
 
 
@@ -78,17 +94,18 @@ def signup_view(request):
             error = "Veuillez renseigner tous les champs."
         elif len(password) < 8:
             error = "Le mot de passe doit contenir au moins 8 caractères."
-        elif User.objects.filter(username=username).exists():
-            error = "Cet identifiant est déjà utilisé."
-        elif User.objects.filter(email=email).exists():
-            error = "Un compte existe déjà avec cette adresse e-mail."
+        elif User.objects.filter(username=username).exists() or User.objects.filter(email=email).exists():
+            error = "Ces informations sont déjà utilisées."
         else:
-            user = User.objects.create_user(username=username, email=email, password=password, is_staff=True)
+            user = User.objects.create_user(username=username, email=email, password=password)
             login(request, user)
 
-            # Claim and auto-publish the anonymous form if coming from builder
+            # Claim anonymous form — only if it matches the current session
             if claim_pk:
                 try:
+                    session_pk = request.session.get('guest_form_pk')
+                    if session_pk is None or int(claim_pk) != session_pk:
+                        raise ValueError('claim mismatch')
                     anon_form = VozaviForm.objects.get(pk=int(claim_pk), user=None)
                     anon_form.user = user
                     if not anon_form.slug:
@@ -98,7 +115,7 @@ def signup_view(request):
                     # Clear guest session key
                     request.session.pop('guest_form_pk', None)
                     return redirect('share_form', pk=anon_form.pk)
-                except (VozaviForm.DoesNotExist, ValueError):
+                except (VozaviForm.DoesNotExist, ValueError, TypeError):
                     pass
 
             return redirect('dashboard')
@@ -118,6 +135,119 @@ def custom_404(request, exception=None):
     return render(request, '404.html', status=404)
 
 
+def og_image_view(request):
+    """Génère l'image Open Graph 1200×630 px pour les aperçus WhatsApp/iMessage/etc."""
+    import io, os
+    from PIL import Image, ImageDraw, ImageFont
+
+    W, H = 1200, 630
+    IND   = (79, 70, 184)    # #4F46B8
+    IND_D = (32, 24, 110)    # fond sombre
+    IND_L = (110, 102, 214)
+    AMB   = (242, 169, 59)   # #F2A93B
+    WHITE = (255, 255, 255)
+    MUTED  = (185, 181, 235)
+    SUBTLE = (135, 130, 205)
+
+    img  = Image.new('RGB', (W, H), IND)
+    draw = ImageDraw.Draw(img, 'RGBA')
+
+    # ── Orbes décoratifs ──────────────────────────────────────────────
+    draw.ellipse((-180, -180, 400, 400), fill=(*IND_D, 110))
+    draw.ellipse((820,  -200, 1380, 360), fill=(*IND_L,  35))
+    draw.ellipse((940,   380, 1360, 800), fill=(*IND_D,  70))
+
+    # Grille de points (texture)
+    for gx in range(0, W, 44):
+        for gy in range(0, H, 44):
+            draw.ellipse([gx-1, gy-1, gx+1, gy+1], fill=(*WHITE, 14))
+
+    # ── Logo vozavi — bulle + étoile ──────────────────────────────────
+    # Le SVG source a viewBox="0 0 64 64".
+    # Icône : bulle x=10..54, y=4..44 + queue jusqu'à y=53
+    # On la reproduit à l'échelle S, centrée verticalement à gauche.
+    S   = 5.6        # facteur d'échelle
+    OX  = 110        # décalage horizontal
+    OY  = (H - 53 * S) / 2   # centré verticalement
+
+    def px(x): return OX + x * S
+    def py(y): return OY + y * S
+    def r(v):  return round(v * S)
+
+    # Bulle arrondie : rect x=10..54, y=4..44, radius=10
+    draw.rounded_rectangle(
+        [px(10), py(4), px(54), py(44)],
+        radius=r(10),
+        fill=(*IND_D, 230),
+    )
+    # Queue de la bulle : triangle (21,44)→(21,53)→(30,44)
+    draw.polygon(
+        [(px(21), py(44)), (px(21), py(53)), (px(30), py(44))],
+        fill=(*IND_D, 230),
+    )
+
+    # Étoile : coordonnées absolues calculées depuis le path SVG relatif
+    # M32 12  l3.4 6.9  7.6 1.1  -5.5 5.4  1.3 7.6  -6.8-3.6  -6.8 3.6  1.3-7.6  -5.5-5.4  7.6-1.1  z
+    star_pts_svg = [
+        (32.0, 12.0), (35.4, 18.9), (43.0, 20.0), (37.5, 25.4),
+        (38.8, 33.0), (32.0, 29.4), (25.2, 33.0), (26.5, 25.4),
+        (21.0, 20.0), (28.6, 18.9),
+    ]
+    draw.polygon([(px(x), py(y)) for x, y in star_pts_svg], fill=AMB)
+
+    # ── Barre accent amber ────────────────────────────────────────────
+    bar_x = round(px(54)) + 46
+    draw.rectangle([bar_x, 185, bar_x + 5, 460], fill=AMB)
+
+    # ── Texte ─────────────────────────────────────────────────────────
+    def load_font(size, bold=False):
+        candidates = [
+            f"C:/Windows/Fonts/{'calibrib' if bold else 'calibri'}.ttf",
+            f"C:/Windows/Fonts/{'arialbd'  if bold else 'arial'}.ttf",
+            f"C:/Windows/Fonts/{'verdanab' if bold else 'verdana'}.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans{}.ttf".format('-Bold' if bold else ''),
+            "/usr/share/fonts/truetype/liberation/LiberationSans{}.ttf".format('-Bold' if bold else '-Regular'),
+            "/System/Library/Fonts/Helvetica.ttc",
+        ]
+        for p in candidates:
+            if os.path.isfile(p):
+                try:
+                    return ImageFont.truetype(p, size)
+                except Exception:
+                    continue
+        try:
+            return ImageFont.load_default(size=size)
+        except TypeError:
+            return ImageFont.load_default()
+
+    f_title  = load_font(116, bold=True)
+    f_tag    = load_font(38)
+    f_domain = load_font(28)
+
+    tx = bar_x + 26
+
+    draw.text((tx, 195), 'vozavi',                         font=f_title,  fill=WHITE)
+    draw.text((tx, 345), "Formulaires d'avis gratuits,",   font=f_tag,    fill=MUTED)
+    draw.text((tx, 395), "prêts en 2 minutes.",             font=f_tag,    fill=MUTED)
+    draw.text((tx, 476), 'vozavi.com',                     font=f_domain, fill=SUBTLE)
+
+    buf = io.BytesIO()
+    img.save(buf, 'PNG', optimize=True)
+    buf.seek(0)
+
+    resp = HttpResponse(buf.read(), content_type='image/png')
+    resp['Cache-Control'] = 'public, max-age=86400'
+    return resp
+
+
+def cgu_view(request):
+    return render(request, 'vozavi/cgu.html', {})
+
+
+def confidentialite_view(request):
+    return render(request, 'vozavi/confidentialite.html', {})
+
+
 def contact_view(request):
     sent = False
     error = None
@@ -129,6 +259,13 @@ def contact_view(request):
         if not name or not email or not message:
             error = "Veuillez remplir tous les champs obligatoires."
         else:
+            from .models import ContactMessage
+            ContactMessage.objects.create(
+                name=name,
+                email=email,
+                category=category,
+                message=message,
+            )
             sent = True
     return render(request, 'vozavi/contact.html', {'sent': sent, 'error': error})
 
@@ -165,14 +302,19 @@ def new_form(request):
             template_key=template_key,
             status='draft',
         )
-        for i, q in enumerate(tpl['questions']):
-            Question.objects.create(
-                form=vform, type=q['type'], label=q['label'],
-                required=q['required'], position=i, options=q['options'],
-            )
+        Question.objects.bulk_create([
+            Question(form=vform, type=q['type'], label=q['label'],
+                     required=q['required'], position=i, options=q['options'])
+            for i, q in enumerate(tpl['questions'])
+        ])
         if user is None:
             request.session['guest_form_pk'] = vform.pk
-            _cleanup_old_guest_forms()
+            try:
+                from .tasks import cleanup_old_guest_forms_task
+                # delay_on_commit : n'envoie la tâche qu'après commit transaction DB
+                cleanup_old_guest_forms_task.delay_on_commit()
+            except Exception:
+                pass  # Celery absent — cleanup ignoré, pas de blocage requête
         return redirect('edit_form', pk=vform.pk)
     return render(request, 'vozavi/builder/new.html')
 
@@ -187,14 +329,26 @@ def edit_form(request, pk):
 
 
 def update_form_meta(request, pk):
+    import re as _re
     vform = _guest_form_or_404(request, pk)
     if request.method == 'POST':
         vform.title = request.POST.get('title', vform.title).strip() or vform.title
         vform.description = request.POST.get('description', vform.description).strip()
         vform.brand_name = request.POST.get('brand_name', vform.brand_name).strip()
-        vform.brand_color = request.POST.get('brand_color', vform.brand_color)
+        brand_color = request.POST.get('brand_color', vform.brand_color)
+        if _re.fullmatch(r'#[0-9A-Fa-f]{6}', brand_color):
+            vform.brand_color = brand_color
         if 'logo' in request.FILES:
-            vform.logo = request.FILES['logo']
+            logo_file = request.FILES['logo']
+            try:
+                from PIL import Image as _Image
+                img = _Image.open(logo_file)
+                img.verify()
+                logo_file.seek(0)
+                if img.format in ('JPEG', 'PNG', 'WEBP', 'GIF'):
+                    vform.logo = logo_file
+            except Exception:
+                pass
         vform.save()
         return HttpResponse('<span class="save-ok">Enregistré ✓</span>')
     return HttpResponse(status=204)
@@ -278,6 +432,7 @@ def delete_question(request, pk, qid):
     return HttpResponse(status=405)
 
 
+@login_required
 def publish_form(request, pk):
     import secrets as _secrets
     vform = get_object_or_404(VozaviForm, pk=pk, user=request.user)
@@ -325,11 +480,12 @@ def preview_form(request, pk):
 
 def public_form(request, slug):
     vform = get_object_or_404(VozaviForm, slug=slug, status='active')
-    questions = vform.questions.order_by('position')
+    questions = list(vform.questions.order_by('position'))
     errors = {}
+
     if request.method == 'POST':
-        response = VozaviResponse.objects.create(form=vform)
-        valid = True
+        # Phase 1 — validate without touching the DB
+        collected = {}
         for q in questions:
             field = f'q_{q.pk}'
             if q.type == 'multiple_choice':
@@ -345,12 +501,18 @@ def public_form(request, slug):
                 value = request.POST.get(field, '').strip()
             if q.required and not value:
                 errors[str(q.pk)] = 'Ce champ est obligatoire.'
-                valid = False
-            else:
-                Answer.objects.create(response=response, question=q, value=value)
-        if valid:
+            collected[q.pk] = value
+
+        # Phase 2 — write only if all fields pass
+        if not errors:
+            response = VozaviResponse.objects.create(form=vform)
+            Answer.objects.bulk_create([
+                Answer(response=response, question_id=qid, value=val)
+                for qid, val in collected.items()
+            ])
+            cache.delete(f'form_results_{vform.pk}')
             return redirect('public_form_thanks', slug=slug)
-        response.delete()
+
     return render(request, 'vozavi/public/form.html', {'vform': vform, 'questions': questions, 'errors': errors})
 
 
@@ -452,43 +614,80 @@ def _fmt_answer(value):
 
 @login_required
 def form_results(request, pk):
-    from django.core.paginator import Paginator
-
     vform = get_object_or_404(VozaviForm, pk=pk, user=request.user)
-    total = vform.responses.count()
     questions = list(vform.questions.order_by('position'))
 
+    cache_key = f'form_results_{pk}'
+    cached = cache.get(cache_key)
+
+    if cached is None:
+        # One query for all answers — eliminates N+1
+        answers_by_q = {}
+        for a in Answer.objects.filter(question__form=vform).values('question_id', 'value'):
+            answers_by_q.setdefault(a['question_id'], []).append(a['value'])
+
+        stats_by_q = {}
+        avg_sum = 0.0
+        avg_weight = 0
+        for q in questions:
+            stats = _compute_question_stats(q, answers_by_q.get(q.pk, []))
+            stats_by_q[q.pk] = stats
+            if stats['type'] == 'rating' and stats.get('avg'):
+                avg_sum += stats['avg'] * stats['count']
+                avg_weight += stats['count']
+
+        global_avg = round(avg_sum / avg_weight, 1) if avg_weight else None
+
+        week_ago = timezone.now() - timedelta(days=7)
+        neg_values = Answer.objects.filter(
+            question__form=vform,
+            question__type='rating',
+            response__created_at__gte=week_ago,
+        ).values_list('value', flat=True)
+        negative_count = sum(1 for v in neg_values if isinstance(v, (int, float)) and v <= 2)
+
+        # Strip PII rows before caching — contact field data must not persist in Redis
+        safe_stats = {}
+        for qpk, stats in stats_by_q.items():
+            if stats.get('type') == 'contact':
+                safe_stats[qpk] = {k: v for k, v in stats.items() if k != 'rows'}
+            else:
+                safe_stats[qpk] = stats
+
+        cached = {
+            'total': vform.responses.count(),
+            'global_avg': global_avg,
+            'negative_count': negative_count,
+            'last_response': vform.responses.order_by('-created_at').values_list('created_at', flat=True).first(),
+            'stats_by_q': safe_stats,
+        }
+        cache.set(cache_key, cached, 120)
+
+    global_avg = cached['global_avg']
+
+    # Reload contact rows fresh from DB (not cached — PII)
+    contact_rows = {}
+    contact_qs = [q for q in questions if q.type == 'contact']
+    if contact_qs:
+        for a in Answer.objects.filter(question__in=contact_qs).values('question_id', 'value'):
+            contact_rows.setdefault(a['question_id'], []).append(a['value'])
+
     questions_data = []
-    avg_sum = 0.0
-    avg_weight = 0
     for q in questions:
-        values = list(Answer.objects.filter(question=q).values_list('value', flat=True))
-        stats = _compute_question_stats(q, values)
+        stats = cached['stats_by_q'].get(q.pk, {'type': q.type, 'count': 0})
+        if q.type == 'contact':
+            rows = [v for v in contact_rows.get(q.pk, []) if isinstance(v, dict) and v]
+            stats = {**stats, 'rows': rows, 'count': len(rows)}
         questions_data.append({'q': q, 'stats': stats})
-        if stats['type'] == 'rating' and stats.get('avg'):
-            avg_sum += stats['avg'] * stats['count']
-            avg_weight += stats['count']
-
-    global_avg = round(avg_sum / avg_weight, 1) if avg_weight else None
-
-    week_ago = timezone.now() - timedelta(days=7)
-    neg_values = Answer.objects.filter(
-        question__form=vform,
-        question__type='rating',
-        response__created_at__gte=week_ago,
-    ).values_list('value', flat=True)
-    negative_count = sum(1 for v in neg_values if isinstance(v, (int, float)) and v <= 2)
-
-    last_response = vform.responses.order_by('-created_at').values_list('created_at', flat=True).first()
 
     return render(request, 'vozavi/builder/results.html', {
         'vform': vform,
-        'total': total,
+        'total': cached['total'],
         'global_avg': global_avg,
         'global_avg_pct': round(global_avg / 5 * 100) if global_avg else 0,
         'questions_data': questions_data,
-        'negative_count': negative_count,
-        'last_response': last_response,
+        'negative_count': cached['negative_count'],
+        'last_response': cached['last_response'],
     })
 
 
@@ -543,20 +742,32 @@ def form_responses(request, pk):
 @login_required
 def export_results_csv(request, pk):
     import csv as _csv
+    import io as _io
     vform = get_object_or_404(VozaviForm, pk=pk, user=request.user)
     questions = list(vform.questions.order_by('position'))
 
-    resp = HttpResponse(content_type='text/csv; charset=utf-8-sig')
-    resp['Content-Disposition'] = f'attachment; filename="resultats_{vform.slug or vform.pk}.csv"'
+    # Single query — all answers as lightweight dicts, grouped by response
+    ans_index = {}
+    for a in Answer.objects.filter(question__form=vform).values('response_id', 'question_id', 'value'):
+        ans_index.setdefault(a['response_id'], {})[a['question_id']] = a['value']
 
-    writer = _csv.writer(resp)
-    writer.writerow(['Date'] + [q.label for q in questions])
-    for r in vform.responses.prefetch_related('answers__question').order_by('-created_at'):
-        ans_map = {a.question_id: a.value for a in r.answers.all()}
-        row = [r.created_at.strftime('%d/%m/%Y %H:%M')]
-        for q in questions:
-            row.append(_fmt_answer(ans_map.get(q.pk, '')))
-        writer.writerow(row)
+    def stream():
+        buf = _io.StringIO()
+        w = _csv.writer(buf)
+        w.writerow(['Date'] + [q.label for q in questions])
+        yield buf.getvalue().encode('utf-8-sig')
+        for r in vform.responses.order_by('-created_at').iterator(chunk_size=500):
+            buf.seek(0)
+            buf.truncate(0)
+            ans_map = ans_index.get(r.pk, {})
+            row = [r.created_at.strftime('%d/%m/%Y %H:%M')]
+            for q in questions:
+                row.append(_fmt_answer(ans_map.get(q.pk, '')))
+            w.writerow(row)
+            yield buf.getvalue().encode('utf-8')
+
+    resp = StreamingHttpResponse(stream(), content_type='text/csv; charset=utf-8-sig')
+    resp['Content-Disposition'] = f'attachment; filename="resultats_{vform.slug or vform.pk}.csv"'
     return resp
 
 
@@ -587,10 +798,15 @@ def export_results_excel(request, pk):
         cell.alignment = center
     ws.row_dimensions[1].height = 32
 
+    # Single query — all answers as lightweight dicts, grouped by response
+    ans_index = {}
+    for a in Answer.objects.filter(question__form=vform).values('response_id', 'question_id', 'value'):
+        ans_index.setdefault(a['response_id'], {})[a['question_id']] = a['value']
+
     for row_idx, r in enumerate(
-        vform.responses.prefetch_related('answers__question').order_by('-created_at'), 2
+        vform.responses.order_by('-created_at').iterator(chunk_size=200), 2
     ):
-        ans_map = {a.question_id: a.value for a in r.answers.all()}
+        ans_map = ans_index.get(r.pk, {})
         row_data = [r.created_at.strftime('%d/%m/%Y %H:%M')]
         for q in questions:
             row_data.append(_fmt_answer(ans_map.get(q.pk, '')))

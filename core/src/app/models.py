@@ -19,7 +19,7 @@ class VozaviForm(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='vozavi_forms', null=True, blank=True)
     title = models.CharField(max_length=255)
     slug = models.CharField(max_length=64, unique=True, null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft', db_index=True)
     template_key = models.CharField(max_length=50, blank=True)
     brand_name = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
@@ -54,6 +54,7 @@ class Question(models.Model):
 
     class Meta:
         ordering = ['position']
+        indexes = [models.Index(fields=['form', 'position'])]
 
     def __str__(self):
         return self.label
@@ -61,10 +62,36 @@ class Question(models.Model):
 
 class VozaviResponse(models.Model):
     form = models.ForeignKey(VozaviForm, on_delete=models.CASCADE, related_name='responses')
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
 
 class Answer(models.Model):
     response = models.ForeignKey(VozaviResponse, on_delete=models.CASCADE, related_name='answers')
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     value = models.JSONField()
+
+
+# ── PAGE CONTACT ──────────────────────────────────────────────────────────────
+
+class ContactMessage(models.Model):
+    CATEGORY_CHOICES = [
+        ('general', 'Question générale'),
+        ('support', 'Support technique'),
+        ('billing', 'Facturation'),
+        ('partnership', 'Partenariat'),
+        ('other', 'Autre'),
+    ]
+    name = models.CharField(max_length=150)
+    email = models.EmailField()
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, blank=True)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Message de contact'
+        verbose_name_plural = 'Messages de contact'
+
+    def __str__(self):
+        return f"{self.name} — {self.email} ({self.created_at.strftime('%d/%m/%Y')})"

@@ -1,5 +1,6 @@
 django
 gunicorn
+whitenoise[brotli]
 django-jazzmin
 django-tinymce
 django-colorfield
@@ -8,7 +9,9 @@ pillow
 python-decouple
 sweetify
 django-after-response
-celery[redis]
+celery
+sqlalchemy
+django-celery-results
 openpyxl
 reportlab
 qrcode[pil]

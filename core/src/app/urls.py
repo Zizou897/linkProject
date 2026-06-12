@@ -5,6 +5,9 @@ urlpatterns = [
     # Home
     path('', views.home, name='home'),
     path('contact/', views.contact_view, name='contact'),
+    path('og-image.png', views.og_image_view, name='og_image'),
+    path('conditions-utilisation/', views.cgu_view, name='cgu'),
+    path('confidentialite/', views.confidentialite_view, name='confidentialite'),
 
     # Authentification
     path('connexion/', views.login_view, name='login'),
@@ -15,8 +18,8 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
 
     # ── VOZAVI FORM BUILDER ──────────────────────────────────────────────────
-    path('dashboard/new/', views.new_form, name='new_form'),
-    path('dashboard/forms/<int:pk>/edit/', views.edit_form, name='edit_form'),
+    path('new/', views.new_form, name='new_form'),
+    path('forms/<int:pk>/edit/', views.edit_form, name='edit_form'),
     path('dashboard/forms/<int:pk>/meta/', views.update_form_meta, name='update_form_meta'),
     path('dashboard/forms/<int:pk>/questions/add/', views.add_question, name='add_question'),
     path('dashboard/forms/<int:pk>/questions/<int:qid>/update/', views.update_question, name='update_question'),

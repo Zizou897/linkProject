@@ -1,0 +1,831 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<title>Politique de Confidentialité — Vozavi</title>
+<meta name="description" content="Découvrez comment Vozavi collecte, utilise et protège vos données personnelles.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"></noscript>
+<style>
+/* ── TOKENS ── */
+:root{
+  --ind:#4F46B8;--ind-d:#3D35A0;--ind-pale:#EEEDF9;--ind-mid:#D8D6F5;
+  --amb:#F2A93B;--amb-pale:#FEF5E4;
+  --grn:#1D9E75;--grn-pale:#E5F8F2;
+  --red:#E24B4A;--red-pale:#FEF2F2;
+  --bg:#F4F3FB;--white:#fff;
+  --txt:#2C2C3A;--txt-2:#5C5C72;--txt-3:#9B9BB5;--txt-4:#C2C1D8;
+  --bdr:#E2E1F0;
+  --sh:0 2px 8px rgba(44,44,58,.07);
+  --sh-md:0 8px 28px rgba(44,44,58,.10);
+  --r:14px;--r-sm:10px;--r-xs:7px;
+  --fh:'Poppins',sans-serif;--fb:'Inter',sans-serif;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--fb);font-size:15px;color:var(--txt);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ── READING PROGRESS BAR ── */
+#progress-bar{
+  position:fixed;top:0;left:0;height:3px;width:0%;
+  background:linear-gradient(90deg,var(--grn) 0%,var(--ind) 55%,var(--amb) 100%);
+  z-index:1000;transition:width .08s linear;border-radius:0 2px 2px 0;
+}
+
+/* ── NAVBAR ── */
+.nav{
+  position:sticky;top:3px;z-index:200;
+  background:rgba(244,243,251,.88);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--bdr);
+  height:60px;display:flex;align-items:center;
+  padding:0 clamp(20px,4vw,48px);gap:24px;
+}
+.nav-logo{display:flex;align-items:center;flex-shrink:0}
+.nav-logo svg{height:24px;width:auto}
+.nav-links{display:flex;align-items:center;gap:4px;margin-left:auto}
+.nav-link{
+  font-family:var(--fh);font-size:.8125rem;font-weight:500;
+  color:var(--txt-2);padding:7px 13px;border-radius:var(--r-xs);
+  transition:background .14s var(--ease),color .14s var(--ease);
+}
+.nav-link:hover{background:var(--ind-pale);color:var(--ind)}
+.nav-link.primary{background:var(--ind);color:#fff;box-shadow:0 2px 8px rgba(79,70,184,.28)}
+.nav-link.primary:hover{background:var(--ind-d)}
+
+/* ── HERO ── */
+.hero{
+  padding:clamp(36px,5vw,64px) clamp(20px,4vw,48px) 0;
+  max-width:1100px;margin:0 auto;
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--grn-pale);border:1px solid rgba(29,158,117,.2);
+  border-radius:20px;padding:5px 14px;margin-bottom:20px;
+  font-family:var(--fh);font-size:.7rem;font-weight:700;
+  color:var(--grn);letter-spacing:.08em;text-transform:uppercase;
+}
+.hero-tag svg{width:12px;height:12px;flex-shrink:0}
+.hero-title{
+  font-family:var(--fh);font-weight:800;
+  font-size:clamp(1.75rem,3.5vw,2.625rem);
+  color:var(--txt);line-height:1.15;letter-spacing:-.03em;margin-bottom:16px;
+}
+.hero-title em{
+  font-style:normal;color:var(--grn);
+}
+.hero-meta{
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  font-size:.8125rem;color:var(--txt-3);font-family:var(--fh);
+  padding-bottom:28px;border-bottom:1px solid var(--bdr);
+}
+.hero-meta-item{display:flex;align-items:center;gap:6px}
+.hero-meta-item svg{width:14px;height:14px;flex-shrink:0;color:var(--txt-4)}
+.hero-audience{
+  display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;
+}
+.audience-pill{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 16px;border-radius:var(--r-sm);
+  font-family:var(--fh);font-size:.8rem;font-weight:600;
+  border:1.5px solid;
+}
+.audience-pill.creator{
+  background:var(--ind-pale);border-color:var(--ind-mid);color:var(--ind);
+}
+.audience-pill.respondent{
+  background:var(--grn-pale);border-color:rgba(29,158,117,.25);color:var(--grn);
+}
+.audience-pill svg{width:14px;height:14px;flex-shrink:0}
+.draft-banner{
+  display:flex;align-items:flex-start;gap:12px;
+  background:var(--amb-pale);border:1px solid rgba(242,169,59,.3);
+  border-radius:var(--r-sm);padding:14px 18px;margin-top:20px;
+  font-size:.8375rem;color:#7A4F10;line-height:1.6;
+}
+.draft-banner svg{width:18px;height:18px;flex-shrink:0;margin-top:1px;color:var(--amb)}
+
+/* ── MAIN LAYOUT ── */
+.layout{
+  max-width:1100px;margin:0 auto;
+  padding:32px clamp(20px,4vw,48px) 80px;
+  display:grid;grid-template-columns:256px 1fr;gap:40px;align-items:start;
+}
+
+/* ── SIDEBAR TOC ── */
+.toc{
+  position:sticky;top:75px;
+  background:var(--white);border:1px solid var(--bdr);
+  border-radius:var(--r);box-shadow:var(--sh);padding:20px 0;overflow:hidden;
+}
+.toc-label{
+  font-family:var(--fh);font-size:.6875rem;font-weight:700;
+  color:var(--txt-4);letter-spacing:.1em;text-transform:uppercase;
+  padding:0 20px;margin-bottom:12px;
+}
+.toc-list{list-style:none}
+.toc-item a{
+  display:flex;align-items:center;gap:10px;padding:8px 20px;
+  font-family:var(--fh);font-size:.8rem;font-weight:500;color:var(--txt-3);
+  transition:all .15s var(--ease);border-left:2.5px solid transparent;line-height:1.4;
+}
+.toc-item a:hover{color:var(--txt-2);background:var(--bg)}
+.toc-item a.active{color:var(--grn);border-left-color:var(--grn);background:var(--grn-pale);font-weight:600}
+.toc-num{
+  font-family:var(--fh);font-size:.65rem;font-weight:700;
+  color:var(--txt-4);min-width:18px;text-align:right;flex-shrink:0;
+  transition:color .15s var(--ease);
+}
+.toc-item a.active .toc-num{color:var(--grn)}
+.toc-footer{margin-top:16px;padding:14px 20px 0;border-top:1px solid var(--bdr)}
+.toc-back{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--fh);font-size:.775rem;font-weight:600;color:var(--txt-3);
+  transition:color .15s var(--ease);
+}
+.toc-back:hover{color:var(--ind)}
+.toc-back svg{width:13px;height:13px}
+
+/* ── CONTENT ── */
+.content{min-width:0}
+
+/* Section */
+.section{
+  background:var(--white);border-radius:var(--r);box-shadow:var(--sh);
+  padding:36px 40px;margin-bottom:16px;position:relative;overflow:hidden;
+  opacity:0;transform:translateY(16px);
+  transition:opacity .45s var(--ease),transform .45s var(--ease);
+}
+.section.visible{opacity:1;transform:none}
+.section-ghost{
+  position:absolute;right:-10px;top:-14px;
+  font-family:var(--fh);font-weight:800;font-size:7rem;line-height:1;
+  color:var(--grn);opacity:.04;pointer-events:none;user-select:none;letter-spacing:-.04em;
+}
+.section-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;border-radius:7px;
+  background:var(--grn-pale);
+  font-family:var(--fh);font-size:.7rem;font-weight:700;color:var(--grn);
+  margin-bottom:14px;flex-shrink:0;
+}
+.section-title{
+  font-family:var(--fh);font-size:1.0625rem;font-weight:700;
+  color:var(--txt);margin-bottom:16px;line-height:1.3;
+}
+.section p{
+  color:var(--txt-2);line-height:1.78;font-size:.9375rem;margin-bottom:12px;
+}
+.section p:last-child{margin-bottom:0}
+.section p strong{color:var(--txt);font-weight:600}
+
+/* Lists */
+.section ul,.section ol{
+  padding-left:0;list-style:none;margin-bottom:12px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.section ul li,.section ol li{
+  display:flex;align-items:flex-start;gap:10px;
+  color:var(--txt-2);line-height:1.65;font-size:.9375rem;
+}
+.section ul li::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--grn);margin-top:8px;flex-shrink:0;
+}
+
+/* Audience tabs (section 2) */
+.audience-tabs{display:flex;gap:0;border-radius:var(--r-sm);overflow:hidden;border:1.5px solid var(--bdr);margin-bottom:20px}
+.tab-btn{
+  flex:1;padding:10px 16px;font-family:var(--fh);font-size:.8125rem;font-weight:600;
+  color:var(--txt-3);background:var(--bg);transition:all .15s var(--ease);cursor:pointer;
+  border:none;display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.tab-btn:first-child{border-right:1.5px solid var(--bdr)}
+.tab-btn.active.creator{background:var(--ind-pale);color:var(--ind)}
+.tab-btn.active.respondent{background:var(--grn-pale);color:var(--grn)}
+.tab-btn svg{width:14px;height:14px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.tab-panel ul{margin-bottom:0}
+
+/* Data table (section 3) */
+.data-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:.875rem}
+.data-table th{
+  font-family:var(--fh);font-size:.7rem;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--txt-3);
+  padding:10px 14px;background:var(--bg);
+  border-bottom:2px solid var(--bdr);text-align:left;
+}
+.data-table td{
+  padding:11px 14px;color:var(--txt-2);border-bottom:1px solid var(--bdr);
+  line-height:1.55;vertical-align:top;
+}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--bg)}
+.data-table td:first-child{font-weight:600;color:var(--txt);white-space:nowrap}
+.data-table td .base{
+  display:inline-block;font-family:var(--fh);font-size:.7rem;font-weight:700;
+  padding:2px 8px;border-radius:20px;background:var(--ind-pale);color:var(--ind);
+  margin-top:4px;
+}
+
+/* "Ce que nous ne collectons PAS" */
+.not-collected{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;
+}
+.not-collected-item{
+  display:flex;align-items:center;gap:6px;
+  background:var(--grn-pale);border:1px solid rgba(29,158,117,.18);
+  border-radius:20px;padding:5px 12px;
+  font-family:var(--fh);font-size:.75rem;font-weight:600;color:var(--grn);
+}
+.not-collected-item svg{width:11px;height:11px;flex-shrink:0}
+
+/* Security measures (section 6) */
+.security-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.security-item{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:14px 16px;border-radius:var(--r-sm);
+  background:var(--bg);border:1px solid var(--bdr);
+  transition:border-color .15s var(--ease),background .15s var(--ease);
+}
+.security-item:hover{border-color:rgba(29,158,117,.25);background:var(--grn-pale)}
+.security-icon{
+  width:36px;height:36px;border-radius:9px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--grn-pale);
+}
+.security-icon svg{width:17px;height:17px;color:var(--grn)}
+.security-body{}
+.security-title{font-family:var(--fh);font-size:.85rem;font-weight:700;color:var(--txt);margin-bottom:3px}
+.security-desc{font-size:.85rem;color:var(--txt-2);line-height:1.6}
+
+/* Rights grid (section 7) */
+.rights-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.right-card{
+  padding:14px 16px;border-radius:var(--r-sm);
+  background:var(--ind-pale);border:1px solid var(--ind-mid);
+}
+.right-card-name{
+  font-family:var(--fh);font-size:.8125rem;font-weight:700;color:var(--ind);margin-bottom:4px;
+  display:flex;align-items:center;gap:6px;
+}
+.right-card-name svg{width:13px;height:13px}
+.right-card-desc{font-size:.8125rem;color:var(--txt-2);line-height:1.55}
+
+/* Cookie pills */
+.cookie-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.cookie-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:13px 16px;border-radius:var(--r-sm);
+  background:var(--bg);border:1px solid var(--bdr);
+}
+.cookie-badge{
+  font-family:var(--fh);font-size:.65rem;font-weight:700;letter-spacing:.05em;
+  padding:3px 8px;border-radius:20px;text-transform:uppercase;flex-shrink:0;margin-top:1px;
+}
+.cookie-badge.required{background:var(--grn-pale);color:var(--grn)}
+.cookie-badge.blocked{background:var(--red-pale);color:var(--red);text-decoration:line-through}
+.cookie-desc{font-size:.875rem;color:var(--txt-2);line-height:1.6}
+.cookie-desc strong{color:var(--txt);font-weight:600}
+
+/* Callouts */
+.callout{
+  border-radius:var(--r-sm);padding:16px 18px;margin:14px 0;
+  display:flex;gap:12px;align-items:flex-start;
+}
+.callout.warn{background:var(--amb-pale);border-left:3px solid var(--amb)}
+.callout.info{background:var(--ind-pale);border-left:3px solid var(--ind)}
+.callout.success{background:var(--grn-pale);border-left:3px solid var(--grn)}
+.callout svg{width:16px;height:16px;flex-shrink:0;margin-top:2px}
+.callout.warn svg{color:var(--amb)}
+.callout.info svg{color:var(--ind)}
+.callout.success svg{color:var(--grn)}
+.callout p{color:var(--txt-2);font-size:.875rem;line-height:1.65;margin-bottom:0!important}
+.callout strong{color:var(--txt);font-weight:600}
+
+/* Contact pill */
+.contact-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--ind);color:#fff;
+  font-family:var(--fh);font-size:.8375rem;font-weight:600;
+  padding:10px 20px;border-radius:var(--r-sm);margin-top:12px;
+  transition:background .15s var(--ease),box-shadow .15s var(--ease);
+}
+.contact-pill:hover{background:var(--ind-d);box-shadow:0 4px 14px rgba(79,70,184,.3)}
+.contact-pill svg{width:15px;height:15px}
+
+/* Sub-heading inside section */
+.sub-heading{
+  font-family:var(--fh);font-size:.875rem;font-weight:700;color:var(--txt);
+  margin:18px 0 10px;display:flex;align-items:center;gap:7px;
+}
+.sub-heading svg{width:14px;height:14px;flex-shrink:0}
+.sub-heading.creator svg,.sub-heading.creator{color:var(--ind)}
+.sub-heading.respondent svg,.sub-heading.respondent{color:var(--grn)}
+
+/* ── FOOTER ── */
+.ft{
+  border-top:1px solid var(--bdr);padding:28px clamp(20px,4vw,48px);
+  max-width:1100px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+}
+.ft-copy{font-size:.8125rem;color:var(--txt-4);font-family:var(--fh)}
+.ft-links{display:flex;gap:16px}
+.ft-link{font-size:.8125rem;color:var(--txt-4);font-family:var(--fh);transition:color .14s}
+.ft-link:hover{color:var(--ind)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px){
+  .layout{grid-template-columns:1fr;gap:0}
+  .toc{position:relative;top:0;margin-bottom:20px}
+  .section-ghost{font-size:5rem}
+  .section{padding:24px 22px}
+  .rights-grid{grid-template-columns:1fr}
+}
+@media(max-width:540px){
+  .nav-links .nav-link:not(.primary){display:none}
+  .hero-title{font-size:1.5rem}
+  .data-table{font-size:.8rem}
+  .data-table th,.data-table td{padding:8px 10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .section{opacity:1;transform:none;transition:none}
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- ── NAVBAR ── -->
+<nav class="nav">
+  <a href="{% url 'home' %}" class="nav-logo" aria-label="Vozavi — Accueil">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64">
+      <path d="M10 14 a10 10 0 0 1 10-10 h24 a10 10 0 0 1 10 10 v20 a10 10 0 0 1-10 10 h-14 l-9 9 v-9 h-1 a10 10 0 0 1-10-10 z" fill="#4F46B8"/>
+      <path d="M32 12 l3.4 6.9 7.6 1.1 -5.5 5.4 1.3 7.6 -6.8-3.6 -6.8 3.6 1.3-7.6 -5.5-5.4 7.6-1.1 z" fill="#F2A93B"/>
+      <text x="68" y="40" font-size="28" font-weight="600" fill="#4F46B8" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
+    </svg>
+  </a>
+  <div class="nav-links">
+    <a href="{% url 'contact' %}" class="nav-link">Contact</a>
+    {% if request.user.is_authenticated %}
+    <a href="{% url 'dashboard' %}" class="nav-link primary">Mon tableau de bord</a>
+    {% else %}
+    <a href="{% url 'new_form' %}" class="nav-link primary">Créer un formulaire</a>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-tag">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 0 0-4 4v2H3a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1h-1V6a4 4 0 0 0-4-4zm2.5 6H5.5V6a2.5 2.5 0 0 1 5 0v2z" fill="currentColor"/></svg>
+    Vos données nous importent
+  </div>
+  <h1 class="hero-title">Politique de <em>Confidentialité</em></h1>
+  <div class="hero-meta">
+    <span class="hero-meta-item">
+      <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Dernière mise à jour&nbsp;: [date]
+    </span>
+    <span class="hero-meta-item">
+      <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Lecture : ~6 minutes
+    </span>
+    <span class="hero-meta-item">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      11 sections
+    </span>
+  </div>
+  <div class="hero-audience">
+    <div class="audience-pill creator">
+      <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Pour les Créateurs (titulaires d'un compte)
+    </div>
+    <div class="audience-pill respondent">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M2 5h12v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z" stroke="currentColor" stroke-width="1.3"/><path d="M2 5l6 5 6-5M5 2h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Pour les Répondants (sans compte)
+    </div>
+  </div>
+  <div class="draft-banner">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M10 3a7 7 0 1 0 0 14A7 7 0 0 0 10 3z" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v3M10 13h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <span><strong>Document provisoire.</strong> Ce texte doit être relu par un juriste avant publication. Les champs entre [crochets] sont à compléter.</span>
+  </div>
+</div>
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="layout">
+
+  <!-- SIDEBAR TOC -->
+  <aside class="toc" aria-label="Table des matières">
+    <p class="toc-label">Sommaire</p>
+    <ul class="toc-list">
+      <li class="toc-item"><a href="#art-1"><span class="toc-num">01</span>Responsable des données</a></li>
+      <li class="toc-item"><a href="#art-2"><span class="toc-num">02</span>Données collectées</a></li>
+      <li class="toc-item"><a href="#art-3"><span class="toc-num">03</span>Finalités du traitement</a></li>
+      <li class="toc-item"><a href="#art-4"><span class="toc-num">04</span>Partage des données</a></li>
+      <li class="toc-item"><a href="#art-5"><span class="toc-num">05</span>Durée de conservation</a></li>
+      <li class="toc-item"><a href="#art-6"><span class="toc-num">06</span>Sécurité</a></li>
+      <li class="toc-item"><a href="#art-7"><span class="toc-num">07</span>Vos droits</a></li>
+      <li class="toc-item"><a href="#art-8"><span class="toc-num">08</span>Cookies</a></li>
+      <li class="toc-item"><a href="#art-9"><span class="toc-num">09</span>Mineurs</a></li>
+      <li class="toc-item"><a href="#art-10"><span class="toc-num">10</span>Modifications</a></li>
+      <li class="toc-item"><a href="#art-11"><span class="toc-num">11</span>Contact</a></li>
+    </ul>
+    <div class="toc-footer">
+      <a href="{% url 'cgu' %}" class="toc-back">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Voir les CGU
+      </a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- Article 1 -->
+    <section id="art-1" class="section">
+      <div class="section-ghost">01</div>
+      <div class="section-num">01</div>
+      <h2 class="section-title">Qui est responsable de vos données&nbsp;?</h2>
+      <p>
+        <strong>Pour les données de compte des Créateurs</strong> (e-mail, mot de passe, contenus des formulaires)&nbsp;:
+        le responsable du traitement est <strong>[nom légal de l'éditeur]</strong>, dont le siège est
+        situé à <strong>[adresse, Abidjan, Côte d'Ivoire]</strong>.
+        Contact&nbsp;: <strong>[e-mail]</strong>.
+      </p>
+      <p>
+        <strong>Pour les Réponses aux formulaires</strong>&nbsp;: le responsable du traitement est le
+        <strong>Créateur du formulaire</strong> auquel vous répondez. Vozavi agit comme sous-traitant et hébergeur
+        technique&nbsp;: nous stockons les réponses pour le compte du Créateur et ne les exploitons pas
+        pour notre propre compte.
+      </p>
+      <div class="callout info">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z" stroke="currentColor" stroke-width="1.4"/><path d="M8 7v3M8 5.5h.01" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <p>Le traitement est encadré par la loi ivoirienne <strong>n° 2013-450</strong> du 19 juin 2013 relative à la protection des données, sous la supervision de l'<strong>ARTCI</strong>.</p>
+      </div>
+    </section>
+
+    <!-- Article 2 -->
+    <section id="art-2" class="section">
+      <div class="section-ghost">02</div>
+      <div class="section-num">02</div>
+      <h2 class="section-title">Quelles données collectons-nous&nbsp;?</h2>
+
+      <div class="audience-tabs" role="tablist">
+        <button class="tab-btn active creator" role="tab" onclick="switchTab('creator',this)" aria-selected="true">
+          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Vous êtes Créateur
+        </button>
+        <button class="tab-btn respondent" role="tab" onclick="switchTab('respondent',this)" aria-selected="false">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 5h12v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z" stroke="currentColor" stroke-width="1.3"/><path d="M2 5l6 5 6-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Vous êtes Répondant
+        </button>
+      </div>
+
+      <div id="tab-creator" class="tab-panel active">
+        <ul>
+          <li><strong>Données de compte</strong>&nbsp;: adresse e-mail, mot de passe (stocké sous forme hachée, jamais en clair).</li>
+          <li><strong>Contenus</strong>&nbsp;: vos formulaires (titres, questions), nom d'organisation, logo et couleur choisis.</li>
+          <li><strong>Données techniques</strong>&nbsp;: journaux de connexion (adresse IP, date, navigateur) conservés à des fins de sécurité.</li>
+        </ul>
+      </div>
+
+      <div id="tab-respondent" class="tab-panel">
+        <ul>
+          <li><strong>Vos réponses au formulaire</strong>&nbsp;: uniquement ce que vous saisissez volontairement.</li>
+          <li><strong>Formulaires anonymes</strong>&nbsp;: Vozavi n'enregistre aucune donnée permettant de vous identifier (ni nom, ni e-mail, ni IP associée à la réponse).</li>
+          <li><strong>Formulaires non anonymes</strong>&nbsp;: seules les informations explicitement demandées dans le formulaire sont enregistrées. Vozavi ne collecte pas d'identité « en arrière-plan ».</li>
+          <li><strong>Données techniques minimales</strong>&nbsp;: journaux serveur de courte durée, à des fins de sécurité uniquement.</li>
+        </ul>
+      </div>
+
+      <p style="margin-top:16px;font-family:var(--fh);font-size:.8125rem;font-weight:700;color:var(--txt-2)">Ce que nous ne collectons <em style="color:var(--grn);font-style:normal">jamais</em>&nbsp;:</p>
+      <div class="not-collected">
+        <span class="not-collected-item"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Données bancaires</span>
+        <span class="not-collected-item"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Géolocalisation</span>
+        <span class="not-collected-item"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Revente de données</span>
+        <span class="not-collected-item"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Publicité ciblée</span>
+      </div>
+    </section>
+
+    <!-- Article 3 -->
+    <section id="art-3" class="section">
+      <div class="section-ghost">03</div>
+      <div class="section-num">03</div>
+      <h2 class="section-title">Pourquoi utilisons-nous ces données&nbsp;?</h2>
+      <div style="overflow-x:auto;border-radius:var(--r-sm);border:1px solid var(--bdr)">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Donnée</th>
+              <th>Finalité</th>
+              <th>Base légale</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>E-mail, mot de passe</td>
+              <td>Création et sécurisation du compte</td>
+              <td><span class="base">Contrat (CGU)</span></td>
+            </tr>
+            <tr>
+              <td>Formulaires et personnalisation</td>
+              <td>Fourniture du service</td>
+              <td><span class="base">Contrat</span></td>
+            </tr>
+            <tr>
+              <td>Réponses des Répondants</td>
+              <td>Restitution au Créateur du formulaire</td>
+              <td><span class="base">Service au Créateur</span></td>
+            </tr>
+            <tr>
+              <td>Journaux techniques</td>
+              <td>Sécurité, prévention des abus</td>
+              <td><span class="base">Intérêt légitime</span></td>
+            </tr>
+            <tr>
+              <td>E-mail (communications)</td>
+              <td>Informations de service (incidents, modifications)</td>
+              <td><span class="base">Contrat</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout success" style="margin-top:12px">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <p>Nous n'envoyons <strong>pas de prospection commerciale</strong> sans votre consentement explicite.</p>
+      </div>
+    </section>
+
+    <!-- Article 4 -->
+    <section id="art-4" class="section">
+      <div class="section-ghost">04</div>
+      <div class="section-num">04</div>
+      <h2 class="section-title">Avec qui les données sont-elles partagées&nbsp;?</h2>
+      <ul>
+        <li><strong>Le Créateur du formulaire</strong> reçoit les Réponses à ses propres formulaires.</li>
+        <li><strong>Nos prestataires techniques</strong> strictement nécessaires au fonctionnement&nbsp;: hébergement (<strong>[nom de l'hébergeur, pays]</strong>), envoi d'e-mails transactionnels (<strong>[prestataire]</strong>). Ces prestataires traitent les données pour notre compte et sont tenus à des obligations de confidentialité.</li>
+        <li><strong>Les autorités compétentes</strong>, uniquement sur demande légale valable et dûment justifiée.</li>
+      </ul>
+      <div class="callout success" style="margin-top:4px">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <p><strong>Aucune vente ni location de données à des tiers</strong>, jamais.</p>
+      </div>
+    </section>
+
+    <!-- Article 5 -->
+    <section id="art-5" class="section">
+      <div class="section-ghost">05</div>
+      <div class="section-num">05</div>
+      <h2 class="section-title">Combien de temps conservons-nous les données&nbsp;?</h2>
+      <ul>
+        <li><strong>Compte Créateur</strong>&nbsp;: tant que le compte est actif. Après suppression&nbsp;: effacement sous <strong>30 jours</strong> (sauvegardes techniques purgées sous <strong>90 jours</strong>).</li>
+        <li><strong>Réponses</strong>&nbsp;: tant que le formulaire existe&nbsp;; supprimées si le Créateur supprime le formulaire ou son compte.</li>
+        <li><strong>Journaux techniques</strong>&nbsp;: <strong>12 mois</strong> maximum.</li>
+      </ul>
+    </section>
+
+    <!-- Article 6 -->
+    <section id="art-6" class="section">
+      <div class="section-ghost">06</div>
+      <div class="section-num">06</div>
+      <h2 class="section-title">Comment protégeons-nous les données&nbsp;?</h2>
+      <div class="security-grid">
+        <div class="security-item">
+          <div class="security-icon">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 2l7 3v5c0 4-3 7-7 8C7 17 4 14 4 10V5l6-3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="security-body">
+            <p class="security-title">Chiffrement HTTPS / TLS</p>
+            <p class="security-desc">Tous les échanges entre votre navigateur et nos serveurs sont chiffrés en transit.</p>
+          </div>
+        </div>
+        <div class="security-item">
+          <div class="security-icon">
+            <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="8" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div class="security-body">
+            <p class="security-title">Mots de passe hachés</p>
+            <p class="security-desc">Vos mots de passe sont stockés sous forme hachée avec un algorithme robuste — jamais en clair.</p>
+          </div>
+        </div>
+        <div class="security-item">
+          <div class="security-icon">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M4 4h12v12H4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 4v12M4 8h12" stroke="currentColor" stroke-width="1.5"/></svg>
+          </div>
+          <div class="security-body">
+            <p class="security-title">Cloisonnement des accès</p>
+            <p class="security-desc">Chaque Créateur n'accède qu'à ses propres formulaires et réponses — contrôle appliqué côté serveur sur chaque requête.</p>
+          </div>
+        </div>
+        <div class="security-item">
+          <div class="security-icon">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 0 0-6 6v2H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1h-1V8a6 6 0 0 0-6-6z" stroke="currentColor" stroke-width="1.5"/></svg>
+          </div>
+          <div class="security-body">
+            <p class="security-title">Accès serveurs limité et journalisé</p>
+            <p class="security-desc">L'accès à l'infrastructure est restreint et chaque connexion administrative est tracée.</p>
+          </div>
+        </div>
+        <div class="security-item">
+          <div class="security-icon">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M17 7l-7 7-4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="security-body">
+            <p class="security-title">Notification en cas de violation</p>
+            <p class="security-desc">En cas de violation susceptible d'engendrer un risque, nous notifions l'autorité compétente et les personnes concernées conformément à la loi.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Article 7 -->
+    <section id="art-7" class="section">
+      <div class="section-ghost">07</div>
+      <div class="section-num">07</div>
+      <h2 class="section-title">Quels sont vos droits&nbsp;?</h2>
+      <p>Conformément à la loi n° 2013-450 (et au RGPD pour les personnes situées dans l'UE), vous disposez des droits suivants&nbsp;:</p>
+      <div class="rights-grid">
+        <div class="right-card">
+          <p class="right-card-name"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 5v3M7 9.5h.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Accès</p>
+          <p class="right-card-desc">Obtenir une copie de vos données personnelles que nous détenons.</p>
+        </div>
+        <div class="right-card">
+          <p class="right-card-name"><svg viewBox="0 0 14 14" fill="none"><path d="M2 12l2-2 7-7 2 2-7 7-2 2z" stroke="currentColor" stroke-width="1.3"/><path d="M9 3l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Rectification</p>
+          <p class="right-card-desc">Corriger des données inexactes ou incomplètes vous concernant.</p>
+        </div>
+        <div class="right-card">
+          <p class="right-card-name"><svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1M11 4l-.7 7.3a1 1 0 0 1-1 .7H4.7a1 1 0 0 1-1-.7L3 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Suppression</p>
+          <p class="right-card-desc">Demander l'effacement de vos données dans les conditions prévues par la loi.</p>
+        </div>
+        <div class="right-card">
+          <p class="right-card-name"><svg viewBox="0 0 14 14" fill="none"><path d="M7 2v5M7 9l-2 2 2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 5.5C11.1 6.2 12 7.5 12 9a5 5 0 0 1-10 0c0-1.5.9-2.8 2-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Portabilité</p>
+          <p class="right-card-desc">Recevoir vos données dans un format structuré et lisible par machine.</p>
+        </div>
+        <div class="right-card" style="grid-column:1/-1">
+          <p class="right-card-name"><svg viewBox="0 0 14 14" fill="none"><path d="M2 7l3 3 7-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Opposition</p>
+          <p class="right-card-desc">Vous opposer au traitement de vos données pour des motifs légitimes.</p>
+        </div>
+      </div>
+      <div class="callout info">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z" stroke="currentColor" stroke-width="1.4"/><path d="M8 7v3M8 5.5h.01" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <p>
+          <strong>Créateurs&nbsp;:</strong> exercez ces droits depuis votre compte ou en écrivant à <strong>[e-mail]</strong>. Réponse sous 30 jours.<br>
+          <strong>Répondants&nbsp;:</strong> adressez-vous en priorité au Créateur du formulaire. Si vous ne pouvez pas l'identifier, contactez-nous à <strong>[e-mail]</strong> avec le lien du formulaire concerné. Pour les formulaires anonymes, il est techniquement impossible de retrouver « votre » réponse.<br><br>
+          Vous pouvez également saisir l'<strong>ARTCI</strong> (Côte d'Ivoire) ou toute autorité de protection des données compétente.
+        </p>
+      </div>
+    </section>
+
+    <!-- Article 8 -->
+    <section id="art-8" class="section">
+      <div class="section-ghost">08</div>
+      <div class="section-num">08</div>
+      <h2 class="section-title">Cookies</h2>
+      <p>Vozavi utilise uniquement des cookies <strong>strictement nécessaires</strong> au fonctionnement du service&nbsp;:</p>
+      <div class="cookie-list">
+        <div class="cookie-item">
+          <span class="cookie-badge required">Nécessaire</span>
+          <p class="cookie-desc"><strong>Cookie de session</strong> — maintient votre connexion active entre les pages.</p>
+        </div>
+        <div class="cookie-item">
+          <span class="cookie-badge required">Nécessaire</span>
+          <p class="cookie-desc"><strong>Cookie de sécurité (CSRF)</strong> — protège les formulaires contre les attaques de falsification.</p>
+        </div>
+        <div class="cookie-item">
+          <span class="cookie-badge blocked">Bloqué</span>
+          <p class="cookie-desc"><strong>Cookies publicitaires</strong> — nous n'en utilisons aucun.</p>
+        </div>
+        <div class="cookie-item">
+          <span class="cookie-badge blocked">Bloqué</span>
+          <p class="cookie-desc"><strong>Traceurs tiers</strong> — nous n'en utilisons aucun.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Article 9 -->
+    <section id="art-9" class="section">
+      <div class="section-ghost">09</div>
+      <div class="section-num">09</div>
+      <h2 class="section-title">Mineurs</h2>
+      <p>
+        La création de compte est réservée aux personnes de <strong>18 ans et plus</strong>
+        (ou mineurs autorisés par leur représentant légal).
+      </p>
+      <p>
+        Les Créateurs s'engagent à ne pas utiliser la Plateforme pour collecter des données
+        de mineurs hors cadre légal approprié (par exemple, une évaluation pédagogique
+        organisée par un établissement scolaire sous sa propre responsabilité).
+      </p>
+    </section>
+
+    <!-- Article 10 -->
+    <section id="art-10" class="section">
+      <div class="section-ghost">10</div>
+      <div class="section-num">10</div>
+      <h2 class="section-title">Modifications de cette politique</h2>
+      <p>
+        Toute modification substantielle sera notifiée aux Créateurs par e-mail ou via
+        la Plateforme au moins <strong>15 jours</strong> avant son entrée en vigueur, avec la date de
+        mise à jour en tête de ce document. La poursuite de l'utilisation du Service
+        vaut acceptation de la nouvelle politique.
+      </p>
+    </section>
+
+    <!-- Article 11 -->
+    <section id="art-11" class="section">
+      <div class="section-ghost">11</div>
+      <div class="section-num">11</div>
+      <h2 class="section-title">Contact</h2>
+      <p>
+        Pour toute question relative à la protection de vos données personnelles ou pour
+        exercer vos droits, contactez notre référent confidentialité&nbsp;:
+      </p>
+      <ul>
+        <li>Par e-mail&nbsp;: <strong>confidentialite@vozavi.com</strong></li>
+        <li>Via notre formulaire de contact en ligne</li>
+      </ul>
+      <a href="{% url 'contact' %}" class="contact-pill">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4z" stroke="currentColor" stroke-width="1.3"/><path d="M2 4l6 5 6-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Nous contacter
+      </a>
+    </section>
+
+  </main>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer class="ft">
+  <span class="ft-copy">© {% now "Y" %} Vozavi — Tous droits réservés</span>
+  <div class="ft-links">
+    <a href="{% url 'home' %}" class="ft-link">Accueil</a>
+    <a href="{% url 'cgu' %}" class="ft-link">CGU</a>
+    <a href="{% url 'confidentialite' %}" class="ft-link" aria-current="page">Confidentialité</a>
+    <a href="{% url 'contact' %}" class="ft-link">Contact</a>
+  </div>
+</footer>
+
+<script>
+// Progress bar
+const bar = document.getElementById('progress-bar');
+document.addEventListener('scroll', () => {
+  const doc = document.documentElement;
+  const total = doc.scrollHeight - doc.clientHeight;
+  bar.style.width = (total > 0 ? (doc.scrollTop / total) * 100 : 0) + '%';
+}, {passive: true});
+
+// Tab switcher (section 2)
+function switchTab(type, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected','false');
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected','true');
+  document.getElementById('tab-' + type).classList.add('active');
+}
+
+// TOC active section
+const sections = document.querySelectorAll('.content .section');
+const tocLinks = document.querySelectorAll('.toc-item a');
+const tocMap = {};
+tocLinks.forEach(l => { tocMap[l.getAttribute('href').replace('#','')] = l; });
+
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocLinks.forEach(l => l.classList.remove('active'));
+      const link = tocMap[e.target.id];
+      if (link) link.classList.add('active');
+    }
+  });
+}, {rootMargin:'-20% 0px -70% 0px', threshold: 0});
+sections.forEach(s => obs.observe(s));
+
+// Fade-in on scroll
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObs.unobserve(e.target);
+    }
+  });
+}, {threshold: 0.06});
+sections.forEach((s, i) => {
+  s.style.transitionDelay = Math.min(i * 0.04, 0.18) + 's';
+  revealObs.observe(s);
+});
+</script>
+</body>
+</html>

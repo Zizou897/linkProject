@@ -1,0 +1,694 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<title>Conditions Générales d'Utilisation — Vozavi</title>
+<meta name="description" content="Consultez les conditions générales d'utilisation de Vozavi, la plateforme de collecte d'avis.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"></noscript>
+<style>
+/* ── TOKENS ── */
+:root{
+  --ind:#4F46B8;--ind-d:#3D35A0;--ind-pale:#EEEDF9;--ind-mid:#D8D6F5;
+  --amb:#F2A93B;--amb-pale:#FEF5E4;
+  --grn:#1D9E75;--grn-pale:#E5F8F2;
+  --red:#E24B4A;--red-pale:#FEF2F2;
+  --bg:#F4F3FB;--white:#fff;
+  --txt:#2C2C3A;--txt-2:#5C5C72;--txt-3:#9B9BB5;--txt-4:#C2C1D8;
+  --bdr:#E2E1F0;
+  --sh:0 2px 8px rgba(44,44,58,.07);
+  --sh-md:0 8px 28px rgba(44,44,58,.10);
+  --r:14px;--r-sm:10px;--r-xs:7px;
+  --fh:'Poppins',sans-serif;--fb:'Inter',sans-serif;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--fb);font-size:15px;color:var(--txt);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ── READING PROGRESS BAR ── */
+#progress-bar{
+  position:fixed;top:0;left:0;height:3px;width:0%;
+  background:linear-gradient(90deg,var(--ind) 0%,#7C75D8 60%,var(--amb) 100%);
+  z-index:1000;transition:width .08s linear;border-radius:0 2px 2px 0;
+}
+
+/* ── NAVBAR ── */
+.nav{
+  position:sticky;top:3px;z-index:200;
+  background:rgba(244,243,251,.88);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--bdr);
+  height:60px;display:flex;align-items:center;
+  padding:0 clamp(20px,4vw,48px);gap:24px;
+}
+.nav-logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.nav-logo svg{height:24px;width:auto}
+.nav-links{display:flex;align-items:center;gap:4px;margin-left:auto}
+.nav-link{
+  font-family:var(--fh);font-size:.8125rem;font-weight:500;
+  color:var(--txt-2);padding:7px 13px;border-radius:var(--r-xs);
+  transition:background .14s var(--ease),color .14s var(--ease);
+}
+.nav-link:hover{background:var(--ind-pale);color:var(--ind)}
+.nav-link.primary{
+  background:var(--ind);color:#fff;
+  box-shadow:0 2px 8px rgba(79,70,184,.28);
+}
+.nav-link.primary:hover{background:var(--ind-d)}
+
+/* ── HERO ── */
+.hero{
+  padding:clamp(36px,5vw,64px) clamp(20px,4vw,48px) 0;
+  max-width:1100px;margin:0 auto;
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--ind-pale);border:1px solid var(--ind-mid);
+  border-radius:20px;padding:5px 14px;margin-bottom:20px;
+  font-family:var(--fh);font-size:.7rem;font-weight:700;
+  color:var(--ind);letter-spacing:.08em;text-transform:uppercase;
+}
+.hero-tag svg{width:12px;height:12px;flex-shrink:0}
+.hero-title{
+  font-family:var(--fh);font-weight:800;
+  font-size:clamp(1.75rem,3.5vw,2.625rem);
+  color:var(--txt);line-height:1.15;letter-spacing:-.03em;
+  margin-bottom:16px;
+}
+.hero-meta{
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  font-size:.8125rem;color:var(--txt-3);font-family:var(--fh);
+  padding-bottom:28px;border-bottom:1px solid var(--bdr);margin-bottom:0;
+}
+.hero-meta-item{display:flex;align-items:center;gap:6px}
+.hero-meta-item svg{width:14px;height:14px;flex-shrink:0;color:var(--txt-4)}
+.draft-banner{
+  display:flex;align-items:flex-start;gap:12px;
+  background:var(--amb-pale);border:1px solid rgba(242,169,59,.3);
+  border-radius:var(--r-sm);padding:14px 18px;margin-top:20px;
+  font-size:.8375rem;color:#7A4F10;line-height:1.6;
+}
+.draft-banner svg{width:18px;height:18px;flex-shrink:0;margin-top:1px;color:var(--amb)}
+
+/* ── MAIN LAYOUT ── */
+.layout{
+  max-width:1100px;margin:0 auto;
+  padding:32px clamp(20px,4vw,48px) 80px;
+  display:grid;
+  grid-template-columns:256px 1fr;
+  gap:40px;
+  align-items:start;
+}
+
+/* ── SIDEBAR TOC ── */
+.toc{
+  position:sticky;top:75px;
+  background:var(--white);border:1px solid var(--bdr);
+  border-radius:var(--r);box-shadow:var(--sh);
+  padding:20px 0;overflow:hidden;
+}
+.toc-label{
+  font-family:var(--fh);font-size:.6875rem;font-weight:700;
+  color:var(--txt-4);letter-spacing:.1em;text-transform:uppercase;
+  padding:0 20px;margin-bottom:12px;
+}
+.toc-list{list-style:none}
+.toc-item a{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 20px;
+  font-family:var(--fh);font-size:.8rem;font-weight:500;color:var(--txt-3);
+  transition:all .15s var(--ease);border-left:2.5px solid transparent;
+  line-height:1.4;
+}
+.toc-item a:hover{color:var(--txt-2);background:var(--bg)}
+.toc-item a.active{
+  color:var(--ind);border-left-color:var(--ind);
+  background:var(--ind-pale);font-weight:600;
+}
+.toc-num{
+  font-family:var(--fh);font-size:.65rem;font-weight:700;
+  color:var(--txt-4);min-width:18px;text-align:right;flex-shrink:0;
+  transition:color .15s var(--ease);
+}
+.toc-item a.active .toc-num{color:var(--ind)}
+.toc-footer{
+  margin-top:16px;padding:14px 20px 0;
+  border-top:1px solid var(--bdr);
+}
+.toc-back{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--fh);font-size:.775rem;font-weight:600;color:var(--txt-3);
+  transition:color .15s var(--ease);
+}
+.toc-back:hover{color:var(--ind)}
+.toc-back svg{width:13px;height:13px}
+
+/* ── CONTENT ── */
+.content{min-width:0}
+
+/* Section */
+.section{
+  background:var(--white);border-radius:var(--r);box-shadow:var(--sh);
+  padding:36px 40px;margin-bottom:16px;position:relative;overflow:hidden;
+  opacity:0;transform:translateY(16px);
+  transition:opacity .45s var(--ease),transform .45s var(--ease);
+}
+.section.visible{opacity:1;transform:none}
+.section-ghost{
+  position:absolute;right:-10px;top:-14px;
+  font-family:var(--fh);font-weight:800;
+  font-size:7rem;line-height:1;
+  color:var(--ind);opacity:.04;
+  pointer-events:none;user-select:none;letter-spacing:-.04em;
+}
+.section-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;border-radius:7px;
+  background:var(--ind-pale);
+  font-family:var(--fh);font-size:.7rem;font-weight:700;color:var(--ind);
+  margin-bottom:14px;flex-shrink:0;
+}
+.section-title{
+  font-family:var(--fh);font-size:1.0625rem;font-weight:700;
+  color:var(--txt);margin-bottom:16px;line-height:1.3;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.section-title-text{flex:1}
+.section p{
+  color:var(--txt-2);line-height:1.78;font-size:.9375rem;
+  margin-bottom:12px;
+}
+.section p:last-child{margin-bottom:0}
+.section p strong{color:var(--txt);font-weight:600}
+
+/* Lists */
+.section ul,.section ol{
+  padding-left:0;list-style:none;margin-bottom:12px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.section ul li,.section ol li{
+  display:flex;align-items:flex-start;gap:10px;
+  color:var(--txt-2);line-height:1.65;font-size:.9375rem;
+}
+.section ul li::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--ind);margin-top:8px;flex-shrink:0;
+}
+.section ol{counter-reset:li}
+.section ol li{counter-increment:li}
+.section ol li::before{
+  content:counter(li);
+  font-family:var(--fh);font-size:.7rem;font-weight:700;color:var(--ind);
+  background:var(--ind-pale);border-radius:5px;
+  min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;
+}
+
+/* Special callout — article important */
+.callout{
+  border-radius:var(--r-sm);padding:18px 20px;margin:16px 0;
+  display:flex;gap:14px;align-items:flex-start;
+}
+.callout.warn{background:var(--amb-pale);border-left:3px solid var(--amb)}
+.callout.info{background:var(--ind-pale);border-left:3px solid var(--ind)}
+.callout.danger{background:var(--red-pale);border-left:3px solid var(--red)}
+.callout svg{width:18px;height:18px;flex-shrink:0;margin-top:1px}
+.callout.warn svg{color:var(--amb)}
+.callout.info svg{color:var(--ind)}
+.callout.danger svg{color:var(--red)}
+.callout-body{flex:1}
+.callout-title{font-family:var(--fh);font-size:.8125rem;font-weight:700;margin-bottom:6px}
+.callout.warn .callout-title{color:#7A4F10}
+.callout.info .callout-title{color:var(--ind)}
+.callout.danger .callout-title{color:var(--red)}
+.callout-body p{color:var(--txt-2);font-size:.875rem;line-height:1.65;margin-bottom:0!important}
+
+/* Forbidden list (article 5) */
+.forbidden-list{list-style:none!important;gap:6px!important}
+.forbidden-list li::before{
+  content:'✕'!important;
+  background:var(--red-pale)!important;color:var(--red)!important;
+  font-size:.55rem;font-weight:900;border-radius:4px!important;
+  width:18px!important;height:18px!important;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:3px;
+}
+
+/* Definition pairs */
+.defs{display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
+.def{
+  display:grid;grid-template-columns:130px 1fr;gap:12px;
+  padding:12px 16px;background:var(--bg);border-radius:var(--r-xs);
+  align-items:baseline;
+}
+.def-term{
+  font-family:var(--fh);font-size:.8125rem;font-weight:700;color:var(--ind);
+}
+.def-desc{font-size:.9rem;color:var(--txt-2);line-height:1.65}
+
+/* Contact pill in last section */
+.contact-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--ind);color:#fff;
+  font-family:var(--fh);font-size:.8375rem;font-weight:600;
+  padding:10px 20px;border-radius:var(--r-sm);margin-top:12px;
+  transition:background .15s var(--ease),box-shadow .15s var(--ease);
+}
+.contact-pill:hover{background:var(--ind-d);box-shadow:0 4px 14px rgba(79,70,184,.3)}
+.contact-pill svg{width:15px;height:15px}
+
+/* ── FOOTER ── */
+.ft{
+  border-top:1px solid var(--bdr);
+  padding:28px clamp(20px,4vw,48px);
+  max-width:1100px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+}
+.ft-copy{font-size:.8125rem;color:var(--txt-4);font-family:var(--fh)}
+.ft-links{display:flex;gap:16px}
+.ft-link{font-size:.8125rem;color:var(--txt-4);font-family:var(--fh);transition:color .14s}
+.ft-link:hover{color:var(--ind)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px){
+  .layout{grid-template-columns:1fr;gap:0}
+  .toc{
+    position:relative;top:0;margin-bottom:20px;
+    border-radius:var(--r);
+  }
+  .section-ghost{font-size:5rem}
+  .section{padding:24px 22px}
+}
+@media(max-width:540px){
+  .nav-links .nav-link:not(.primary){display:none}
+  .hero-title{font-size:1.5rem}
+  .def{grid-template-columns:1fr;gap:4px}
+}
+
+/* ── ENTRY ANIMATION ── */
+@media(prefers-reduced-motion:reduce){
+  .section{opacity:1;transform:none;transition:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Reading progress bar -->
+<div id="progress-bar"></div>
+
+<!-- ── NAVBAR ── -->
+<nav class="nav">
+  <a href="{% url 'home' %}" class="nav-logo" aria-label="Vozavi — Accueil">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64">
+      <path d="M10 14 a10 10 0 0 1 10-10 h24 a10 10 0 0 1 10 10 v20 a10 10 0 0 1-10 10 h-14 l-9 9 v-9 h-1 a10 10 0 0 1-10-10 z" fill="#4F46B8"/>
+      <path d="M32 12 l3.4 6.9 7.6 1.1 -5.5 5.4 1.3 7.6 -6.8-3.6 -6.8 3.6 1.3-7.6 -5.5-5.4 7.6-1.1 z" fill="#F2A93B"/>
+      <text x="68" y="40" font-size="28" font-weight="600" fill="#4F46B8" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
+    </svg>
+  </a>
+  <div class="nav-links">
+    <a href="{% url 'contact' %}" class="nav-link">Contact</a>
+    {% if request.user.is_authenticated %}
+    <a href="{% url 'dashboard' %}" class="nav-link primary">Mon tableau de bord</a>
+    {% else %}
+    <a href="{% url 'new_form' %}" class="nav-link primary">Créer un formulaire</a>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-tag">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M13 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z" stroke="currentColor" stroke-width="1.4"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    Document légal
+  </div>
+  <h1 class="hero-title">Conditions Générales<br>d'Utilisation</h1>
+  <div class="hero-meta">
+    <span class="hero-meta-item">
+      <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Dernière mise à jour&nbsp;: [date]
+    </span>
+    <span class="hero-meta-item">
+      <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Lecture : ~8 minutes
+    </span>
+    <span class="hero-meta-item">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2z" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v1l1 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      12 articles
+    </span>
+  </div>
+  <div class="draft-banner">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M10 3a7 7 0 1 0 0 14A7 7 0 0 0 10 3z" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v3M10 13h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <span><strong>Document provisoire.</strong> Ce texte doit être relu par un juriste avant publication. Tous les champs entre [crochets] doivent être complétés.</span>
+  </div>
+</div>
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="layout">
+
+  <!-- ── SIDEBAR TOC ── -->
+  <aside class="toc" aria-label="Table des matières">
+    <p class="toc-label">Sommaire</p>
+    <ul class="toc-list">
+      <li class="toc-item"><a href="#art-1"><span class="toc-num">01</span>Présentation du service</a></li>
+      <li class="toc-item"><a href="#art-2"><span class="toc-num">02</span>Définitions</a></li>
+      <li class="toc-item"><a href="#art-3"><span class="toc-num">03</span>Accès et inscription</a></li>
+      <li class="toc-item"><a href="#art-4"><span class="toc-num">04</span>Rôles et responsabilités</a></li>
+      <li class="toc-item"><a href="#art-5"><span class="toc-num">05</span>Usages interdits</a></li>
+      <li class="toc-item"><a href="#art-6"><span class="toc-num">06</span>Propriété intellectuelle</a></li>
+      <li class="toc-item"><a href="#art-7"><span class="toc-num">07</span>Disponibilité du service</a></li>
+      <li class="toc-item"><a href="#art-8"><span class="toc-num">08</span>Responsabilité de l'éditeur</a></li>
+      <li class="toc-item"><a href="#art-9"><span class="toc-num">09</span>Résiliation</a></li>
+      <li class="toc-item"><a href="#art-10"><span class="toc-num">10</span>Modification des CGU</a></li>
+      <li class="toc-item"><a href="#art-11"><span class="toc-num">11</span>Droit applicable</a></li>
+      <li class="toc-item"><a href="#art-12"><span class="toc-num">12</span>Contact</a></li>
+    </ul>
+    <div class="toc-footer">
+      <a href="{% url 'home' %}" class="toc-back">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Retour à l'accueil
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── CONTENT ── -->
+  <main class="content" aria-label="Contenu des CGU">
+
+    <!-- Article 1 -->
+    <section id="art-1" class="section">
+      <div class="section-ghost">01</div>
+      <div class="section-num">01</div>
+      <h2 class="section-title"><span class="section-title-text">Présentation du service</span></h2>
+      <p>
+        Vozavi (ci-après « le Service » ou « la Plateforme ») est une plateforme en ligne
+        gratuite permettant de créer des formulaires de collecte d'avis et de feedback,
+        de les diffuser via un lien public ou un QR code, et de consulter les réponses reçues.
+      </p>
+      <p>
+        Le Service est édité par <strong>[nom légal / forme juridique]</strong>, immatriculé(e) en Côte d'Ivoire
+        sous le numéro <strong>[RCCM]</strong>, dont le siège est situé à <strong>[adresse, Abidjan, Côte d'Ivoire]</strong>.
+        Contact&nbsp;: <strong>[adresse e-mail de contact]</strong>.
+      </p>
+      <p>
+        L'utilisation de la Plateforme implique l'acceptation pleine et entière des présentes
+        Conditions Générales d'Utilisation (« CGU »).
+      </p>
+    </section>
+
+    <!-- Article 2 -->
+    <section id="art-2" class="section">
+      <div class="section-ghost">02</div>
+      <div class="section-num">02</div>
+      <h2 class="section-title"><span class="section-title-text">Définitions</span></h2>
+      <div class="defs">
+        <div class="def">
+          <span class="def-term">Créateur</span>
+          <span class="def-desc">Toute personne disposant d'un compte Vozavi et créant des formulaires via la Plateforme.</span>
+        </div>
+        <div class="def">
+          <span class="def-term">Répondant</span>
+          <span class="def-desc">Toute personne répondant à un formulaire créé par un Créateur, sans nécessité de compte.</span>
+        </div>
+        <div class="def">
+          <span class="def-term">Formulaire</span>
+          <span class="def-desc">Questionnaire créé par un Créateur via la Plateforme.</span>
+        </div>
+        <div class="def">
+          <span class="def-term">Réponses</span>
+          <span class="def-desc">Données soumises par les Répondants via un Formulaire.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Article 3 -->
+    <section id="art-3" class="section">
+      <div class="section-ghost">03</div>
+      <div class="section-num">03</div>
+      <h2 class="section-title"><span class="section-title-text">Accès au service et inscription</span></h2>
+      <p>
+        <strong>3.1.</strong> La création d'un compte est réservée aux personnes âgées d'au moins 18 ans,
+        ou aux mineurs disposant de l'autorisation de leur représentant légal.
+      </p>
+      <p>
+        <strong>3.2.</strong> L'inscription requiert une adresse e-mail valide et un mot de passe. Le Créateur s'engage
+        à fournir des informations exactes et à maintenir la confidentialité de ses identifiants.
+        Toute activité réalisée depuis son compte est réputée effectuée par lui.
+      </p>
+      <p>
+        <strong>3.3.</strong> Le Service est fourni <strong>gratuitement</strong>. L'éditeur se réserve le droit de faire
+        évoluer son modèle&nbsp;; les fonctionnalités déjà utilisées gratuitement ne deviendront pas
+        payantes sans préavis d'au moins <strong>30 jours</strong>.
+      </p>
+    </section>
+
+    <!-- Article 4 -->
+    <section id="art-4" class="section">
+      <div class="section-ghost">04</div>
+      <div class="section-num">04</div>
+      <h2 class="section-title"><span class="section-title-text">Rôles et responsabilités relatives aux données collectées</span></h2>
+      <div class="callout warn">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M10 3a7 7 0 1 0 0 14A7 7 0 0 0 10 3z" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v3M10 13h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <div class="callout-body">
+          <p class="callout-title">Point essentiel</p>
+          <p>Cet article définit les responsabilités de chacun vis-à-vis des données personnelles. Lisez-le attentivement.</p>
+        </div>
+      </div>
+      <p>
+        <strong>4.1.</strong> Pour les données collectées via les Formulaires, le <strong>Créateur agit en qualité de
+        responsable du traitement</strong>&nbsp;: c'est lui qui décide des questions posées, des finalités
+        de la collecte et de l'usage des Réponses.
+      </p>
+      <p>
+        <strong>4.2.</strong> Vozavi agit en qualité de <strong>sous-traitant / hébergeur technique</strong>&nbsp;: la Plateforme
+        stocke et restitue les Réponses pour le compte du Créateur, sans les exploiter pour son propre compte.
+      </p>
+      <p><strong>4.3.</strong> En conséquence, le Créateur s'engage à&nbsp;:</p>
+      <ul>
+        <li>respecter la législation applicable en matière de protection des données, notamment la loi ivoirienne n° 2013-450 du 19 juin 2013 et, le cas échéant, toute réglementation applicable à ses Répondants (ex. RGPD pour des répondants situés dans l'Union européenne)&nbsp;;</li>
+        <li>informer ses Répondants de la finalité de la collecte&nbsp;;</li>
+        <li>ne pas collecter de données sensibles (santé, opinions politiques, religion, orientation sexuelle, données biométriques, etc.) ni de données relatives à des mineurs sans cadre légal approprié&nbsp;;</li>
+        <li>respecter la promesse d'anonymat lorsqu'un Formulaire est paramétré comme anonyme, et ne pas chercher à réidentifier les Répondants&nbsp;;</li>
+        <li>traiter les demandes d'accès, de rectification ou de suppression émanant de ses Répondants.</li>
+      </ul>
+    </section>
+
+    <!-- Article 5 -->
+    <section id="art-5" class="section">
+      <div class="section-ghost">05</div>
+      <div class="section-num">05</div>
+      <h2 class="section-title"><span class="section-title-text">Usages interdits</span></h2>
+      <div class="callout danger" style="margin-bottom:18px">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M10 3a7 7 0 1 0 0 14A7 7 0 0 0 10 3z" stroke="currentColor" stroke-width="1.5"/><path d="M7 7l6 6M13 7l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <div class="callout-body">
+          <p class="callout-title">Violation = suspension immédiate</p>
+          <p>Tout compte ou formulaire contrevenant sera suspendu sans préavis. Les contenus manifestement illicites seront signalés aux autorités.</p>
+        </div>
+      </div>
+      <p>Il est strictement interdit d'utiliser la Plateforme pour&nbsp;:</p>
+      <ul class="forbidden-list">
+        <li>collecter des données en vue de harceler, discriminer, escroquer ou nuire à autrui&nbsp;;</li>
+        <li>usurper l'identité d'une personne ou d'une organisation&nbsp;;</li>
+        <li>diffuser des contenus illicites, diffamatoires, haineux, pornographiques ou portant atteinte aux droits de tiers&nbsp;;</li>
+        <li>collecter des identifiants, mots de passe, données bancaires ou toute donnée d'authentification (phishing)&nbsp;;</li>
+        <li>envoyer des sollicitations massives non désirées (spam)&nbsp;;</li>
+        <li>perturber le fonctionnement de la Plateforme (tentatives d'intrusion, surcharge volontaire, contournement des mesures de sécurité).</li>
+      </ul>
+    </section>
+
+    <!-- Article 6 -->
+    <section id="art-6" class="section">
+      <div class="section-ghost">06</div>
+      <div class="section-num">06</div>
+      <h2 class="section-title"><span class="section-title-text">Propriété intellectuelle</span></h2>
+      <p>
+        <strong>6.1.</strong> La Plateforme, sa marque, son logo, son design et son code demeurent la propriété
+        exclusive de l'éditeur.
+      </p>
+      <p>
+        <strong>6.2.</strong> Le Créateur reste propriétaire du contenu de ses Formulaires (questions, logo, textes)
+        et des Réponses collectées. Il concède à l'éditeur une licence limitée, mondiale et gratuite,
+        strictement nécessaire à l'hébergement, l'affichage et la sauvegarde de ces contenus dans
+        le cadre du fonctionnement du Service.
+      </p>
+      <p>
+        <strong>6.3.</strong> Le Créateur garantit détenir les droits sur les éléments qu'il téléverse
+        (notamment son logo).
+      </p>
+    </section>
+
+    <!-- Article 7 -->
+    <section id="art-7" class="section">
+      <div class="section-ghost">07</div>
+      <div class="section-num">07</div>
+      <h2 class="section-title"><span class="section-title-text">Disponibilité et évolution du service</span></h2>
+      <p>
+        <strong>7.1.</strong> L'éditeur s'efforce d'assurer une disponibilité continue de la Plateforme mais ne
+        garantit aucun niveau de disponibilité. Des interruptions pour maintenance, mise à jour ou
+        cas de force majeure sont possibles.
+      </p>
+      <p>
+        <strong>7.2.</strong> L'éditeur peut faire évoluer les fonctionnalités du Service. En cas de suppression
+        d'une fonctionnalité substantielle ou d'arrêt du Service, les Créateurs seront informés au
+        moins <strong>30 jours</strong> à l'avance afin de pouvoir exporter leurs données.
+      </p>
+    </section>
+
+    <!-- Article 8 -->
+    <section id="art-8" class="section">
+      <div class="section-ghost">08</div>
+      <div class="section-num">08</div>
+      <h2 class="section-title"><span class="section-title-text">Responsabilité de l'éditeur</span></h2>
+      <p><strong>8.1.</strong> Le Service est fourni « en l'état ». Dans les limites permises par la loi, l'éditeur ne saurait être tenu responsable&nbsp;:</p>
+      <ul>
+        <li>du contenu des Formulaires créés par les Créateurs ni de l'usage qu'ils font des Réponses&nbsp;;</li>
+        <li>des Réponses soumises par les Répondants&nbsp;;</li>
+        <li>des dommages indirects (perte de chiffre d'affaires, perte de données imputable à un tiers, atteinte à l'image) liés à l'utilisation ou à l'impossibilité d'utiliser le Service&nbsp;;</li>
+        <li>en cas de force majeure ou de fait d'un tiers (panne d'hébergeur, attaque informatique malgré des mesures de sécurité raisonnables).</li>
+      </ul>
+      <p>
+        <strong>8.2.</strong> La responsabilité de l'éditeur, si elle était retenue, serait limitée aux dommages directs
+        et prouvés, le Service étant fourni à titre gratuit.
+      </p>
+      <p>
+        <strong>8.3.</strong> L'éditeur agit en qualité d'hébergeur des contenus créés par les utilisateurs&nbsp;: il n'exerce
+        pas de contrôle préalable sur ceux-ci, mais retirera promptement tout contenu manifestement
+        illicite qui lui serait signalé à <strong>[e-mail de signalement]</strong>.
+      </p>
+    </section>
+
+    <!-- Article 9 -->
+    <section id="art-9" class="section">
+      <div class="section-ghost">09</div>
+      <div class="section-num">09</div>
+      <h2 class="section-title"><span class="section-title-text">Résiliation</span></h2>
+      <p>
+        <strong>9.1.</strong> Le Créateur peut supprimer son compte à tout moment depuis les paramètres ou en
+        écrivant à <strong>[e-mail]</strong>. La suppression entraîne l'effacement de ses Formulaires et des
+        Réponses associées dans un délai maximal de <strong>30 jours</strong> (hors sauvegardes techniques,
+        purgées sous <strong>90 jours</strong>).
+      </p>
+      <p>
+        <strong>9.2.</strong> L'éditeur peut suspendre ou résilier un compte en cas de violation des présentes CGU,
+        avec notification sauf urgence ou obligation légale contraire.
+      </p>
+    </section>
+
+    <!-- Article 10 -->
+    <section id="art-10" class="section">
+      <div class="section-ghost">10</div>
+      <div class="section-num">10</div>
+      <h2 class="section-title"><span class="section-title-text">Modification des CGU</span></h2>
+      <p>
+        L'éditeur peut modifier les présentes CGU. Les Créateurs seront informés de toute modification
+        substantielle par e-mail ou notification sur la Plateforme au moins <strong>15 jours</strong> avant son entrée
+        en vigueur. La poursuite de l'utilisation du Service vaut acceptation des nouvelles CGU.
+      </p>
+    </section>
+
+    <!-- Article 11 -->
+    <section id="art-11" class="section">
+      <div class="section-ghost">11</div>
+      <div class="section-num">11</div>
+      <h2 class="section-title"><span class="section-title-text">Droit applicable et juridiction</span></h2>
+      <div class="callout info">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M10 3a7 7 0 1 0 0 14A7 7 0 0 0 10 3z" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v4M10 7h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <div class="callout-body">
+          <p class="callout-title">Juridiction compétente</p>
+          <p>En cas de litige non résolu à l'amiable, les juridictions d'Abidjan (Côte d'Ivoire) sont compétentes.</p>
+        </div>
+      </div>
+      <p>
+        Les présentes CGU sont régies par le <strong>droit ivoirien</strong>. Tout litige relatif à leur interprétation
+        ou exécution relèvera, à défaut de résolution amiable, des juridictions compétentes d'Abidjan
+        (Côte d'Ivoire).
+      </p>
+    </section>
+
+    <!-- Article 12 -->
+    <section id="art-12" class="section">
+      <div class="section-ghost">12</div>
+      <div class="section-num">12</div>
+      <h2 class="section-title"><span class="section-title-text">Contact</span></h2>
+      <p>
+        Pour toute question relative aux présentes CGU, ou pour exercer vos droits relatifs à vos
+        données personnelles, vous pouvez nous contacter&nbsp;:
+      </p>
+      <ul>
+        <li>Par e-mail&nbsp;: <strong>contact@vozavi.com</strong></li>
+        <li>Via notre formulaire de contact en ligne</li>
+      </ul>
+      <a href="{% url 'contact' %}" class="contact-pill">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4z" stroke="currentColor" stroke-width="1.3"/><path d="M2 4l6 5 6-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Nous contacter
+      </a>
+    </section>
+
+  </main>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer class="ft">
+  <span class="ft-copy">© {% now "Y" %} Vozavi — Tous droits réservés</span>
+  <div class="ft-links">
+    <a href="{% url 'home' %}" class="ft-link">Accueil</a>
+    <a href="{% url 'contact' %}" class="ft-link">Contact</a>
+    <a href="{% url 'cgu' %}" class="ft-link" aria-current="page">CGU</a>
+  </div>
+</footer>
+
+<script>
+// Reading progress bar
+const bar = document.getElementById('progress-bar');
+function updateProgress() {
+  const doc = document.documentElement;
+  const total = doc.scrollHeight - doc.clientHeight;
+  bar.style.width = (total > 0 ? (doc.scrollTop / total) * 100 : 0) + '%';
+}
+document.addEventListener('scroll', updateProgress, {passive: true});
+
+// TOC active section via IntersectionObserver
+const sections = document.querySelectorAll('.content .section');
+const tocLinks = document.querySelectorAll('.toc-item a');
+
+const tocMap = {};
+tocLinks.forEach(link => {
+  const id = link.getAttribute('href').replace('#', '');
+  tocMap[id] = link;
+});
+
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      tocLinks.forEach(l => l.classList.remove('active'));
+      const link = tocMap[entry.target.id];
+      if (link) link.classList.add('active');
+    }
+  });
+}, {rootMargin: '-20% 0px -70% 0px', threshold: 0});
+
+sections.forEach(s => obs.observe(s));
+
+// Fade-in sections on scroll
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObs.unobserve(entry.target);
+    }
+  });
+}, {threshold: 0.06});
+
+sections.forEach((s, i) => {
+  s.style.transitionDelay = Math.min(i * 0.04, 0.18) + 's';
+  revealObs.observe(s);
+});
+</script>
+</body>
+</html>

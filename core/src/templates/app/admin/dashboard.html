@@ -8,7 +8,8 @@
 <title>Tableau de bord — Vozavi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap"></noscript>
 <style>
 :root {
   --indigo:#4F46B8; --indigo-d:#433CA0; --indigo-pale:#EEEDFB; --indigo-mid:#E4E2F8;
@@ -273,10 +274,10 @@ ul{list-style:none}
           <div class="u-drop-email">{{ request.user.email }}</div>
         </div>
         <div class="d-sep"></div>
-        <a href="{% url 'logout' %}" class="d-item danger">
+        <form method="post" action="{% url 'logout' %}" style="margin:0">{% csrf_token %}<button type="submit" class="d-item danger" style="width:100%;background:none;border:none;cursor:pointer;text-align:left;font:inherit;padding:0">
           <svg viewBox="0 0 14 14" fill="none"><path d="M5 7h7M9 4.5L12 7l-3 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
           Se déconnecter
-        </a>
+        </button></form>
       </div>
     </div>
   </div>
@@ -288,7 +289,7 @@ ul{list-style:none}
     <a href="{% url 'dashboard' %}" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;font-family:var(--f-head);font-weight:600;font-size:.9rem;background:var(--indigo-pale);color:var(--indigo)">Tableau de bord</a>
     <a href="{% url 'new_form' %}" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;font-family:var(--f-head);font-size:.9rem;color:var(--text-2)">Nouveau formulaire</a>
     <div style="height:1px;background:var(--border);margin:4px 0"></div>
-    <a href="{% url 'logout' %}" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;font-family:var(--f-head);font-size:.9rem;color:var(--red)">Se déconnecter</a>
+    <form method="post" action="{% url 'logout' %}" style="margin:0">{% csrf_token %}<button type="submit" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;font-family:var(--f-head);font-size:.9rem;color:var(--red);background:none;border:none;cursor:pointer;width:100%;text-align:left">Se déconnecter</button></form>
   </nav>
 </div>
 
