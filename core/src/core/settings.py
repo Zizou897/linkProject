@@ -76,7 +76,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME':     config('DB_NAME', default='avizo_bd'),
+            'NAME':     config('DB_NAME', default='vozavi_bd'),
             'USER':     config('DB_USER', default='root'),
             'PASSWORD': config('DB_PASSWORD'),
             'HOST':     config('DB_HOST', default='localhost'),

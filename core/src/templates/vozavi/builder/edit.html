@@ -405,9 +405,14 @@ input,textarea,select{font-family:inherit}
     </svg>
   </a>
   {% if is_guest %}
-  <a href="{% url 'new_form' %}" class="hdr-back" onclick="if(document.referrer){event.preventDefault();history.back();}">
+  <a href="{% url 'new_form' %}" class="hdr-back">
     <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     Retour
+  </a>
+  {% else %}
+  <a href="{% url 'dashboard' %}" class="hdr-back">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Tableau de bord
   </a>
   {% endif %}
   <div class="hdr-divider"></div>
