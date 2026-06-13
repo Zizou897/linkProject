@@ -38,5 +38,6 @@ urlpatterns = [
     path('f/demo/', views.demo_form, name='demo_form_url'),
     path('f/demo/merci/', views.demo_form_thanks, name='demo_form_thanks'),
     path('f/<slug:slug>/', views.public_form, name='public_form'),
+    path('f/<slug:slug>/og-image.png', views.form_og_image_view, name='form_og_image'),
     path('f/<slug:slug>/merci/', views.public_form_thanks, name='public_form_thanks'),
 ]

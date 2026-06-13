@@ -521,6 +521,138 @@ def public_form_thanks(request, slug):
     return render(request, 'vozavi/public/thanks.html', {'vform': vform})
 
 
+def form_og_image_view(request, slug):
+    """Image Open Graph 1200×630 personnalisée par formulaire (aperçu WhatsApp/iMessage)."""
+    import io, os, re
+    from PIL import Image, ImageDraw, ImageFont
+
+    vform = get_object_or_404(VozaviForm, slug=slug, status='active')
+
+    W, H = 1200, 630
+    WHITE = (255, 255, 255)
+
+    def hex_to_rgb(h):
+        h = (h or '').strip().lstrip('#')
+        if not re.fullmatch(r'[0-9a-fA-F]{6}', h):
+            h = '4F46B8'
+        return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+
+    def mix(c1, c2, t):
+        return tuple(round(a + (b - a) * t) for a, b in zip(c1, c2))
+
+    brand = hex_to_rgb(vform.brand_color)
+    bg = mix(brand, (0, 0, 0), 0.72)        # fond sombre dérivé de la marque
+    accent = mix(brand, (255, 255, 255), 0.12)
+    muted = mix(WHITE, bg, 0.42)
+
+    img = Image.new('RGB', (W, H), bg)
+    draw = ImageDraw.Draw(img, 'RGBA')
+
+    # Orbes + texture
+    draw.ellipse((-180, -180, 400, 400), fill=(*mix(brand, (255, 255, 255), 0.10), 40))
+    draw.ellipse((860, 300, 1380, 820), fill=(*mix(brand, (0, 0, 0), 0.4), 90))
+    for gx in range(0, W, 44):
+        for gy in range(0, H, 44):
+            draw.ellipse([gx - 1, gy - 1, gx + 1, gy + 1], fill=(*WHITE, 12))
+
+    # Barre accent (bord gauche)
+    draw.rectangle([0, 0, 10, H], fill=accent)
+
+    def load_font(size, bold=False):
+        candidates = [
+            f"C:/Windows/Fonts/{'calibrib' if bold else 'calibri'}.ttf",
+            f"C:/Windows/Fonts/{'arialbd' if bold else 'arial'}.ttf",
+            f"C:/Windows/Fonts/{'verdanab' if bold else 'verdana'}.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans{}.ttf".format('-Bold' if bold else ''),
+            "/usr/share/fonts/truetype/liberation/LiberationSans{}.ttf".format('-Bold' if bold else '-Regular'),
+            "/System/Library/Fonts/Helvetica.ttc",
+        ]
+        for p in candidates:
+            if os.path.isfile(p):
+                try:
+                    return ImageFont.truetype(p, size)
+                except Exception:
+                    continue
+        try:
+            return ImageFont.load_default(size=size)
+        except TypeError:
+            return ImageFont.load_default()
+
+    LEFT = 92
+    top = 120
+
+    # Logo de la marque si présent, sinon pastille étoile
+    logo_img = None
+    if vform.logo:
+        try:
+            with vform.logo.open('rb') as fh:
+                logo_img = Image.open(io.BytesIO(fh.read())).convert('RGBA')
+        except Exception:
+            logo_img = None
+
+    if logo_img is not None:
+        box = 132
+        logo_img.thumbnail((box, box), Image.LANCZOS)
+        img.paste(logo_img, (LEFT, top), logo_img)
+    else:
+        # Pastille arrondie + étoile (logo vozavi)
+        b = 128
+        draw.rounded_rectangle([LEFT, top, LEFT + b, top + b], radius=28, fill=(*mix(brand, (0, 0, 0), 0.35), 255))
+        cx, cy, R, r = LEFT + b / 2, top + b / 2, 46, 19
+        import math
+        star = []
+        for i in range(10):
+            ang = -math.pi / 2 + i * math.pi / 5
+            rad = R if i % 2 == 0 else r
+            star.append((cx + rad * math.cos(ang), cy + rad * math.sin(ang)))
+        draw.polygon(star, fill=accent)
+
+    # Eyebrow : nom de marque
+    f_eyebrow = load_font(34, bold=True)
+    f_title = load_font(82, bold=True)
+    f_foot = load_font(32)
+
+    y = top + 168
+    brand_name = (vform.brand_name or '').strip()
+    if brand_name:
+        draw.text((LEFT, y), brand_name.upper()[:42], font=f_eyebrow, fill=accent)
+        y += 56
+
+    # Titre (retour à la ligne automatique, max 3 lignes)
+    def wrap(text, font, max_w):
+        words = text.split()
+        lines, cur = [], ''
+        for w in words:
+            test = (cur + ' ' + w).strip()
+            if draw.textlength(test, font=font) <= max_w or not cur:
+                cur = test
+            else:
+                lines.append(cur)
+                cur = w
+        if cur:
+            lines.append(cur)
+        return lines
+
+    title = (vform.title or 'Donnez votre avis').strip()
+    lines = wrap(title, f_title, W - LEFT - 80)
+    if len(lines) > 3:
+        lines = lines[:3]
+        lines[-1] = lines[-1].rstrip('…') + '…'
+    for ln in lines:
+        draw.text((LEFT, y), ln, font=f_title, fill=WHITE)
+        y += 96
+
+    # Pied : invitation + domaine
+    draw.text((LEFT, H - 88), 'Donnez votre avis en 2 minutes · vozavi.com', font=f_foot, fill=muted)
+
+    buf = io.BytesIO()
+    img.save(buf, 'PNG', optimize=True)
+    buf.seek(0)
+    resp = HttpResponse(buf.read(), content_type='image/png')
+    resp['Cache-Control'] = 'public, max-age=86400'
+    return resp
+
+
 # ── DEMO ──────────────────────────────────────────────────────────────────────
 
 def demo_form(request):

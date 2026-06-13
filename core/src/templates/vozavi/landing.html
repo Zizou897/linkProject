@@ -364,6 +364,29 @@ p{color:var(--text-2);line-height:1.72}
   .dash-card{right:-16px;width:148px}
   .resp-card{left:-12px;width:132px}
 }
+
+/* ── COOKIE BANNER ──────────────────────────────────────────────── */
+.cookie-banner{
+  position:fixed;left:24px;bottom:24px;z-index:1200;max-width:360px;
+  background:var(--white);color:var(--text);
+  border:1px solid var(--border);border-left:3px solid var(--indigo);
+  border-radius:var(--r-lg);padding:18px 20px;box-shadow:var(--sh-up);
+  opacity:0;transform:translateY(14px);transition:opacity .3s ease,transform .3s ease;
+}
+.cookie-banner.is-visible{opacity:1;transform:translateY(0)}
+.cookie-banner__text{display:flex;gap:11px;align-items:flex-start}
+.cookie-banner__text svg{flex-shrink:0;margin-top:1px}
+.cookie-banner__text p{font-size:.875rem;line-height:1.55;color:var(--text-2);margin:0}
+.cookie-banner__text a{color:var(--indigo);font-weight:600;text-decoration:underline}
+.cookie-banner__actions{display:flex;gap:10px;margin-top:15px;justify-content:flex-end}
+.cookie-btn{font-family:var(--f-head);font-weight:600;font-size:.875rem;padding:9px 18px;border-radius:10px;transition:all .18s ease}
+.cookie-btn--solid{background:var(--indigo);color:var(--white)}
+.cookie-btn--solid:hover{background:var(--indigo-d)}
+.cookie-btn--ghost{background:transparent;color:var(--text-2);border:1px solid var(--border)}
+.cookie-btn--ghost:hover{color:var(--text);border-color:var(--text-3)}
+@media(max-width:480px){
+  .cookie-banner{left:16px;right:16px;bottom:16px;max-width:none}
+}
 </style>
 </head>
 <body>
@@ -1014,6 +1037,66 @@ p{color:var(--text-2);line-height:1.72}
     }
   });
 
+})();
+</script>
+
+<!-- Bannière cookies -->
+<div id="cookieBanner" class="cookie-banner" role="dialog" aria-live="polite" aria-label="Consentement aux cookies" hidden>
+  <div class="cookie-banner__text">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4F46B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/>
+      <path d="M8.5 8.5v.01M16 15.5v.01M12 12v.01M11 17v.01M7 14v.01"/>
+    </svg>
+    <p>Ce site utilise des cookies pour améliorer votre expérience et analyser le trafic. <a href="/confidentialite">En savoir plus</a></p>
+  </div>
+  <div class="cookie-banner__actions">
+    <button type="button" id="cookieDecline" class="cookie-btn cookie-btn--ghost">Refuser</button>
+    <button type="button" id="cookieAccept" class="cookie-btn cookie-btn--solid">Accepter</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  // ⚠️ Remplacez par votre identifiant de mesure Google Analytics 4 (ex. G-XXXXXXXXXX).
+  // Laissez vide pour ne charger aucun script de suivi.
+  var GA_MEASUREMENT_ID = '';
+
+  var banner = document.getElementById('cookieBanner');
+  var KEY = 'cookie-consent';
+  var analyticsLoaded = false;
+
+  function loadAnalytics(){
+    if(analyticsLoaded || !GA_MEASUREMENT_ID) return;
+    analyticsLoaded = true;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', GA_MEASUREMENT_ID);
+  }
+
+  function setChoice(value){
+    try { localStorage.setItem(KEY, value); } catch(e){}
+    if(value === 'accepted') loadAnalytics();
+    banner.classList.remove('is-visible');
+    setTimeout(function(){ banner.hidden = true; }, 300);
+  }
+
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch(e){}
+  if(stored === 'accepted'){
+    loadAnalytics();
+  } else if(!stored){
+    banner.hidden = false;
+    requestAnimationFrame(function(){ banner.classList.add('is-visible'); });
+  }
+  document.getElementById('cookieAccept').addEventListener('click', function(){ setChoice('accepted'); });
+  document.getElementById('cookieDecline').addEventListener('click', function(){ setChoice('declined'); });
 })();
 </script>
 </body>
