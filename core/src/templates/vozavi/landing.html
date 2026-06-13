@@ -1092,8 +1092,12 @@ p{color:var(--text-2);line-height:1.72}
   if(stored === 'accepted'){
     loadAnalytics();
   } else if(!stored){
-    banner.hidden = false;
-    requestAnimationFrame(function(){ banner.classList.add('is-visible'); });
+    // Apparition différée de 5 à 8 secondes.
+    var delay = 5000 + Math.floor(Math.random() * 3000);
+    setTimeout(function(){
+      banner.hidden = false;
+      requestAnimationFrame(function(){ banner.classList.add('is-visible'); });
+    }, delay);
   }
   document.getElementById('cookieAccept').addEventListener('click', function(){ setChoice('accepted'); });
   document.getElementById('cookieDecline').addEventListener('click', function(){ setChoice('declined'); });
