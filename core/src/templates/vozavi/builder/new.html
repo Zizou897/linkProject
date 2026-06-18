@@ -286,8 +286,6 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
 <style>@keyframes ov-spin{to{transform:rotate(360deg)}}</style>
 
 <script>
-document.addEventListener('click',function(e){if(!e.target.closest('.u-menu'))document.querySelectorAll('.u-menu.open').forEach(function(m){m.classList.remove('open')});});
-
 (function(){
   var overlay = document.getElementById('create-overlay');
   var label   = document.getElementById('overlay-label');

@@ -670,12 +670,6 @@ input,textarea,select{font-family:inherit}
 </main>
 
 <script>
-// Close user menu on outside click
-document.addEventListener('click',function(e){
-  if(!e.target.closest('.u-menu'))
-    document.querySelectorAll('.u-menu.open').forEach(function(m){m.classList.remove('open')});
-});
-
 // Fix CSRF for all standalone hx-post buttons (delete, move, required toggle)
 document.body.addEventListener('htmx:configRequest', function(e){
   e.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
