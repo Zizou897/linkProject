@@ -20,6 +20,11 @@ couleurs en dur pour garantir un rendu identique quelle que soit la page.
 .vzum-item.danger:hover{background:#FEF2F2;color:#E24B4A}
 .vzum-item.danger:hover svg{color:#E24B4A}
 .vzum-sep{height:1px;background:#E2E1F0;margin:5px 0}
+@media(max-width:640px){
+  .vzum-av{width:40px;height:40px;font-size:.8125rem}
+  .vzum-drop{min-width:min(260px,calc(100vw - 28px))}
+  .vzum-item{padding:12px}
+}
 </style>
 <div class="vzum" id="vzum">
   <button type="button" class="vzum-av" aria-label="Mon profil" aria-haspopup="true" aria-expanded="false" onclick="vzumToggle(event)">{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}{% if not request.user.first_name %}{{ request.user.username|slice:":2"|upper }}{% endif %}</button>

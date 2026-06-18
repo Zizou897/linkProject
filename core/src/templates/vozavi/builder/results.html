@@ -370,7 +370,13 @@ button{font-family:var(--f-body);cursor:pointer;border:none;background:none}
 @media(max-width:680px){
   .kpi-row{grid-template-columns:repeat(2,1fr)}
   .kpi-card:nth-child(3){grid-column:span 2}
-  .hdr-title{max-width:140px}
+  .hdr{gap:8px;padding:0 14px}
+  .hdr-logo{display:none}
+  .hdr-tag{display:none}
+  .hdr-btn-txt{display:none}
+  .hdr-btn{padding:0 11px}
+  .exp-btn{padding:0 11px}
+  .hdr-title{max-width:120px}
   .rating-top{flex-direction:column;gap:16px;align-items:flex-start}
   .dist-rows{width:100%}
   .resp-qa-row{grid-template-columns:1fr;gap:4px}
@@ -403,23 +409,23 @@ button{font-family:var(--f-body);cursor:pointer;border:none;background:none}
   <div class="hdr-space"></div>
   <a href="{% url 'form_responses' vform.pk %}" class="hdr-btn hdr-btn-ghost">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H9l-3 3v-3H3a1 1 0 0 1-1-1V4z"/></svg>
-    Avis
+    <span class="hdr-btn-txt">Avis</span>
   </a>
   <a href="{% url 'edit_form' vform.pk %}" class="hdr-btn hdr-btn-ghost">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg>
-    Éditer
+    <span class="hdr-btn-txt">Éditer</span>
   </a>
   {% if vform.status == 'active' %}
   <a href="{% url 'share_form' vform.pk %}" class="hdr-btn hdr-btn-ghost">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="4" r="1.5"/><circle cx="4" cy="8" r="1.5"/><circle cx="12" cy="12" r="1.5"/><path d="M5.5 7.2l5-2.4M5.5 8.8l5 2.4"/></svg>
-    Partager
+    <span class="hdr-btn-txt">Partager</span>
   </a>
   {% endif %}
   <!-- Export dropdown -->
   <div class="exp-wrap">
     <button class="exp-btn" id="expBtn" aria-expanded="false" aria-haspopup="true">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8M5 7l3 3 3-3"/><path d="M3 11v2a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-2"/></svg>
-      Exporter
+      <span class="hdr-btn-txt">Exporter</span>
       <svg viewBox="0 0 10 6" fill="currentColor" style="width:10px;height:6px;opacity:.7"><path d="M0 0l5 6 5-6z"/></svg>
     </button>
     <div class="exp-drop" id="expDrop" role="menu">
