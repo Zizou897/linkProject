@@ -461,26 +461,8 @@ button{font-family:var(--f-body);cursor:pointer;border:none;background:none}
       </a>
     </div>
   </div>
-  <!-- User avatar -->
-  <div class="u-menu">
-    <button class="u-av" id="uBtn" aria-expanded="false" aria-haspopup="true">
-      {{ request.user.username|slice:":2"|upper }}
-    </button>
-    <div class="u-drop" id="uDrop" role="menu">
-      <div class="u-drop-info">
-        <div class="u-drop-name">{{ request.user.get_full_name|default:request.user.username }}</div>
-        <div class="u-drop-email">{{ request.user.email }}</div>
-      </div>
-      <a href="{% url 'dashboard' %}" class="u-drop-item">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
-        Tableau de bord
-      </a>
-      <form method="post" action="{% url 'logout' %}" style="margin:0">{% csrf_token %}<button type="submit" class="u-drop-item" style="width:100%;background:none;border:none;cursor:pointer;text-align:left;font:inherit;padding:0">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 4l4 4-4 4M14 8H6"/><path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>
-        Déconnexion
-      </button></form>
-    </div>
-  </div>
+  <!-- Menu profil -->
+  {% include 'vozavi/partials/user_menu.html' %}
 </header>
 
 <!-- ── ALERT BANNER ── -->
@@ -739,7 +721,7 @@ button{font-family:var(--f-body);cursor:pointer;border:none;background:none}
 </main>
 
 <script>
-// Export dropdown toggle
+// Export dropdown toggle (le menu profil est géré par le partiel user_menu)
 const expBtn = document.getElementById('expBtn');
 const expDrop = document.getElementById('expDrop');
 expBtn.addEventListener('click', (e) => {
@@ -747,23 +729,9 @@ expBtn.addEventListener('click', (e) => {
   const open = expDrop.classList.toggle('open');
   expBtn.setAttribute('aria-expanded', open);
 });
-
-// User avatar dropdown toggle
-const uBtn = document.getElementById('uBtn');
-const uDrop = document.getElementById('uDrop');
-uBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  const open = uDrop.classList.toggle('open');
-  uBtn.setAttribute('aria-expanded', open);
-  if (open) expDrop.classList.remove('open');
-});
-
-// Close all dropdowns on outside click
 document.addEventListener('click', () => {
   expDrop.classList.remove('open');
-  uDrop.classList.remove('open');
   expBtn.setAttribute('aria-expanded', 'false');
-  uBtn.setAttribute('aria-expanded', 'false');
 });
 </script>
 </body>

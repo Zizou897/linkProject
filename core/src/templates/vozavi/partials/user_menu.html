@@ -1,0 +1,74 @@
+{% comment %}
+Menu profil unifié (avatar + dropdown), identique sur toutes les navbars.
+Auto-contenu : styles + markup + JS avec classes préfixées « vzum- » et
+couleurs en dur pour garantir un rendu identique quelle que soit la page.
+À inclure dans le <header> : {% include 'vozavi/partials/user_menu.html' %}
+{% endcomment %}
+{% if request.user.is_authenticated %}
+<style>
+.vzum{position:relative;flex-shrink:0;font-family:'Inter',system-ui,sans-serif}
+.vzum-av{width:34px;height:34px;border-radius:50%;background:#4F46B8;color:#fff;font-family:'Poppins','Segoe UI',sans-serif;font-weight:700;font-size:.75rem;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;outline:2px solid transparent;outline-offset:2px;transition:outline-color .15s}
+.vzum-av:hover,.vzum.open .vzum-av{outline-color:#E4E2F8}
+.vzum-drop{position:absolute;right:0;top:calc(100% + 8px);background:#fff;border:1px solid #E2E1F0;border-radius:12px;padding:6px;min-width:224px;box-shadow:0 8px 24px rgba(44,44,58,.12);opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .16s ease,transform .16s ease,visibility .16s;z-index:400}
+.vzum.open .vzum-drop{opacity:1;visibility:visible;transform:translateY(0)}
+.vzum-head{padding:10px 12px 12px;border-bottom:1px solid #E2E1F0;margin-bottom:6px}
+.vzum-name{font-family:'Poppins','Segoe UI',sans-serif;font-weight:600;font-size:.875rem;color:#2C2C3A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vzum-email{font-size:.75rem;color:#9B9BB5;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vzum-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-family:'Inter',system-ui,sans-serif;font-size:.875rem;color:#5C5C72;width:100%;background:none;border:none;cursor:pointer;text-align:left;text-decoration:none;transition:background .12s,color .12s}
+.vzum-item:hover{background:#F4F3FB;color:#2C2C3A}
+.vzum-item svg{width:15px;height:15px;flex-shrink:0;color:#9B9BB5}
+.vzum-item.danger:hover{background:#FEF2F2;color:#E24B4A}
+.vzum-item.danger:hover svg{color:#E24B4A}
+.vzum-sep{height:1px;background:#E2E1F0;margin:5px 0}
+</style>
+<div class="vzum" id="vzum">
+  <button type="button" class="vzum-av" aria-label="Mon profil" aria-haspopup="true" aria-expanded="false" onclick="vzumToggle(event)">{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}{% if not request.user.first_name %}{{ request.user.username|slice:":2"|upper }}{% endif %}</button>
+  <div class="vzum-drop" role="menu">
+    <div class="vzum-head">
+      <div class="vzum-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+      <div class="vzum-email">{{ request.user.email }}</div>
+    </div>
+    <a href="{% url 'dashboard' %}" class="vzum-item" role="menuitem">
+      <svg viewBox="0 0 16 16" fill="none"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1.4" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="1.4" stroke="currentColor" stroke-width="1.4"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="1.4" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="5.5" height="5.5" rx="1.4" stroke="currentColor" stroke-width="1.4"/></svg>
+      Tableau de bord
+    </a>
+    <a href="{% url 'forms_list' %}" class="vzum-item" role="menuitem">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M2 3.5h12M2 8h12M2 12.5h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Mes formulaires
+    </a>
+    <a href="{% url 'account_settings' %}" class="vzum-item" role="menuitem">
+      <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="2.6" stroke="currentColor" stroke-width="1.4"/><path d="M2.8 13.5c0-2.5 2.3-4.4 5.2-4.4s5.2 1.9 5.2 4.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Mon compte
+    </a>
+    <div class="vzum-sep"></div>
+    <form method="post" action="{% url 'logout' %}" style="margin:0">{% csrf_token %}
+      <button type="submit" class="vzum-item danger" role="menuitem">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M10 4.5L13 8l-3 3.5M13 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 2.5H3.5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1H7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Déconnexion
+      </button>
+    </form>
+  </div>
+</div>
+<script>
+(function(){
+  if (window.__vzumInit) return;       // ne lie les écouteurs qu'une fois
+  window.__vzumInit = true;
+  window.vzumToggle = function(e){
+    e.stopPropagation();
+    var m = document.getElementById('vzum');
+    var open = m.classList.toggle('open');
+    e.currentTarget.setAttribute('aria-expanded', open);
+  };
+  document.addEventListener('click', function(e){
+    var m = document.getElementById('vzum');
+    if (m && !e.target.closest('#vzum')) m.classList.remove('open');
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') {
+      var m = document.getElementById('vzum');
+      if (m) m.classList.remove('open');
+    }
+  });
+})();
+</script>
+{% endif %}

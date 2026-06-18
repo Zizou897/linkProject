@@ -470,24 +470,7 @@ input,textarea,select{font-family:inherit}
     </form>
     {% endif %}{# end is_guest #}
   </div>
-  {% if is_guest %}
-  
-  {% else %}
-  <div class="u-menu" id="user-menu">
-    <button class="u-av" onclick="document.getElementById('user-menu').classList.toggle('open')" aria-label="Menu utilisateur">{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}{% if not request.user.first_name %}{{ request.user.username|slice:":2"|upper }}{% endif %}</button>
-    <div class="u-drop">
-      <div class="u-drop-head">
-        <div class="u-drop-name">{{ request.user.get_full_name|default:request.user.username }}</div>
-        <div class="u-drop-email">{{ request.user.email }}</div>
-      </div>
-      <div class="d-sep"></div>
-      <form method="post" action="{% url 'logout' %}" style="margin:0">{% csrf_token %}<button type="submit" class="d-item danger" style="width:100%;background:none;border:none;cursor:pointer;text-align:left;font:inherit;padding:0">
-        <svg viewBox="0 0 14 14" fill="none"><path d="M5 7h7M9 4.5L12 7l-3 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-        Se déconnecter
-      </button></form>
-    </div>
-  </div>
-  {% endif %}
+  {% include 'vozavi/partials/user_menu.html' %}
 </header>
 
 <div class="stepper">
