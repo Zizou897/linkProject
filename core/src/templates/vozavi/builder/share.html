@@ -152,9 +152,9 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
       <text x="68" y="40" font-size="28" font-weight="600" fill="#4F46B8" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
     </svg>
   </a>
-  <a href="{% url 'dashboard' %}" class="hdr-back">
+  <a href="{% url 'forms_list' %}" class="hdr-back">
     <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Tableau de bord
+    Retour
   </a>
   <div class="u-menu" id="user-menu">
     <button class="u-av" onclick="document.getElementById('user-menu').classList.toggle('open')" aria-label="Menu utilisateur">{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}{% if not request.user.first_name %}{{ request.user.username|slice:":2"|upper }}{% endif %}</button>

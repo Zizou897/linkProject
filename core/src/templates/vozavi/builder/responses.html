@@ -39,6 +39,9 @@ button{font-family:var(--f-body);cursor:pointer;border:none;background:none}
 }
 .hdr-logo{display:flex;align-items:center;flex-shrink:0}
 .hdr-logo svg{height:22px;width:auto}
+.hdr-back{display:flex;align-items:center;gap:6px;font-family:var(--f-head);font-size:.8125rem;font-weight:500;color:var(--text-2);padding:6px 11px;border-radius:8px;transition:background .14s,color .14s;flex-shrink:0}
+.hdr-back:hover{background:var(--lavender);color:var(--indigo)}
+.hdr-back svg{width:14px;height:14px}
 .hdr-div{width:1px;height:24px;background:var(--border);flex-shrink:0}
 .hdr-title{
   font-family:var(--f-head);font-weight:600;font-size:.875rem;color:var(--text);
@@ -260,6 +263,10 @@ button{font-family:var(--f-body);cursor:pointer;border:none;background:none}
       <text x="68" y="40" font-size="28" font-weight="600" fill="#4F46B8" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
     </svg>
   </div>
+  <a href="{% url 'forms_list' %}" class="hdr-back">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Retour
+  </a>
   <div class="hdr-div"></div>
   <span class="hdr-title" title="{{ vform.title }}">{{ vform.title }}</span>
   <span class="hdr-tag">Avis</span>
