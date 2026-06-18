@@ -90,34 +90,6 @@ button{font-family:var(--f-body);cursor:pointer;border:none;background:none}
 .exp-drop a svg{width:15px;height:15px;color:var(--text-3)}
 .exp-drop a:not(:last-child){border-bottom:1px solid var(--border)}
 
-/* User avatar */
-.u-menu{position:relative;flex-shrink:0}
-.u-av{
-  width:34px;height:34px;border-radius:50%;
-  background:var(--indigo);color:var(--white);
-  font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:opacity .15s;border:none;text-transform:uppercase;
-}
-.u-av:hover{opacity:.85}
-.u-drop{
-  position:absolute;right:0;top:calc(100% + 8px);
-  background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);
-  box-shadow:var(--shadow-lg);min-width:200px;
-  opacity:0;visibility:hidden;transform:translateY(-4px);
-  transition:opacity .15s,transform .15s,visibility .15s;z-index:200;
-}
-.u-drop.open{opacity:1;visibility:visible;transform:translateY(0)}
-.u-drop-info{padding:12px 14px;border-bottom:1px solid var(--border)}
-.u-drop-name{font-weight:600;font-size:.8125rem;color:var(--text)}
-.u-drop-email{font-size:.75rem;color:var(--text-3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.u-drop-item{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 14px;font-size:.8125rem;color:var(--text);
-  transition:background .1s;cursor:pointer;
-}
-.u-drop-item:hover{background:var(--lavender)}
-.u-drop-item svg{width:15px;height:15px;color:var(--text-3)}
-
 /* ── ALERT BANNER ─────────────────────────────────────────────────────────── */
 .alert-neg{
   background:#FFF3CD;border-bottom:2px solid var(--amber);

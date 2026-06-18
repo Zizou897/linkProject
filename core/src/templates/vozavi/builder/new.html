@@ -133,18 +133,6 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
   position:absolute;inset:0;border-radius:var(--radius);
   opacity:0;
 }
-.u-menu{position:relative}
-.u-av{width:34px;height:34px;border-radius:50%;background:var(--indigo);color:var(--white);font-family:var(--f-head);font-weight:700;font-size:.75rem;display:flex;align-items:center;justify-content:center;cursor:pointer;outline:2px solid transparent;outline-offset:2px;transition:outline-color .15s;border:none}
-.u-av:hover,.u-menu.open .u-av{outline-color:#E4E2F8}
-.u-drop{position:absolute;right:0;top:calc(100% + 8px);background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:6px;min-width:190px;box-shadow:var(--shadow-md);display:none;z-index:300}
-.u-menu.open .u-drop{display:block}
-.u-drop-head{padding:8px 10px 10px;border-bottom:1px solid var(--border);margin-bottom:6px}
-.u-drop-name{font-family:var(--f-head);font-weight:600;font-size:.875rem;color:var(--text)}
-.u-drop-email{font-size:.75rem;color:var(--text-3);margin-top:1px}
-.d-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;font-size:.875rem;color:var(--text-2);transition:background .12s,color .12s;width:100%}
-.d-item:hover{background:var(--lavender);color:var(--text)}
-.d-item.danger:hover{background:#FEF2F2;color:#E24B4A}
-.d-sep{height:1px;background:var(--border);margin:4px 0}
 </style>
 </head>
 <body>
@@ -161,22 +149,7 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
     <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     {% if request.user.is_authenticated %}Retour au tableau de bord{% else %}Retour à la page d'accueil{% endif %}
   </a>
-  {% if request.user.is_authenticated %}
-  <div class="u-menu" id="user-menu">
-    <button class="u-av" onclick="document.getElementById('user-menu').classList.toggle('open')" aria-label="Menu utilisateur">{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}{% if not request.user.first_name %}{{ request.user.username|slice:":2"|upper }}{% endif %}</button>
-    <div class="u-drop">
-      <div class="u-drop-head">
-        <div class="u-drop-name">{{ request.user.get_full_name|default:request.user.username }}</div>
-        <div class="u-drop-email">{{ request.user.email }}</div>
-      </div>
-      <div class="d-sep"></div>
-      <form method="post" action="{% url 'logout' %}" style="margin:0">{% csrf_token %}<button type="submit" class="d-item danger" style="width:100%;background:none;border:none;cursor:pointer;text-align:left;font:inherit;padding:0">
-        <svg viewBox="0 0 14 14" fill="none"><path d="M5 7h7M9 4.5L12 7l-3 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-        Se déconnecter
-      </button></form>
-    </div>
-  </div>
-  {% endif %}
+  {% include 'vozavi/partials/user_menu.html' %}
 </header>
 
 <div class="stepper">
