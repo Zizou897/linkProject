@@ -1,0 +1,370 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<title>Mes formulaires — Vozavi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap"></noscript>
+<style>
+:root {
+  --indigo:#4F46B8; --indigo-d:#433CA0; --indigo-pale:#EEEDFB; --indigo-mid:#E4E2F8;
+  --amber:#F2A93B;  --amber-pale:#FFF8EC;
+  --green:#1D9E75;  --green-pale:#E8F8F3;
+  --red:#E24B4A;    --red-pale:#FEF2F2;
+  --lavender:#F4F3FB;
+  --white:#fff; --text:#2C2C3A; --text-2:#5C5C72; --text-3:#9B9BB5;
+  --border:#E2E1F0; --border-2:#EDECED;
+  --shadow-sm:0 1px 4px rgba(44,44,58,.07);
+  --shadow:0 2px 8px rgba(44,44,58,.08);
+  --shadow-md:0 8px 24px rgba(44,44,58,.12);
+  --radius:12px; --radius-sm:8px;
+  --f-head:'Poppins',sans-serif; --f-body:'Inter',sans-serif;
+  --hdr:60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--f-body);font-size:15px;color:var(--text);background:var(--lavender);-webkit-font-smoothing:antialiased;min-height:100dvh}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+ul{list-style:none}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:200;height:var(--hdr);background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px}
+.hdr-logo{display:flex;align-items:center;flex-shrink:0}
+.hdr-logo svg{height:22px;width:auto}
+.hdr-divider{width:1px;height:20px;background:var(--border);flex-shrink:0}
+.hdr-nav{display:flex;align-items:center;gap:2px}
+.hdr-nav a{display:flex;align-items:center;gap:6px;font-family:var(--f-head);font-size:.8125rem;font-weight:500;color:var(--text-2);padding:6px 11px;border-radius:7px;transition:background .14s,color .14s}
+.hdr-nav a:hover{background:var(--lavender);color:var(--indigo)}
+.hdr-nav a.on{background:var(--indigo-pale);color:var(--indigo);font-weight:600}
+.hdr-nav a svg{width:13px;height:13px;flex-shrink:0}
+.hdr-space{flex:1}
+.u-menu{position:relative}
+.u-av{width:34px;height:34px;border-radius:50%;background:var(--indigo);color:var(--white);font-family:var(--f-head);font-weight:700;font-size:.75rem;display:flex;align-items:center;justify-content:center;outline:2px solid transparent;outline-offset:2px;transition:outline-color .15s}
+.u-av:hover,.u-menu.open .u-av{outline-color:var(--indigo-mid)}
+.u-drop{position:absolute;right:0;top:calc(100% + 8px);background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:6px;min-width:200px;box-shadow:var(--shadow-md);display:none;z-index:300}
+.u-menu.open .u-drop{display:block}
+.u-drop-head{padding:8px 10px 10px;border-bottom:1px solid var(--border);margin-bottom:6px}
+.u-drop-name{font-family:var(--f-head);font-weight:600;font-size:.875rem;color:var(--text)}
+.u-drop-email{font-size:.75rem;color:var(--text-3);margin-top:1px}
+.d-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;font-size:.875rem;color:var(--text-2);transition:background .12s,color .12s;width:100%}
+.d-item:hover{background:var(--lavender);color:var(--text)}
+.d-item.danger:hover{background:var(--red-pale);color:var(--red)}
+.d-item svg{width:14px;height:14px;flex-shrink:0}
+.mob-nav-btn{display:none;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--radius-sm);color:var(--text-2)}
+.mob-nav-btn:hover{background:var(--lavender)}
+.mob-nav-btn svg{width:18px;height:18px}
+
+/* LAYOUT */
+.page{max-width:1140px;margin:0 auto;padding:32px 24px 72px}
+.page-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.page-title{font-family:var(--f-head);font-weight:700;font-size:clamp(1.375rem,3vw,1.75rem);color:var(--text);letter-spacing:-.02em}
+.page-title span{font-weight:400;color:var(--text-3);font-size:1rem;margin-left:6px}
+.cta-new{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--radius-sm);background:var(--indigo);color:var(--white);font-family:var(--f-head);font-weight:600;font-size:.875rem;box-shadow:0 4px 14px rgba(79,70,184,.28);transition:background .18s,transform .14s}
+.cta-new:hover{background:var(--indigo-d);transform:translateY(-1px)}
+.cta-new svg{width:15px;height:15px}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.search-box{position:relative;flex:1;min-width:200px}
+.search-box svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-3)}
+.search-box input{width:100%;height:42px;padding:0 14px 0 38px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--f-body);font-size:.9rem;color:var(--text);background:var(--white);outline:none;transition:border-color .15s,box-shadow .15s}
+.search-box input:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(79,70,184,.1)}
+.tb-select{height:42px;padding:0 36px 0 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--f-head);font-size:.85rem;font-weight:500;color:var(--text-2);background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' stroke='%239B9BB5' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 13px center;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none}
+.tb-select:focus{border-color:var(--indigo)}
+
+/* CARDS */
+.forms-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:900px){.forms-grid{grid-template-columns:1fr 1fr}}
+.fc{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 24px;transition:box-shadow .2s,transform .15s;display:flex;flex-direction:column}
+.fc:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.fc-row1{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.fc-info{flex:1;min-width:0}
+.fc-name{font-family:var(--f-head);font-weight:600;font-size:.9375rem;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-date{font-size:.8rem;color:var(--text-3)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--f-head);font-size:.6875rem;font-weight:700;padding:3px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.badge-active{background:var(--green-pale);color:var(--green)}
+.badge-draft{background:#F0F0F6;color:var(--text-3)}
+.badge-closed{background:var(--amber-pale);color:#B07A10}
+.fc-stats{display:flex;align-items:center;gap:20px;background:var(--lavender);border-radius:8px;padding:11px 16px;margin-bottom:16px}
+.fc-stat{display:flex;flex-direction:column;gap:2px}
+.fc-stat-v{font-family:var(--f-head);font-weight:700;font-size:1.125rem;color:var(--text);line-height:1}
+.fc-stat-l{font-size:.7rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.fc-stat-sep{width:1px;height:28px;background:var(--border-2);flex-shrink:0}
+.fc-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:auto}
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-head);font-weight:600;font-size:.8125rem;padding:8px 14px;border-radius:var(--radius-sm);transition:all .15s;cursor:pointer;border:none}
+.btn-primary{background:var(--indigo);color:var(--white)}
+.btn-primary:hover{background:var(--indigo-d)}
+.btn-ghost{background:transparent;color:var(--text-2);border:1.5px solid var(--border)}
+.btn-ghost:hover{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-pale)}
+.btn svg{width:13px;height:13px;flex-shrink:0}
+
+/* kebab menu */
+.kebab{position:relative;margin-left:auto}
+.kebab-btn{width:34px;height:34px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--text-3);border:1.5px solid var(--border);transition:all .15s}
+.kebab-btn:hover{color:var(--text);border-color:var(--text-3)}
+.kebab-btn svg{width:16px;height:16px}
+.kebab-drop{position:absolute;right:0;bottom:calc(100% + 6px);background:var(--white);border:1px solid var(--border);border-radius:10px;padding:6px;min-width:180px;box-shadow:var(--shadow-md);display:none;z-index:50}
+.kebab.open .kebab-drop{display:block}
+.kebab-drop form{margin:0}
+.kebab-drop .d-item{font-family:var(--f-head);font-weight:500;cursor:pointer;text-align:left}
+
+/* EMPTY */
+.empty{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:52px 32px;text-align:center}
+.empty-ico{margin:0 auto 18px;opacity:.12}
+.empty-t{font-family:var(--f-head);font-weight:700;font-size:1.125rem;color:var(--text);margin-bottom:8px}
+.empty-s{font-size:.9rem;color:var(--text-2);line-height:1.65;max-width:360px;margin:0 auto 24px}
+
+/* PAGINATION */
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:28px}
+.pg{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--white);font-family:var(--f-head);font-size:.85rem;font-weight:600;color:var(--text-2);transition:all .15s}
+.pg:hover{border-color:var(--indigo);color:var(--indigo)}
+.pg.on{background:var(--indigo);border-color:var(--indigo);color:var(--white)}
+.pg.disabled{opacity:.4;pointer-events:none}
+.pg svg{width:14px;height:14px}
+.pg-info{font-size:.85rem;color:var(--text-3);margin:0 8px}
+
+@media(max-width:640px){
+  .page{padding:20px 16px 56px}
+  .hdr{padding:0 16px}
+  .hdr-nav{display:none}
+  .mob-nav-btn{display:flex}
+  .fc{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <a href="{% url 'home' %}" class="hdr-logo" aria-label="Vozavi — Accueil">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64">
+      <path d="M10 14 a10 10 0 0 1 10-10 h24 a10 10 0 0 1 10 10 v20 a10 10 0 0 1-10 10 h-14 l-9 9 v-9 h-1 a10 10 0 0 1-10-10 z" fill="#4F46B8"/>
+      <path d="M32 12 l3.4 6.9 7.6 1.1 -5.5 5.4 1.3 7.6 -6.8-3.6 -6.8 3.6 1.3-7.6 -5.5-5.4 7.6-1.1 z" fill="#F2A93B"/>
+      <text x="68" y="40" font-size="28" font-weight="600" fill="#4F46B8" font-family="Poppins,'Segoe UI',Arial,sans-serif">vozavi</text>
+    </svg>
+  </a>
+  <div class="hdr-divider" aria-hidden="true"></div>
+  <nav class="hdr-nav" aria-label="Navigation principale">
+    <a href="{% url 'dashboard' %}">
+      <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+      Tableau de bord
+    </a>
+    <a href="{% url 'forms_list' %}" class="on">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M2 3h12M2 8h12M2 13h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Mes formulaires
+    </a>
+    <a href="{% url 'new_form' %}">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Nouveau formulaire
+    </a>
+  </nav>
+  <div class="hdr-space"></div>
+  <button class="mob-nav-btn" id="mob-btn" aria-label="Menu" onclick="location.href='{% url 'dashboard' %}'">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+  </button>
+  <div class="u-menu" id="user-menu">
+    <button class="u-av" onclick="toggleMenu('user-menu')" aria-label="Menu utilisateur">
+      {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}{% if not request.user.first_name %}{{ request.user.username|slice:":2"|upper }}{% endif %}
+    </button>
+    <div class="u-drop">
+      <div class="u-drop-head">
+        <div class="u-drop-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+        <div class="u-drop-email">{{ request.user.email }}</div>
+      </div>
+      <a href="{% url 'account_settings' %}" class="d-item">
+        <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.4" stroke="currentColor" stroke-width="1.3"/><path d="M2.5 12c0-2.2 2-4 4.5-4s4.5 1.8 4.5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Mon compte
+      </a>
+      <form method="post" action="{% url 'logout' %}" style="margin:6px 0 0">{% csrf_token %}<button type="submit" class="d-item danger" style="text-align:left">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M5 7h7M9 4.5L12 7l-3 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Se déconnecter
+      </button></form>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+
+  <div class="page-head">
+    <h1 class="page-title">Mes formulaires <span>({{ total_count }})</span></h1>
+    <a href="{% url 'new_form' %}" class="cta-new">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Nouveau
+    </a>
+  </div>
+
+  <!-- TOOLBAR -->
+  <form method="get" class="toolbar" id="filter-form">
+    <div class="search-box">
+      <svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <input type="text" name="q" value="{{ q }}" placeholder="Rechercher un formulaire…" autocomplete="off">
+    </div>
+    <select name="status" class="tb-select" onchange="document.getElementById('filter-form').submit()">
+      <option value="">Tous les statuts</option>
+      <option value="active" {% if status == 'active' %}selected{% endif %}>Actifs</option>
+      <option value="draft" {% if status == 'draft' %}selected{% endif %}>Brouillons</option>
+      <option value="closed" {% if status == 'closed' %}selected{% endif %}>Fermés</option>
+    </select>
+    <select name="sort" class="tb-select" onchange="document.getElementById('filter-form').submit()">
+      <option value="recent" {% if sort == 'recent' %}selected{% endif %}>Récemment modifiés</option>
+      <option value="created" {% if sort == 'created' %}selected{% endif %}>Récemment créés</option>
+      <option value="responses" {% if sort == 'responses' %}selected{% endif %}>Plus de réponses</option>
+      <option value="title" {% if sort == 'title' %}selected{% endif %}>Titre (A→Z)</option>
+    </select>
+  </form>
+
+  {% if page_obj.object_list %}
+  <div class="forms-grid">
+    {% for f in page_obj %}
+    <article class="fc">
+      <div class="fc-row1">
+        <div class="fc-info">
+          <div class="fc-name" title="{{ f.title }}">{{ f.title }}</div>
+          <div class="fc-date">Modifié {{ f.updated_at|timesince }}</div>
+        </div>
+        {% if f.status == 'active' %}<span class="badge badge-active">Actif</span>
+        {% elif f.status == 'closed' %}<span class="badge badge-closed">Fermé</span>
+        {% else %}<span class="badge badge-draft">Brouillon</span>{% endif %}
+      </div>
+
+      <div class="fc-stats">
+        <div class="fc-stat"><span class="fc-stat-v">{{ f.nb_responses }}</span><span class="fc-stat-l">Réponses</span></div>
+        <div class="fc-stat-sep"></div>
+        <div class="fc-stat"><span class="fc-stat-v">{{ f.questions.count }}</span><span class="fc-stat-l">Questions</span></div>
+      </div>
+
+      <div class="fc-actions">
+        <a href="{% url 'edit_form' f.pk %}" class="btn btn-primary">
+          <svg viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          Éditer
+        </a>
+        <a href="{% url 'form_results' f.pk %}" class="btn btn-ghost">
+          <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="8" width="3" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="5.5" y="5" width="3" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="2" width="3" height="11" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+          Résultats
+        </a>
+        {% if f.status == 'active' %}
+        <a href="{% url 'share_form' f.pk %}" class="btn btn-ghost">
+          <svg viewBox="0 0 14 14" fill="none"><circle cx="11" cy="3" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="3" cy="7" r="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="11" cy="11" r="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.4 8l5.2 2M9.6 4L4.4 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Partager
+        </a>
+        {% endif %}
+
+        <div class="kebab">
+          <button type="button" class="kebab-btn" onclick="toggleKebab(this)" aria-label="Plus d'actions">
+            <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+          </button>
+          <div class="kebab-drop">
+            <a href="{% url 'form_responses' f.pk %}" class="d-item">
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1.5 3a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H8L5.5 11.5V9H2.5a1 1 0 0 1-1-1V3z"/></svg>
+              Voir les avis
+            </a>
+            <form method="post" action="{% url 'duplicate_form' f.pk %}">{% csrf_token %}
+              <button type="submit" class="d-item">
+                <svg viewBox="0 0 14 14" fill="none"><rect x="4.5" y="4.5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 4.5V3A1.5 1.5 0 0 0 8 1.5H3A1.5 1.5 0 0 0 1.5 3v5A1.5 1.5 0 0 0 3 9.5h1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+                Dupliquer
+              </button>
+            </form>
+            {% if f.status == 'active' %}
+            <form method="post" action="{% url 'toggle_form_status' f.pk %}">{% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <button type="submit" class="d-item">
+                <svg viewBox="0 0 14 14" fill="none"><rect x="3" y="6" width="8" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 6V4.5a2.5 2.5 0 0 1 5 0V6" stroke="currentColor" stroke-width="1.3"/></svg>
+                Fermer la collecte
+              </button>
+            </form>
+            {% elif f.status == 'closed' %}
+            <form method="post" action="{% url 'toggle_form_status' f.pk %}">{% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <button type="submit" class="d-item">
+                <svg viewBox="0 0 14 14" fill="none"><rect x="3" y="6" width="8" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 6V4.5a2.5 2.5 0 0 1 4.8-1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                Rouvrir la collecte
+              </button>
+            </form>
+            {% endif %}
+            <a href="{% url 'delete_form' f.pk %}" class="d-item danger">
+              <svg viewBox="0 0 14 14" fill="none"><path d="M2 4h10M5 4V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1M10.5 4l-.6 7.4a1 1 0 0 1-1 .9H5.1a1 1 0 0 1-1-.9L3.5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Supprimer
+            </a>
+          </div>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+
+  <!-- PAGINATION -->
+  {% if page_obj.paginator.num_pages > 1 %}
+  <nav class="pagination" aria-label="Pagination">
+    {% if page_obj.has_previous %}
+    <a class="pg" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Précédent">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    {% else %}<span class="pg disabled"><svg viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>{% endif %}
+
+    <span class="pg-info">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+    <a class="pg" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Suivant">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    {% else %}<span class="pg disabled"><svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>{% endif %}
+  </nav>
+  {% endif %}
+
+  {% else %}
+  <div class="empty">
+    <svg class="empty-ico" width="72" height="72" viewBox="0 0 80 80" fill="none">
+      <path d="M20 28 a14 14 0 0 1 14-14 h32 a14 14 0 0 1 14 14 v20 a14 14 0 0 1-14 14 H52 l-12 12 v-12 h-6 a14 14 0 0 1-14-14 z" fill="#4F46B8"/>
+      <path d="M44 22 l4.5 9.5 10.5 1.5 -7.6 7.4 1.8 10.5 -9.2-4.9 -9.2 4.9 1.8-10.5 -7.6-7.4 10.5-1.5 z" fill="#F2A93B"/>
+    </svg>
+    {% if q or status %}
+    <p class="empty-t">Aucun résultat</p>
+    <p class="empty-s">Aucun formulaire ne correspond à votre recherche ou à ce filtre.</p>
+    <a href="{% url 'forms_list' %}" class="btn btn-ghost" style="display:inline-flex">Réinitialiser les filtres</a>
+    {% else %}
+    <p class="empty-t">Aucun formulaire pour l'instant</p>
+    <p class="empty-s">Créez votre premier formulaire et obtenez votre lien de collecte en moins de 2 minutes.</p>
+    <a href="{% url 'new_form' %}" class="btn btn-primary" style="display:inline-flex;padding:11px 22px">
+      <svg viewBox="0 0 14 14" fill="none" style="width:14px;height:14px"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Créer un formulaire
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</main>
+
+<script>
+(function(){
+  function toggleMenu(id){
+    var el=document.getElementById(id);
+    var isOpen=el.classList.contains('open');
+    document.querySelectorAll('.u-menu.open,.kebab.open').forEach(function(m){m.classList.remove('open')});
+    if(!isOpen) el.classList.add('open');
+  }
+  window.toggleMenu=toggleMenu;
+
+  function toggleKebab(btn){
+    var k=btn.closest('.kebab');
+    var isOpen=k.classList.contains('open');
+    document.querySelectorAll('.u-menu.open,.kebab.open').forEach(function(m){m.classList.remove('open')});
+    if(!isOpen) k.classList.add('open');
+  }
+  window.toggleKebab=toggleKebab;
+
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.u-menu')&&!e.target.closest('.kebab')){
+      document.querySelectorAll('.u-menu.open,.kebab.open').forEach(function(m){m.classList.remove('open')});
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -149,6 +149,25 @@ button{font-family:var(--f-body);cursor:pointer;border:none;background:none}
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
 
+/* ── TREND / ACTIVITÉ ─────────────────────────────────────────────────────── */
+.trend-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;margin-bottom:28px}
+.trend-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.trend-title{font-family:var(--f-head);font-size:.95rem;font-weight:600;color:var(--text)}
+.trend-meta{display:flex;align-items:center;gap:10px;font-size:.8rem;color:var(--text-3)}
+.trend-badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--f-head);font-weight:700;font-size:.75rem;padding:3px 9px;border-radius:99px}
+.trend-up{background:var(--green-pale,#E8F8F3);color:var(--green,#1D9E75)}
+.trend-down{background:#FEF2F2;color:var(--red,#E24B4A)}
+.trend-flat{background:#F0F0F6;color:var(--text-3)}
+.trend-chart{display:flex;align-items:flex-end;gap:3px;height:90px}
+.trend-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;position:relative}
+.trend-bar{width:100%;max-width:26px;border-radius:4px 4px 2px 2px;background:var(--indigo-pale,#EEEDFB);min-height:3px;transition:height .3s ease}
+.trend-bar.has{background:var(--indigo,#4F46B8)}
+.trend-bar-wrap:hover .trend-bar{background:var(--indigo-d,#433CA0)}
+.trend-bar-wrap .tip{position:absolute;bottom:calc(100% + 4px);background:var(--text,#2C2C3A);color:#fff;font-size:.7rem;padding:2px 7px;border-radius:5px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s}
+.trend-bar-wrap:hover .tip{opacity:1}
+.trend-x{font-size:.6rem;color:var(--text-3)}
+@media(max-width:540px){.trend-x{display:none}}
+
 /* ── EMPTY STATE ──────────────────────────────────────────────────────────── */
 .empty-state{
   background:var(--white);border:1px solid var(--border);border-radius:var(--radius);
@@ -523,6 +542,34 @@ button{font-family:var(--f-body);cursor:pointer;border:none;background:none}
     {% endif %}
   </div>
   {% else %}
+  <!-- Activité / tendance -->
+  <div class="trend-card">
+    <div class="trend-head">
+      <span class="trend-title">Activité des 14 derniers jours</span>
+      <div class="trend-meta">
+        <span><strong style="color:var(--text)">{{ last_7 }}</strong> cette semaine</span>
+        {% if trend_pct is not None %}
+          {% if trend_pct > 0 %}
+          <span class="trend-badge trend-up">▲ {{ trend_pct }}%</span>
+          {% elif trend_pct < 0 %}
+          <span class="trend-badge trend-down">▼ {{ trend_pct }}%</span>
+          {% else %}
+          <span class="trend-badge trend-flat">= 0%</span>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+    <div class="trend-chart">
+      {% for d in daily_series %}
+      <div class="trend-bar-wrap">
+        <span class="tip">{{ d.label }} · {{ d.count }}</span>
+        <div class="trend-bar {% if d.count %}has{% endif %}" style="height:{% if d.count %}{{ d.pct }}%{% else %}3px{% endif %}"></div>
+        <span class="trend-x">{{ d.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
   <!-- Questions analysis -->
   <div class="section-hdr">
     <span class="section-title">Analyse par question</span>

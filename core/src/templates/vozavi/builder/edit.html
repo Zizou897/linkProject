@@ -641,6 +641,27 @@ input,textarea,select{font-family:inherit}
               <p class="field-hint">Apparaîtra sur votre formulaire public</p>
             </div>
 
+            {% if not is_guest %}
+            <div class="field" style="border-top:1px solid var(--border,#E2E1F0);padding-top:16px;margin-top:4px">
+              <label class="notify-row" style="display:flex;align-items:flex-start;gap:12px;cursor:pointer">
+                <input
+                  type="checkbox"
+                  name="notify_responses"
+                  {% if vform.notify_responses %}checked{% endif %}
+                  hx-post="{% url 'update_form_notify' vform.pk %}"
+                  hx-trigger="change"
+                  hx-target="#save-status"
+                  hx-swap="innerHTML"
+                  style="width:18px;height:18px;margin-top:2px;accent-color:#4F46B8;flex-shrink:0"
+                >
+                <span>
+                  <span class="field-label" style="display:block">Notifications par e-mail</span>
+                  <span class="field-hint">Recevez un e-mail à chaque nouvelle réponse{% if request.user.email %} sur <strong>{{ request.user.email }}</strong>{% endif %}.</span>
+                </span>
+              </label>
+            </div>
+            {% endif %}
+
           </div>
         </div>
       </form>

@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<title>Supprimer le formulaire — Vozavi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --indigo:#4F46B8;--indigo-d:#433CA0;--indigo-pale:#EEEDFB;
+  --red:#E24B4A;--red-d:#C53B3A;--red-pale:#FEF2F2;
+  --lavender:#F4F3FB;--white:#fff;
+  --text:#2C2C3A;--text-2:#5C5C72;--text-3:#9B9BB5;--border:#E2E1F0;
+  --shadow-md:0 8px 24px rgba(44,44,58,.12);
+  --radius:14px;--radius-sm:9px;
+  --f-head:'Poppins',sans-serif;--f-body:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f-body);color:var(--text);background:var(--lavender);-webkit-font-smoothing:antialiased;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-md);max-width:460px;width:100%;padding:36px 34px;text-align:center}
+.icon{width:64px;height:64px;border-radius:50%;background:var(--red-pale);display:flex;align-items:center;justify-content:center;margin:0 auto 22px}
+.icon svg{width:30px;height:30px;color:var(--red)}
+h1{font-family:var(--f-head);font-weight:700;font-size:1.375rem;color:var(--text);letter-spacing:-.02em;margin-bottom:10px}
+.sub{font-size:.9375rem;color:var(--text-2);line-height:1.65;margin-bottom:22px}
+.target{background:var(--lavender);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:22px;text-align:left}
+.target-name{font-family:var(--f-head);font-weight:600;font-size:.9375rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.target-meta{font-size:.8125rem;color:var(--text-3);margin-top:3px}
+.warn{display:flex;gap:10px;align-items:flex-start;background:var(--red-pale);border:1px solid rgba(226,75,74,.2);border-radius:var(--radius-sm);padding:13px 15px;margin-bottom:24px;text-align:left}
+.warn svg{width:17px;height:17px;color:var(--red);flex-shrink:0;margin-top:1px}
+.warn p{font-size:.85rem;color:#A8312F;line-height:1.55}
+.actions{display:flex;gap:10px}
+.btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;border-radius:var(--radius-sm);font-family:var(--f-head);font-weight:600;font-size:.9375rem;transition:all .16s}
+.btn-cancel{background:var(--white);color:var(--text-2);border:1.5px solid var(--border)}
+.btn-cancel:hover{border-color:var(--text-3);color:var(--text)}
+.btn-delete{background:var(--red);color:var(--white)}
+.btn-delete:hover{background:var(--red-d);box-shadow:0 6px 16px rgba(226,75,74,.3)}
+.btn svg{width:15px;height:15px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M18 7l-1 12.5a1.5 1.5 0 0 1-1.5 1.4H8.5A1.5 1.5 0 0 1 7 19.5L6 7M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <h1>Supprimer ce formulaire&nbsp;?</h1>
+  <p class="sub">Cette action est définitive et ne peut pas être annulée.</p>
+
+  <div class="target">
+    <div class="target-name" title="{{ vform.title }}">{{ vform.title }}</div>
+    <div class="target-meta">{{ vform.questions.count }} question{{ vform.questions.count|pluralize }} · {{ nb_responses }} réponse{{ nb_responses|pluralize }}</div>
+  </div>
+
+  {% if nb_responses %}
+  <div class="warn">
+    <svg viewBox="0 0 18 18" fill="none"><path d="M9 1.5a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15z" stroke="currentColor" stroke-width="1.4"/><path d="M9 5.5v4M9 12h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <p>Les <strong>{{ nb_responses }} réponse{{ nb_responses|pluralize }}</strong> déjà collectée{{ nb_responses|pluralize }} seront également supprimées définitivement.</p>
+  </div>
+  {% endif %}
+
+  <form method="post" action="{% url 'delete_form' vform.pk %}">
+    {% csrf_token %}
+    <div class="actions">
+      <a href="{% url 'forms_list' %}" class="btn btn-cancel">Annuler</a>
+      <button type="submit" class="btn btn-delete">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 5h10M6 5V3.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V5M12 5l-.7 8.2a1 1 0 0 1-1 .9H5.7a1 1 0 0 1-1-.9L4 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Supprimer définitivement
+      </button>
+    </div>
+  </form>
+</div>
+</body>
+</html>
