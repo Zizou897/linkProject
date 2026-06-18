@@ -508,6 +508,11 @@ def add_question(request, pk):
             form=vform, type=q_type, label=label,
             required=False, position=(max_pos or 0) + 1, options=options,
         )
+        # Repli sans JS : si la requête n'est pas HTMX (le <form> natif a été
+        # soumis car HTMX ne s'est pas chargé), on recharge l'éditeur au lieu
+        # de renvoyer un fragment de page nu.
+        if request.headers.get('HX-Request') != 'true':
+            return redirect('edit_form', pk=vform.pk)
         questions = vform.questions.order_by('position')
         return render(request, 'vozavi/builder/partials/questions_list.html', {'vform': vform, 'questions': questions})
     return HttpResponse(status=405)

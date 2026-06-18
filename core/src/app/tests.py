@@ -52,6 +52,36 @@ class FormCreationTests(TestCase):
         self.assertEqual(resp.status_code, 302)
 
 
+class AddQuestionFallbackTests(TestCase):
+    """add_question : mode HTMX (fragment) et repli sans JS (redirection)."""
+
+    def setUp(self):
+        self.user = User.objects.create_user('createur', password='motdepasse123')
+        self.client.force_login(self.user)
+        self.vform = VozaviForm.objects.create(user=self.user, title='F', status='draft')
+
+    def test_htmx_request_returns_partial(self):
+        resp = self.client.post(
+            reverse('add_question', args=[self.vform.pk]),
+            {'type': 'text'}, HTTP_HX_REQUEST='true',
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(self.vform.questions.count(), 1)
+
+    def test_non_htmx_request_redirects_to_editor(self):
+        """Sans HTMX (JS indisponible), l'ajout doit recharger l'éditeur,
+        pas renvoyer un fragment de page nu."""
+        resp = self.client.post(
+            reverse('add_question', args=[self.vform.pk]),
+            {'type': 'rating'},
+        )
+        self.assertEqual(self.vform.questions.count(), 1)
+        self.assertRedirects(
+            resp, reverse('edit_form', args=[self.vform.pk]),
+            fetch_redirect_response=False,
+        )
+
+
 @override_settings(CACHES=LOCMEM_CACHE)
 class ResponseSubmissionTests(TestCase):
     """public_form : soumission et validation des réponses."""

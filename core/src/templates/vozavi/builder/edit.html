@@ -661,7 +661,7 @@ input,textarea,select{font-family:inherit}
           <div>
             <button type="button" class="btn-add-q" @click="panelOpen=!panelOpen">
               <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-              <span x-text="panelOpen ? 'Fermer' : 'Ajouter une question'"></span>
+              <span x-text="panelOpen ? 'Fermer' : 'Ajouter une question'">Ajouter une question</span>
             </button>
             <div x-show="panelOpen" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="margin-top:8px">
               {% include 'vozavi/builder/partials/add_panel.html' %}
