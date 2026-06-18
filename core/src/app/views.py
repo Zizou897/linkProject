@@ -11,8 +11,17 @@ from django.utils import timezone
 from django.core.cache import cache
 from datetime import timedelta
 
+import after_response
+
 from .models import VozaviForm, Question, VozaviResponse, Answer
 from .templates_data import FORM_TEMPLATES
+
+
+@after_response.enable
+def _notify_new_response(form_id, results_url):
+    """Envoi de la notification après la réponse HTTP (thread, sans bloquer)."""
+    from .tasks import send_new_response_email
+    send_new_response_email(form_id, results_url)
 
 
 # ── DASHBOARD ─────────────────────────────────────────────────────────────────
@@ -34,6 +43,114 @@ def dashboard(request):
         'total_active': agg['active'],
         'total_responses': total_responses,
         'recent_forms': recent_forms,
+    })
+
+
+@login_required
+def account_settings(request):
+    """Gestion du compte : e-mail, mot de passe, suppression."""
+    from django.contrib.auth import update_session_auth_hash
+    from django.contrib.auth.models import User
+    from django.core.validators import validate_email
+    from django.core.exceptions import ValidationError
+
+    user = request.user
+    ok = {}      # messages de succès par section
+    errors = {}  # messages d'erreur par section
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'email':
+            new_email = request.POST.get('email', '').strip().lower()
+            try:
+                validate_email(new_email)
+            except ValidationError:
+                errors['email'] = "Adresse e-mail invalide."
+            else:
+                if User.objects.filter(email__iexact=new_email).exclude(pk=user.pk).exists():
+                    errors['email'] = "Cette adresse e-mail est déjà utilisée."
+                else:
+                    user.email = new_email
+                    user.save(update_fields=['email'])
+                    ok['email'] = "Adresse e-mail mise à jour."
+
+        elif action == 'password':
+            current = request.POST.get('current_password', '')
+            new1 = request.POST.get('new_password1', '')
+            new2 = request.POST.get('new_password2', '')
+            if not user.check_password(current):
+                errors['password'] = "Mot de passe actuel incorrect."
+            elif len(new1) < 8:
+                errors['password'] = "Le nouveau mot de passe doit contenir au moins 8 caractères."
+            elif new1 != new2:
+                errors['password'] = "Les deux mots de passe ne correspondent pas."
+            else:
+                user.set_password(new1)
+                user.save()
+                update_session_auth_hash(request, user)  # garde la session active
+                ok['password'] = "Mot de passe modifié."
+
+    return render(request, 'vozavi/account/settings.html', {'ok': ok, 'errors': errors})
+
+
+@login_required
+def delete_account(request):
+    """Suppression définitive du compte et de toutes ses données."""
+    user = request.user
+    if request.method == 'POST':
+        if user.check_password(request.POST.get('password', '')):
+            logout(request)
+            user.delete()  # supprime en cascade les formulaires, réponses, etc.
+            return redirect('home')
+        return render(request, 'vozavi/account/delete_account.html', {
+            'error': "Mot de passe incorrect. Compte non supprimé.",
+            'nb_forms': user.vozavi_forms.count(),
+        })
+    return render(request, 'vozavi/account/delete_account.html', {
+        'nb_forms': user.vozavi_forms.count(),
+    })
+
+
+@login_required
+def forms_list(request):
+    """Liste complète des formulaires avec recherche, filtre statut, tri et pagination."""
+    from django.core.paginator import Paginator
+
+    qs = VozaviForm.objects.filter(user=request.user).annotate(
+        nb_responses=Count('responses', distinct=True),
+    )
+
+    q = request.GET.get('q', '').strip()
+    if q:
+        qs = qs.filter(Q(title__icontains=q) | Q(brand_name__icontains=q))
+
+    status = request.GET.get('status', '').strip()
+    if status in ('draft', 'active', 'closed'):
+        qs = qs.filter(status=status)
+
+    sort = request.GET.get('sort', 'recent')
+    sort_map = {
+        'recent': '-updated_at',
+        'created': '-created_at',
+        'responses': '-nb_responses',
+        'title': 'title',
+    }
+    qs = qs.order_by(sort_map.get(sort, '-updated_at'))
+
+    paginator = Paginator(qs, 12)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    # Conserve les filtres dans les liens de pagination (sans 'page')
+    params = request.GET.copy()
+    params.pop('page', None)
+    querystring = params.urlencode()
+
+    return render(request, 'vozavi/builder/forms_list.html', {
+        'page_obj': page_obj,
+        'total_count': paginator.count,
+        'q': q, 'status': status, 'sort': sort,
+        'querystring': querystring,
     })
 
 
@@ -248,6 +365,14 @@ def confidentialite_view(request):
     return render(request, 'vozavi/confidentialite.html', {})
 
 
+def blog_view(request):
+    return render(request, 'vozavi/blog.html', {})
+
+
+def aide_view(request):
+    return render(request, 'vozavi/aide.html', {})
+
+
 def contact_view(request):
     sent = False
     error = None
@@ -354,6 +479,17 @@ def update_form_meta(request, pk):
     return HttpResponse(status=204)
 
 
+@login_required
+def update_form_notify(request, pk):
+    """Active/désactive les notifications e-mail de nouvelles réponses (HTMX)."""
+    vform = get_object_or_404(VozaviForm, pk=pk, user=request.user)
+    if request.method == 'POST':
+        vform.notify_responses = request.POST.get('notify_responses') == 'on'
+        vform.save(update_fields=['notify_responses', 'updated_at'])
+        return HttpResponse('<span class="save-ok">Enregistré ✓</span>')
+    return HttpResponse(status=204)
+
+
 def add_question(request, pk):
     vform = _guest_form_or_404(request, pk)
     if request.method == 'POST':
@@ -446,12 +582,80 @@ def publish_form(request, pk):
 
 
 @login_required
+def toggle_form_status(request, pk):
+    """Ferme un formulaire actif, ou rouvre un formulaire fermé."""
+    import secrets as _secrets
+    vform = get_object_or_404(VozaviForm, pk=pk, user=request.user)
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+    if vform.status == 'active':
+        vform.status = 'closed'
+        vform.save()
+    elif vform.status == 'closed':
+        if not vform.slug:
+            vform.slug = _secrets.token_urlsafe(8)
+        vform.status = 'active'
+        vform.save()
+    # Un brouillon doit d'abord être publié : on le laisse inchangé.
+    next_url = request.POST.get('next')
+    if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+        return redirect(next_url)
+    return redirect('forms_list')
+
+
+@login_required
+def duplicate_form(request, pk):
+    """Crée une copie (brouillon) d'un formulaire existant avec ses questions."""
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+    original = get_object_or_404(VozaviForm, pk=pk, user=request.user)
+    questions = list(original.questions.order_by('position'))
+
+    copy = VozaviForm.objects.create(
+        user=request.user,
+        title=f"{original.title} (copie)",
+        template_key=original.template_key,
+        brand_name=original.brand_name,
+        description=original.description,
+        brand_color=original.brand_color,
+        is_anonymous=original.is_anonymous,
+        notify_responses=original.notify_responses,
+        status='draft',  # la copie démarre en brouillon, sans slug ni réponses
+    )
+    Question.objects.bulk_create([
+        Question(form=copy, type=q.type, label=q.label,
+                 required=q.required, position=q.position, options=q.options)
+        for q in questions
+    ])
+    return redirect('edit_form', pk=copy.pk)
+
+
+@login_required
+def delete_form(request, pk):
+    """Supprime définitivement un formulaire et toutes ses réponses (droit à l'effacement)."""
+    vform = get_object_or_404(VozaviForm, pk=pk, user=request.user)
+    if request.method == 'POST':
+        cache.delete(f'form_results_{vform.pk}')
+        vform.delete()
+        return redirect('forms_list')
+    return render(request, 'vozavi/builder/delete_form.html', {
+        'vform': vform,
+        'nb_responses': vform.responses.count(),
+    })
+
+
+@login_required
 def share_form(request, pk):
     vform = get_object_or_404(VozaviForm, pk=pk, user=request.user)
     if vform.status == 'draft':
         return redirect('edit_form', pk=vform.pk)
     public_url = request.build_absolute_uri(reverse('public_form', args=[vform.slug]))
-    return render(request, 'vozavi/builder/share.html', {'vform': vform, 'public_url': public_url})
+    brand = vform.brand_name or vform.title
+    share_text = f"Donnez votre avis sur {brand} 👉 {public_url}"
+    return render(request, 'vozavi/builder/share.html', {
+        'vform': vform, 'public_url': public_url,
+        'brand': brand, 'share_text': share_text,
+    })
 
 
 @login_required
@@ -511,6 +715,13 @@ def public_form(request, slug):
                 for qid, val in collected.items()
             ])
             cache.delete(f'form_results_{vform.pk}')
+
+            # Notifie le créateur en arrière-plan (thread, après la réponse HTTP)
+            if vform.notify_responses and vform.user_id and vform.user.email:
+                results_url = request.build_absolute_uri(
+                    reverse('form_results', args=[vform.pk]))
+                _notify_new_response.after_response(vform.pk, results_url)
+
             return redirect('public_form_thanks', slug=slug)
 
     return render(request, 'vozavi/public/form.html', {'vform': vform, 'questions': questions, 'errors': errors})
@@ -778,6 +989,28 @@ def form_results(request, pk):
         ).values_list('value', flat=True)
         negative_count = sum(1 for v in neg_values if isinstance(v, (int, float)) and v <= 2)
 
+        # Tendance : activité quotidienne sur 14 jours + semaine vs semaine précédente
+        dates = [timezone.localdate() - timedelta(days=i) for i in range(13, -1, -1)]
+        day_counts = {d: 0 for d in dates}
+        since = (timezone.now() - timedelta(days=14)).replace(hour=0, minute=0, second=0, microsecond=0)
+        for dt in vform.responses.filter(created_at__gte=since).values_list('created_at', flat=True):
+            d = timezone.localtime(dt).date()
+            if d in day_counts:
+                day_counts[d] += 1
+        peak = max(day_counts.values()) or 1
+        daily_series = [
+            {'label': d.strftime('%d/%m'),
+             'count': day_counts[d],
+             'pct': round(day_counts[d] / peak * 100)}
+            for d in dates
+        ]
+        last_7 = sum(day_counts[d] for d in dates[-7:])
+        prev_7 = sum(day_counts[d] for d in dates[:7])
+        if prev_7:
+            trend_pct = round((last_7 - prev_7) / prev_7 * 100)
+        else:
+            trend_pct = None  # pas de base de comparaison
+
         # Strip PII rows before caching — contact field data must not persist in Redis
         safe_stats = {}
         for qpk, stats in stats_by_q.items():
@@ -792,6 +1025,10 @@ def form_results(request, pk):
             'negative_count': negative_count,
             'last_response': vform.responses.order_by('-created_at').values_list('created_at', flat=True).first(),
             'stats_by_q': safe_stats,
+            'daily_series': daily_series,
+            'last_7': last_7,
+            'prev_7': prev_7,
+            'trend_pct': trend_pct,
         }
         cache.set(cache_key, cached, 120)
 
@@ -820,6 +1057,10 @@ def form_results(request, pk):
         'questions_data': questions_data,
         'negative_count': cached['negative_count'],
         'last_response': cached['last_response'],
+        'daily_series': cached.get('daily_series', []),
+        'last_7': cached.get('last_7', 0),
+        'prev_7': cached.get('prev_7', 0),
+        'trend_pct': cached.get('trend_pct'),
     })
 
 

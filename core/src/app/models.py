@@ -26,6 +26,7 @@ class VozaviForm(models.Model):
     brand_color = models.CharField(max_length=7, default='#4F46B8')
     logo = models.ImageField(upload_to='logos/', null=True, blank=True)
     is_anonymous = models.BooleanField(default=False)
+    notify_responses = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
