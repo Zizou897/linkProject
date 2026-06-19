@@ -10,8 +10,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap"></noscript>
-<script src="{% static 'app/js/htmx.min.js' %}" defer></script>
-<script src="{% static 'app/js/alpine.min.js' %}" defer></script>
+<!-- HTMX + Alpine via CDN (chargement fiable en prod, indépendant de collectstatic) -->
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.12/dist/htmx.min.js" crossorigin="anonymous" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" crossorigin="anonymous" defer></script>
 <style>
 :root {
   --indigo:#4F46B8; --indigo-d:#3D35A0; --indigo-pale:#EEEDFB; --indigo-mid:#E4E2F8;
