@@ -571,3 +571,24 @@ class OnboardingWelcomeTests(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertNotContains(resp, 'Bienvenue sur Vozavi')
         self.assertContains(resp, "Quel type d'avis")
+
+    def test_signup_with_claim_still_redirects_to_share(self):
+        # Un formulaire créé en invité, mémorisé en session, doit être
+        # « réclamé » à l'inscription → redirection vers le partage, PAS l'accueil.
+        guest_form = VozaviForm.objects.create(user=None, title='Invité', status='draft')
+        session = self.client.session
+        session['guest_form_pk'] = guest_form.pk
+        session.save()
+
+        resp = self.client.post(reverse('signup') + '?claim=%d' % guest_form.pk, {
+            'username': 'reclameur',
+            'email': 'reclameur@example.com',
+            'password1': 'motdepasse123',
+            'claim': str(guest_form.pk),
+        })
+        guest_form.refresh_from_db()
+        self.assertEqual(guest_form.user.username, 'reclameur')
+        self.assertRedirects(
+            resp, reverse('share_form', args=[guest_form.pk]),
+            fetch_redirect_response=False,
+        )
