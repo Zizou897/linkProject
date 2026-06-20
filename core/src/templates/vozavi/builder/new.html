@@ -133,6 +133,15 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
   position:absolute;inset:0;border-radius:var(--radius);
   opacity:0;
 }
+
+/* ── ONBOARDING WELCOME ── */
+.welcome-hero{margin-bottom:28px}
+.welcome-hero .page-title{margin-bottom:8px}
+.welcome-steps{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px;padding:10px 16px;background:var(--indigo-pale,#EEEDFB);border:1px solid var(--indigo-mid,#E4E2F8);border-radius:999px}
+.welcome-step{display:inline-flex;align-items:center;gap:7px;font-family:var(--f-head,'Poppins',sans-serif);font-weight:600;font-size:.85rem;color:var(--indigo,#4F46B8)}
+.ws-num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--indigo,#4F46B8);color:#fff;font-size:.72rem;font-weight:700}
+.welcome-arrow{color:var(--indigo,#4F46B8);opacity:.55;font-weight:700}
+@media(max-width:480px){.welcome-steps{gap:7px;padding:9px 12px}.welcome-step{font-size:.8rem}}
 </style>
 </head>
 <body>
@@ -170,10 +179,24 @@ button{cursor:pointer;font-family:inherit;border:none;background:none}
 </div>
 
 <main class="page">
+  {% if welcome %}
+  <div class="welcome-hero">
+    <h1 class="page-title">Bienvenue sur Vozavi&nbsp;👋</h1>
+    <p class="page-sub">Créons votre premier formulaire. Choisissez un point de départ — vous pourrez tout personnaliser ensuite.</p>
+    <div class="welcome-steps" aria-hidden="true">
+      <span class="welcome-step"><span class="ws-num">1</span> Créez</span>
+      <span class="welcome-arrow">→</span>
+      <span class="welcome-step"><span class="ws-num">2</span> Partagez</span>
+      <span class="welcome-arrow">→</span>
+      <span class="welcome-step"><span class="ws-num">3</span> Écoutez</span>
+    </div>
+  </div>
+  {% else %}
   <div class="page-head">
     <h1 class="page-title">Quel type d'avis voulez-vous recueillir ?</h1>
     <p class="page-sub">Choisissez un modèle prérempli ou partez de zéro pour créer votre formulaire.</p>
   </div>
+  {% endif %}
 
   <div class="tpl-grid">
 

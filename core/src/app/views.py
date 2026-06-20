@@ -235,7 +235,8 @@ def signup_view(request):
                 except (VozaviForm.DoesNotExist, ValueError, TypeError):
                     pass
 
-            return redirect('dashboard')
+            # Onboarding : inscription fraîche → écran de bienvenue (choix du modèle)
+            return redirect(reverse('new_form') + '?bienvenue=1')
 
     return render(request, 'account/signup.html', {'error': error, 'claim_pk': claim_pk})
 
@@ -441,7 +442,9 @@ def new_form(request):
             except Exception:
                 pass  # Celery absent — cleanup ignoré, pas de blocage requête
         return redirect('edit_form', pk=vform.pk)
-    return render(request, 'vozavi/builder/new.html')
+    return render(request, 'vozavi/builder/new.html', {
+        'welcome': request.GET.get('bienvenue') == '1',
+    })
 
 
 def edit_form(request, pk):
