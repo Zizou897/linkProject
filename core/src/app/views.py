@@ -442,7 +442,9 @@ def new_form(request):
             except Exception:
                 pass  # Celery absent — cleanup ignoré, pas de blocage requête
         return redirect('edit_form', pk=vform.pk)
-    return render(request, 'vozavi/builder/new.html')
+    return render(request, 'vozavi/builder/new.html', {
+        'welcome': request.GET.get('bienvenue') == '1',
+    })
 
 
 def edit_form(request, pk):

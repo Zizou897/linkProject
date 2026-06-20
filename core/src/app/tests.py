@@ -560,3 +560,14 @@ class OnboardingWelcomeTests(TestCase):
             resp, reverse('new_form') + '?bienvenue=1',
             fetch_redirect_response=False,
         )
+
+    def test_welcome_hero_shown_with_param(self):
+        resp = self.client.get(reverse('new_form') + '?bienvenue=1')
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'Bienvenue sur Vozavi')
+
+    def test_no_welcome_hero_in_normal_visit(self):
+        resp = self.client.get(reverse('new_form'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotContains(resp, 'Bienvenue sur Vozavi')
+        self.assertContains(resp, "Quel type d'avis")
