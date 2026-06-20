@@ -545,3 +545,18 @@ class ShareChannelsTests(TestCase):
         self.assertContains(resp, 'wa.me')
         self.assertContains(resp, 'Envoyer par WhatsApp')
         self.assertContains(resp, 'Donnez%20votre%20avis')  # message pré-rempli (URL-encodé)
+
+
+class OnboardingWelcomeTests(TestCase):
+    """Onboarding : redirection après inscription + en-tête de bienvenue."""
+
+    def test_signup_redirects_to_welcome(self):
+        resp = self.client.post(reverse('signup'), {
+            'username': 'nouveau',
+            'email': 'nouveau@example.com',
+            'password1': 'motdepasse123',
+        })
+        self.assertRedirects(
+            resp, reverse('new_form') + '?bienvenue=1',
+            fetch_redirect_response=False,
+        )

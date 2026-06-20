@@ -235,7 +235,8 @@ def signup_view(request):
                 except (VozaviForm.DoesNotExist, ValueError, TypeError):
                     pass
 
-            return redirect('dashboard')
+            # Onboarding : inscription fraîche → écran de bienvenue (choix du modèle)
+            return redirect(reverse('new_form') + '?bienvenue=1')
 
     return render(request, 'account/signup.html', {'error': error, 'claim_pk': claim_pk})
 
