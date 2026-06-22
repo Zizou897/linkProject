@@ -21,3 +21,26 @@ class AccessControlTests(TestCase):
         self.client.force_login(self.admin)
         r = self.client.get(reverse('bo_overview'))
         self.assertEqual(r.status_code, 200)
+
+
+class KpiTests(TestCase):
+    def test_funnel_and_counts(self):
+        from backoffice.kpis import overview_context
+        from app.models import VozaviForm, VozaviResponse
+        u1 = User.objects.create_user('a', password='x12345678')
+        u2 = User.objects.create_user('b', password='x12345678')
+        User.objects.create_user('c', password='x12345678')        # inscrit, sans formulaire
+        User.objects.create_superuser('boss', 'b@x.co', 'x12345678')  # exclu des stats
+        f1 = VozaviForm.objects.create(user=u1, title='F1', slug='s1', status='active')
+        VozaviForm.objects.create(user=u2, title='F2', status='draft')  # créé, non publié
+        VozaviResponse.objects.create(form=f1)
+
+        ctx = overview_context()
+        self.assertEqual(ctx['users_total'], 3)        # superadmin exclu
+        self.assertEqual(ctx['funnel']['signed_up'], 3)
+        self.assertEqual(ctx['funnel']['created'], 2)  # u1, u2
+        self.assertEqual(ctx['funnel']['published'], 1)  # u1
+        self.assertEqual(ctx['funnel']['with_response'], 1)  # u1
+        self.assertEqual(ctx['forms_total'], 2)
+        self.assertEqual(ctx['responses_total'], 1)
+        self.assertEqual(len(ctx['signups_series']), 30)
