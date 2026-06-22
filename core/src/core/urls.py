@@ -7,6 +7,7 @@ handler404 = 'app.views.custom_404'
 
 urlpatterns = [
     path('vz-control-panel/', admin.site.urls),
+    path('admin-vozavi/', include('backoffice.urls')),
     path('', include('app.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
   + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
