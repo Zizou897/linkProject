@@ -92,3 +92,44 @@ class UsersListTests(TestCase):
         self.assertContains(r, 'awa@x.co')
         r2 = self.client.get(reverse('bo_users'), {'q': 'introuvable'})
         self.assertNotContains(r2, 'awa@x.co')
+
+
+class UserActionsTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_superuser('boss', 'b@x.co', 'x12345678')
+        self.admin2 = User.objects.create_superuser('boss2', 'b2@x.co', 'x12345678')
+        self.target = User.objects.create_user('cible', password='x12345678')
+        self.client.force_login(self.admin)
+
+    def test_detail_renders(self):
+        r = self.client.get(reverse('bo_user_detail', args=[self.target.pk]))
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'cible')
+
+    def test_deactivate_sets_inactive_and_logs(self):
+        from app.models import ActivityEvent
+        self.client.post(reverse('bo_user_toggle', args=[self.target.pk]))
+        self.target.refresh_from_db()
+        self.assertFalse(self.target.is_active)
+        self.assertTrue(ActivityEvent.objects.filter(event_type='account_deactivated').exists())
+
+    def test_cannot_deactivate_self(self):
+        self.client.post(reverse('bo_user_toggle', args=[self.admin.pk]))
+        self.admin.refresh_from_db()
+        self.assertTrue(self.admin.is_active)        # inchangé
+
+    def test_cannot_deactivate_other_superuser(self):
+        self.client.post(reverse('bo_user_toggle', args=[self.admin2.pk]))
+        self.admin2.refresh_from_db()
+        self.assertTrue(self.admin2.is_active)
+
+    def test_delete_removes_user_and_logs(self):
+        from app.models import ActivityEvent
+        pk = self.target.pk
+        self.client.post(reverse('bo_user_delete', args=[pk]))
+        self.assertFalse(User.objects.filter(pk=pk).exists())
+        self.assertTrue(ActivityEvent.objects.filter(event_type='account_deleted_by_admin').exists())
+
+    def test_cannot_delete_other_superuser(self):
+        self.client.post(reverse('bo_user_delete', args=[self.admin2.pk]))
+        self.assertTrue(User.objects.filter(pk=self.admin2.pk).exists())

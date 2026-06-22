@@ -1,0 +1,57 @@
+{% extends 'backoffice/base_admin.html' %}
+{% block title %}{{ target.email|default:target.username }} — Admin Vozavi{% endblock %}
+{% block heading %}{{ target.email|default:target.username }}{% endblock %}
+{% block content %}
+<p style="margin-bottom:16px">
+  Inscrit le {{ target.date_joined|date:'d/m/Y' }} ·
+  {% if target.is_active %}<span class="bo-badge bo-ok">Actif</span>{% else %}<span class="bo-badge bo-ko">Désactivé</span>{% endif %}
+</p>
+
+{% if confirm_delete %}
+<div class="bo-section" style="border-color:var(--red)">
+  <h2>Supprimer définitivement ce compte&nbsp;?</h2>
+  <p style="color:var(--txt-2);margin-bottom:14px">Cette action supprime le compte et tous ses formulaires et réponses. Irréversible.</p>
+  <form method="post" action="{% url 'bo_user_delete' target.pk %}">{% csrf_token %}
+    <button class="bo-badge bo-ko" style="border:none;cursor:pointer;padding:10px 18px">Confirmer la suppression</button>
+    <a href="{% url 'bo_user_detail' target.pk %}" style="margin-left:12px">Annuler</a>
+  </form>
+</div>
+{% endif %}
+
+{% if not protected %}
+<div class="bo-section">
+  <h2>Actions</h2>
+  <form method="post" action="{% url 'bo_user_toggle' target.pk %}" style="display:inline">{% csrf_token %}
+    <button style="padding:9px 16px;border:1.5px solid var(--bdr);border-radius:var(--r-sm);background:#fff;cursor:pointer;font-family:var(--fh)">
+      {% if target.is_active %}Désactiver le compte{% else %}Réactiver le compte{% endif %}
+    </button>
+  </form>
+  <a href="{% url 'bo_user_delete' target.pk %}" style="margin-left:10px;padding:9px 16px;border:1.5px solid var(--red);color:var(--red);border-radius:var(--r-sm);font-family:var(--fh)">Supprimer…</a>
+</div>
+{% else %}
+<p style="color:var(--txt-3)">Compte protégé (vous-même ou un autre administrateur) — actions désactivées.</p>
+{% endif %}
+
+<div class="bo-section" style="padding:0;overflow:auto">
+  <h2 style="padding:18px 18px 0">Formulaires</h2>
+  <table class="bo-table">
+    <thead><tr><th>Titre</th><th>Statut</th><th>Réponses</th></tr></thead>
+    <tbody>
+    {% for f in forms %}
+      <tr><td>{{ f.title }}</td><td>{{ f.get_status_display }}</td><td>{{ f.nb }}</td></tr>
+    {% empty %}<tr><td colspan="3" style="padding:18px;color:var(--txt-3)">Aucun formulaire.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="bo-section">
+  <h2>Activité récente</h2>
+  <table class="bo-table">
+    {% for e in events %}
+    <tr><td style="width:130px;color:var(--txt-3)">{{ e.created_at|date:'d/m H:i' }}</td>
+      <td>{{ e.get_event_type_display }}</td>
+      <td>{{ e.label }}</td></tr>
+    {% empty %}<tr><td style="color:var(--txt-3);padding:14px">Aucun événement.</td></tr>{% endfor %}
+  </table>
+</div>
+{% endblock %}

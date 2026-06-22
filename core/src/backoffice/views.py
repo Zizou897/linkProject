@@ -2,7 +2,11 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.db.models import Count, Max, Q
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.http import HttpResponse
+
+from app.models import ActivityEvent
+from app.activity import log_event
 
 from .decorators import superuser_required
 from .kpis import overview_context
@@ -44,9 +48,53 @@ def users_list(request):
                   {'active': 'users', 'page_obj': page, 'q': q})
 
 
+def _protected(request, target):
+    """True si la cible ne peut pas être modifiée (soi-même ou autre super-admin)."""
+    return target.pk == request.user.pk or target.is_superuser
+
+
 @superuser_required
 def user_detail(request, pk):
-    return render(request, 'backoffice/stub.html', {'active': 'users', 'heading': 'Fiche utilisateur'})
+    target = get_object_or_404(User, pk=pk)
+    forms = target.vozavi_forms.annotate(nb=Count('responses', distinct=True)).order_by('-updated_at')
+    events = ActivityEvent.objects.filter(actor=target)[:50]
+    return render(request, 'backoffice/user_detail.html', {
+        'active': 'users', 'target': target, 'forms': forms, 'events': events,
+        'protected': _protected(request, target),
+    })
+
+
+@superuser_required
+def user_toggle_active(request, pk):
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+    target = get_object_or_404(User, pk=pk)
+    if _protected(request, target):
+        return redirect('bo_user_detail', pk=pk)
+    target.is_active = not target.is_active
+    target.save(update_fields=['is_active'])
+    log_event('account_deactivated' if not target.is_active else 'user_login',
+              actor=request.user, request=request, label=target.get_username(),
+              now_active=target.is_active)
+    return redirect('bo_user_detail', pk=pk)
+
+
+@superuser_required
+def user_delete(request, pk):
+    target = get_object_or_404(User, pk=pk)
+    if _protected(request, target):
+        return redirect('bo_user_detail', pk=pk)
+    if request.method == 'POST':
+        username = target.get_username()
+        target.delete()
+        log_event('account_deleted_by_admin', actor=request.user, request=request,
+                  label=username)
+        return redirect('bo_users')
+    return render(request, 'backoffice/user_detail.html', {
+        'active': 'users', 'target': target, 'confirm_delete': True,
+        'forms': target.vozavi_forms.all(), 'events': [],
+        'protected': _protected(request, target),
+    })
 
 
 @superuser_required
