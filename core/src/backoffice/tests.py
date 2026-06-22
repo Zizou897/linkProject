@@ -56,3 +56,23 @@ class ChromeRenderTests(TestCase):
             r = self.client.get(reverse(name))
             self.assertEqual(r.status_code, 200, name)
             self.assertContains(r, 'bo-side')          # chrome present
+
+
+class OverviewRenderTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_superuser('boss', 'b@x.co', 'x12345678')
+        self.client.force_login(self.admin)
+
+    def test_overview_shows_kpis(self):
+        from app.models import VozaviForm
+        User.objects.create_user('a', password='x12345678')
+        VozaviForm.objects.create(title='F', status='active', slug='s1')
+        r = self.client.get(reverse('bo_overview'))
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'Utilisateurs')
+        self.assertContains(r, 'Funnel')
+
+    def test_kpis_partial_ok(self):
+        r = self.client.get(reverse('bo_kpis_partial'))
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'bo-card')
