@@ -638,3 +638,13 @@ class ContactFormTests(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(resp.context['sent'])                 # succès simulé
         self.assertEqual(ContactMessage.objects.count(), 0)   # rien enregistré
+
+
+class ActivityEventModelTests(TestCase):
+    def test_event_creation_and_defaults(self):
+        from .models import ActivityEvent
+        e = ActivityEvent.objects.create(event_type='form_created', label='Resto')
+        self.assertTrue(e.success)            # succès par défaut
+        self.assertIsNone(e.actor)            # acteur facultatif
+        self.assertEqual(e.metadata, {})      # JSON par défaut
+        self.assertIsNotNone(e.created_at)

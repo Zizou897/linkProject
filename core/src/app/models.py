@@ -96,3 +96,47 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"{self.name} — {self.email} ({self.created_at.strftime('%d/%m/%Y')})"
+
+
+# ── JOURNALISATION (back-office) ──────────────────────────────────────────────
+
+class ActivityEvent(models.Model):
+    EVENT_CHOICES = [
+        ('user_signup', 'Inscription'),
+        ('user_login', 'Connexion'),
+        ('user_logout', 'Déconnexion'),
+        ('account_deleted', 'Compte supprimé'),
+        ('guest_form_claimed', 'Formulaire invité réclamé'),
+        ('form_created', 'Formulaire créé'),
+        ('form_published', 'Formulaire publié'),
+        ('form_closed', 'Formulaire fermé'),
+        ('form_reopened', 'Formulaire rouvert'),
+        ('form_duplicated', 'Formulaire dupliqué'),
+        ('form_deleted', 'Formulaire supprimé'),
+        ('response_received', 'Réponse reçue'),
+        ('contact_message', 'Message de contact'),
+        ('email_sent', 'E-mail envoyé'),
+        ('email_failed', 'E-mail échoué'),
+        ('account_deactivated', 'Compte désactivé (admin)'),
+        ('account_deleted_by_admin', 'Compte supprimé (admin)'),
+    ]
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    event_type = models.CharField(max_length=40, choices=EVENT_CHOICES, db_index=True)
+    actor = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL,
+                              related_name='activity_events')
+    target_type = models.CharField(max_length=40, blank=True)
+    target_id = models.PositiveIntegerField(null=True, blank=True)
+    label = models.CharField(max_length=255, blank=True)
+    success = models.BooleanField(default=True)
+    ip = models.GenericIPAddressField(null=True, blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['event_type', 'created_at']),
+            models.Index(fields=['actor', 'created_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.event_type} · {self.label or self.actor or '—'}"
