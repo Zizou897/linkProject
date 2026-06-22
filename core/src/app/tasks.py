@@ -62,3 +62,11 @@ def send_new_response_email(form_id, results_url):
 def notify_new_response_task(form_id, results_url):
     """Variante Celery de la notification (utilisable pour des envois planifiés)."""
     send_new_response_email(form_id, results_url)
+
+
+@shared_task
+def cleanup_old_events(days=180):
+    """Purge les ActivityEvent plus vieux que `days` jours."""
+    from .models import ActivityEvent
+    cutoff = timezone.now() - timedelta(days=days)
+    ActivityEvent.objects.filter(created_at__lt=cutoff).delete()

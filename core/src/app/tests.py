@@ -8,10 +8,12 @@ Lancement (DEBUG=True force SQLite pour la base de test) :
     DEBUG=True python manage.py test app
 """
 import io
+from datetime import timedelta
 
 from django.test import TestCase, override_settings
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
 
 from .models import VozaviForm, Question, VozaviResponse, Answer
 from .views import _compute_question_stats
@@ -730,3 +732,16 @@ class InstrumentationTests(TestCase):
                 'django.core.cache.backends.locmem.LocMemCache'}}):
             self.client.post(reverse('public_form', args=['pub1']), {f'q_{q.pk}': 'Top'})
         self.assertTrue(ActivityEvent.objects.filter(event_type='response_received').exists())
+
+
+class EventRetentionTests(TestCase):
+    def test_old_events_purged(self):
+        from app.models import ActivityEvent
+        from app.tasks import cleanup_old_events
+        old = ActivityEvent.objects.create(event_type='user_login', label='vieux')
+        ActivityEvent.objects.filter(pk=old.pk).update(
+            created_at=timezone.now() - timedelta(days=200))
+        ActivityEvent.objects.create(event_type='user_login', label='récent')
+        cleanup_old_events(days=180)
+        self.assertEqual(ActivityEvent.objects.count(), 1)
+        self.assertTrue(ActivityEvent.objects.filter(label='récent').exists())
