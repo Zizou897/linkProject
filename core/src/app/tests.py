@@ -674,3 +674,12 @@ class LogEventTests(TestCase):
         # event_type invalide / metadata non sérialisable : ne doit pas lever
         log_event('form_created', metadata={'x': object()})
         # le test réussit simplement s'il n'y a pas d'exception
+
+
+class LoginSignalTests(TestCase):
+    def test_login_creates_event(self):
+        from django.contrib.auth.models import User
+        from .models import ActivityEvent
+        User.objects.create_user('jo', password='motdepasse123')
+        self.client.login(username='jo', password='motdepasse123')
+        self.assertTrue(ActivityEvent.objects.filter(event_type='user_login').exists())
