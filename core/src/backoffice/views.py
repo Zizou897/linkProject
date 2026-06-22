@@ -1,11 +1,14 @@
+from datetime import timedelta
+
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.db.models import Count, Max, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponse
+from django.utils import timezone
 
-from app.models import ActivityEvent
+from app.models import ActivityEvent, ContactMessage, VozaviForm
 from app.activity import log_event
 
 from .decorators import superuser_required
@@ -127,4 +130,13 @@ def journal_feed(request):
 
 @superuser_required
 def health(request):
-    return render(request, 'backoffice/stub.html', {'active': 'health', 'heading': 'Santé technique'})
+    since48 = timezone.now() - timedelta(hours=48)
+    ctx = {
+        'active': 'health',
+        'emails_sent': ActivityEvent.objects.filter(event_type='email_sent').count(),
+        'emails_failed': ActivityEvent.objects.filter(event_type='email_failed').count(),
+        'contacts_unread': ContactMessage.objects.filter(is_read=False).count(),
+        'guest_forms': VozaviForm.objects.filter(user=None, created_at__gte=since48).count(),
+        'recent_failures': ActivityEvent.objects.filter(success=False)[:20],
+    }
+    return render(request, 'backoffice/health.html', ctx)

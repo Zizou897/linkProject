@@ -1,0 +1,24 @@
+{% extends 'backoffice/base_admin.html' %}
+{% block title %}Santé technique — Admin Vozavi{% endblock %}
+{% block heading %}Santé technique{% endblock %}
+{% block content %}
+<div class="bo-cards">
+  <div class="bo-card"><div class="bo-card-k">{{ emails_sent }}</div><div class="bo-card-l">E-mails envoyés</div></div>
+  <div class="bo-card"><div class="bo-card-k">{{ emails_failed }}</div><div class="bo-card-l">E-mails échoués</div></div>
+  <div class="bo-card"><div class="bo-card-k">{{ contacts_unread }}</div><div class="bo-card-l">Contacts non lus</div></div>
+  <div class="bo-card"><div class="bo-card-k">{{ guest_forms }}</div><div class="bo-card-l">Formulaires invités (&lt;48 h)</div></div>
+</div>
+<div class="bo-section">
+  <h2>Derniers échecs</h2>
+  <table class="bo-table">
+    <thead><tr><th>Quand</th><th>Type</th><th>Cible</th><th>Détail</th></tr></thead>
+    <tbody>
+    {% for e in recent_failures %}
+      <tr><td style="width:130px;color:var(--txt-3)">{{ e.created_at|date:'d/m H:i' }}</td>
+        <td>{{ e.get_event_type_display }}</td><td>{{ e.label }}</td>
+        <td style="color:var(--txt-3)">{{ e.metadata.error|default:'' }}</td></tr>
+    {% empty %}<tr><td colspan="4" style="text-align:center;color:var(--grn);padding:20px">Aucun échec récent ✓</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

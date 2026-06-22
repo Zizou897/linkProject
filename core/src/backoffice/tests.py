@@ -154,3 +154,18 @@ class JournalTests(TestCase):
     def test_feed_partial_ok(self):
         r = self.client.get(reverse('bo_journal_feed'))
         self.assertEqual(r.status_code, 200)
+
+
+class HealthTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_superuser('boss', 'b@x.co', 'x12345678')
+        self.client.force_login(self.admin)
+
+    def test_health_counts(self):
+        from app.models import ActivityEvent, ContactMessage
+        ActivityEvent.objects.create(event_type='email_failed', success=False, label='x')
+        ContactMessage.objects.create(name='A', email='a@x.co', message='hi')
+        r = self.client.get(reverse('bo_health'))
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'Contacts non lus')
+        self.assertContains(r, 'E-mails échoués')
