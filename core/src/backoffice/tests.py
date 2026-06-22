@@ -44,3 +44,15 @@ class KpiTests(TestCase):
         self.assertEqual(ctx['forms_total'], 2)
         self.assertEqual(ctx['responses_total'], 1)
         self.assertEqual(len(ctx['signups_series']), 30)
+
+
+class ChromeRenderTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_superuser('boss', 'b@x.co', 'motdepasse123')
+        self.client.force_login(self.admin)
+
+    def test_all_nav_pages_render(self):
+        for name in ['bo_overview', 'bo_users', 'bo_journal', 'bo_health']:
+            r = self.client.get(reverse(name))
+            self.assertEqual(r.status_code, 200, name)
+            self.assertContains(r, 'bo-side')          # chrome present
