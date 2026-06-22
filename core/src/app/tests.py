@@ -683,3 +683,50 @@ class LoginSignalTests(TestCase):
         User.objects.create_user('jo', password='motdepasse123')
         self.client.login(username='jo', password='motdepasse123')
         self.assertTrue(ActivityEvent.objects.filter(event_type='user_login').exists())
+
+
+class InstrumentationTests(TestCase):
+    def _user(self):
+        from django.contrib.auth.models import User
+        u = User.objects.create_user('cre', email='c@x.co', password='motdepasse123')
+        self.client.force_login(u)
+        return u
+
+    def test_signup_logs_user_signup(self):
+        from .models import ActivityEvent
+        self.client.post(reverse('signup'), {
+            'username': 'neo', 'email': 'neo@x.co', 'password1': 'motdepasse123'})
+        self.assertTrue(ActivityEvent.objects.filter(event_type='user_signup').exists())
+
+    def test_new_form_logs_form_created(self):
+        from .models import ActivityEvent
+        self._user()
+        self.client.post(reverse('new_form'), {'template_key': 'restaurant'})
+        self.assertTrue(ActivityEvent.objects.filter(event_type='form_created').exists())
+
+    def test_publish_logs_form_published(self):
+        from .models import ActivityEvent, VozaviForm
+        u = self._user()
+        f = VozaviForm.objects.create(user=u, title='F', status='draft')
+        self.client.post(reverse('publish_form', args=[f.pk]))
+        self.assertTrue(ActivityEvent.objects.filter(event_type='form_published').exists())
+
+    def test_delete_logs_form_deleted_with_title(self):
+        from .models import ActivityEvent, VozaviForm
+        u = self._user()
+        f = VozaviForm.objects.create(user=u, title='À jeter', slug='x1', status='active')
+        self.client.post(reverse('delete_form', args=[f.pk]))
+        e = ActivityEvent.objects.get(event_type='form_deleted')
+        self.assertEqual(e.label, 'À jeter')
+
+    def test_public_submission_logs_response_received(self):
+        from .models import ActivityEvent, VozaviForm, Question
+        from django.test import override_settings
+        u = self._user(); self.client.logout()
+        f = VozaviForm.objects.create(user=u, title='F', slug='pub1', status='active')
+        q = Question.objects.create(form=f, type='text', label='Avis', required=False,
+                                    position=0, options={})
+        with override_settings(CACHES={'default': {'BACKEND':
+                'django.core.cache.backends.locmem.LocMemCache'}}):
+            self.client.post(reverse('public_form', args=['pub1']), {f'q_{q.pk}': 'Top'})
+        self.assertTrue(ActivityEvent.objects.filter(event_type='response_received').exists())

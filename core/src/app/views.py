@@ -15,6 +15,7 @@ import after_response
 
 from .models import VozaviForm, Question, VozaviResponse, Answer
 from .templates_data import FORM_TEMPLATES
+from .activity import log_event
 
 
 @after_response.enable
@@ -100,8 +101,10 @@ def delete_account(request):
     user = request.user
     if request.method == 'POST':
         if user.check_password(request.POST.get('password', '')):
+            username = user.get_username()
             logout(request)
             user.delete()  # supprime en cascade les formulaires, réponses, etc.
+            log_event('account_deleted', label=username)
             return redirect('home')
         return render(request, 'vozavi/account/delete_account.html', {
             'error': "Mot de passe incorrect. Compte non supprimé.",
@@ -216,6 +219,7 @@ def signup_view(request):
         else:
             user = User.objects.create_user(username=username, email=email, password=password)
             login(request, user)
+            log_event('user_signup', actor=user, request=request, label=user.get_username())
 
             # Claim anonymous form — only if it matches the current session
             if claim_pk:
@@ -231,6 +235,7 @@ def signup_view(request):
                     anon_form.save()
                     # Clear guest session key
                     request.session.pop('guest_form_pk', None)
+                    log_event('guest_form_claimed', actor=user, target=anon_form, request=request)
                     return redirect('share_form', pk=anon_form.pk)
                 except (VozaviForm.DoesNotExist, ValueError, TypeError):
                     pass
@@ -428,6 +433,7 @@ def contact_view(request):
                 category=category,
                 message=message,
             )
+            log_event('contact_message', request=request, label=name, category=category)
             sent = True
     return render(request, 'vozavi/contact.html', {'sent': sent, 'error': error})
 
@@ -469,6 +475,7 @@ def new_form(request):
                      required=q['required'], position=i, options=q['options'])
             for i, q in enumerate(tpl['questions'])
         ])
+        log_event('form_created', actor=user, target=vform, request=request)
         if user is None:
             request.session['guest_form_pk'] = vform.pk
             try:
@@ -621,6 +628,7 @@ def publish_form(request, pk):
             vform.slug = _secrets.token_urlsafe(8)
         vform.status = 'active'
         vform.save()
+        log_event('form_published', actor=request.user, target=vform, request=request)
         return redirect('share_form', pk=vform.pk)
     return HttpResponse(status=405)
 
@@ -635,11 +643,13 @@ def toggle_form_status(request, pk):
     if vform.status == 'active':
         vform.status = 'closed'
         vform.save()
+        log_event('form_closed', actor=request.user, target=vform, request=request)
     elif vform.status == 'closed':
         if not vform.slug:
             vform.slug = _secrets.token_urlsafe(8)
         vform.status = 'active'
         vform.save()
+        log_event('form_reopened', actor=request.user, target=vform, request=request)
     # Un brouillon doit d'abord être publié : on le laisse inchangé.
     next_url = request.POST.get('next')
     if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
@@ -671,6 +681,8 @@ def duplicate_form(request, pk):
                  required=q.required, position=q.position, options=q.options)
         for q in questions
     ])
+    log_event('form_duplicated', actor=request.user, target=copy, request=request,
+              source_id=original.pk)
     return redirect('edit_form', pk=copy.pk)
 
 
@@ -680,7 +692,11 @@ def delete_form(request, pk):
     vform = get_object_or_404(VozaviForm, pk=pk, user=request.user)
     if request.method == 'POST':
         cache.delete(f'form_results_{vform.pk}')
+        title = vform.title
+        nb = vform.responses.count()
         vform.delete()
+        log_event('form_deleted', actor=request.user, label=title, request=request,
+                  responses=nb)
         return redirect('forms_list')
     return render(request, 'vozavi/builder/delete_form.html', {
         'vform': vform,
@@ -764,6 +780,7 @@ def public_form(request, slug):
                 for qid, val in collected.items()
             ])
             cache.delete(f'form_results_{vform.pk}')
+            log_event('response_received', actor=vform.user, target=vform, request=request)
 
             # Notifie le créateur en arrière-plan (thread, après la réponse HTTP)
             if vform.notify_responses and vform.user_id and vform.user.email:

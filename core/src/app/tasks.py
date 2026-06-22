@@ -49,8 +49,13 @@ def send_new_response_email(form_id, results_url):
     try:
         send_mail(subject, text, settings.DEFAULT_FROM_EMAIL,
                   [vform.user.email], html_message=html, fail_silently=False)
+        from .activity import log_event
+        log_event('email_sent', actor=vform.user, target=vform, label=vform.title)
     except Exception as e:
         logger.error(f"Échec notification nouvelle réponse (form {form_id}): {e}")
+        from .activity import log_event
+        log_event('email_failed', actor=vform.user, target=vform, label=vform.title,
+                  success=False, error=str(e)[:200])
 
 
 @shared_task
