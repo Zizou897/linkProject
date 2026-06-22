@@ -5,6 +5,8 @@ from . import views
 urlpatterns = [
     # Home
     path('', views.home, name='home'),
+    path('robots.txt', views.robots_txt, name='robots_txt'),
+    path('sitemap.xml', views.sitemap_xml, name='sitemap_xml'),
     path('contact/', views.contact_view, name='contact'),
     path('og-image.png', views.og_image_view, name='og_image'),
     path('conditions-utilisation/', views.cgu_view, name='cgu'),

@@ -128,6 +128,20 @@ class ResponseSubmissionTests(TestCase):
         self.vform.save()
         self.assertEqual(self.client.get(self.url).status_code, 404)
 
+    def test_honeypot_blocks_bot_submission(self):
+        """Honeypot rempli → réponse non enregistrée, succès simulé."""
+        resp = self.client.post(self.url, {
+            f'q_{self.q_rating.pk}': '5',
+            f'q_{self.q_text.pk}': 'Spam',
+            'website': 'http://spam.example',   # honeypot rempli (bot)
+        })
+        self.assertEqual(VozaviResponse.objects.count(), 0)
+        self.assertEqual(Answer.objects.count(), 0)
+        self.assertRedirects(
+            resp, reverse('public_form_thanks', args=['abc123']),
+            fetch_redirect_response=False,
+        )
+
 
 class StatsComputationTests(TestCase):
     """_compute_question_stats : agrégats par type de question."""
@@ -211,6 +225,14 @@ class PublicPagesTests(TestCase):
         for name in ['home', 'blog', 'aide', 'cgu', 'confidentialite', 'contact']:
             with self.subTest(page=name):
                 self.assertEqual(self.client.get(reverse(name)).status_code, 200)
+
+    def test_robots_and_sitemap(self):
+        r = self.client.get(reverse('robots_txt'))
+        self.assertEqual(r.status_code, 200)
+        self.assertIn('Disallow: /dashboard/', r.content.decode())
+        s = self.client.get(reverse('sitemap_xml'))
+        self.assertEqual(s.status_code, 200)
+        self.assertIn('<urlset', s.content.decode())
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -592,3 +614,27 @@ class OnboardingWelcomeTests(TestCase):
             resp, reverse('share_form', args=[guest_form.pk]),
             fetch_redirect_response=False,
         )
+
+
+class ContactFormTests(TestCase):
+    """contact_view : enregistrement d'un message + anti-spam honeypot."""
+
+    def test_valid_message_is_saved(self):
+        from .models import ContactMessage
+        resp = self.client.post(reverse('contact'), {
+            'name': 'Awa', 'email': 'awa@example.com',
+            'category': 'support', 'message': 'Bonjour, une question.',
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(ContactMessage.objects.count(), 1)
+
+    def test_honeypot_blocks_bot_message(self):
+        from .models import ContactMessage
+        resp = self.client.post(reverse('contact'), {
+            'name': 'Bot', 'email': 'bot@spam.example',
+            'category': 'support', 'message': 'spam spam',
+            'website': 'http://spam.example',   # honeypot rempli
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.context['sent'])                 # succès simulé
+        self.assertEqual(ContactMessage.objects.count(), 0)   # rien enregistré

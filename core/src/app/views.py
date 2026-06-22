@@ -358,6 +358,38 @@ def og_image_view(request):
     return resp
 
 
+def robots_txt(request):
+    """robots.txt : autorise l'indexation des pages publiques, bloque l'app privée."""
+    host = f"{request.scheme}://{request.get_host()}"
+    lines = [
+        "User-agent: *",
+        "Allow: /$",
+        "Disallow: /dashboard/",
+        "Disallow: /forms/",
+        "Disallow: /new/",
+        "Disallow: /connexion/",
+        "Disallow: /inscription/",
+        "Disallow: /vz-control-panel/",
+        "Disallow: /mot-de-passe/",
+        "",
+        f"Sitemap: {host}/sitemap.xml",
+    ]
+    return HttpResponse("\n".join(lines) + "\n", content_type="text/plain")
+
+
+def sitemap_xml(request):
+    """Sitemap des pages publiques (pas l'app privée ni les formulaires individuels)."""
+    host = f"{request.scheme}://{request.get_host()}"
+    names = ['home', 'contact', 'aide', 'blog', 'cgu', 'confidentialite']
+    urls = [f"{host}{reverse(n)}" for n in names]
+    body = ['<?xml version="1.0" encoding="UTF-8"?>',
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for u in urls:
+        body.append(f"  <url><loc>{u}</loc></url>")
+    body.append('</urlset>')
+    return HttpResponse("\n".join(body), content_type="application/xml")
+
+
 def cgu_view(request):
     return render(request, 'vozavi/cgu.html', {})
 
@@ -378,6 +410,10 @@ def contact_view(request):
     sent = False
     error = None
     if request.method == 'POST':
+        # Anti-spam : honeypot rempli → bot. On simule le succès sans rien enregistrer.
+        if request.POST.get('website', '').strip():
+            return render(request, 'vozavi/contact.html', {'sent': True, 'error': None})
+
         name = request.POST.get('name', '').strip()
         email = request.POST.get('email', '').strip()
         category = request.POST.get('category', '').strip()
@@ -696,6 +732,11 @@ def public_form(request, slug):
     errors = {}
 
     if request.method == 'POST':
+        # Anti-spam : si le honeypot est rempli, c'est un bot. On simule le succès
+        # (redirection vers le remerciement) sans rien enregistrer.
+        if request.POST.get('website', '').strip():
+            return redirect('public_form_thanks', slug=slug)
+
         # Phase 1 — validate without touching the DB
         collected = {}
         for q in questions:
