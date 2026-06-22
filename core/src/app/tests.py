@@ -648,3 +648,29 @@ class ActivityEventModelTests(TestCase):
         self.assertIsNone(e.actor)            # acteur facultatif
         self.assertEqual(e.metadata, {})      # JSON par défaut
         self.assertIsNotNone(e.created_at)
+
+
+class LogEventTests(TestCase):
+    def test_log_event_creates_record_with_target_and_ip(self):
+        from .activity import log_event
+        from .models import ActivityEvent, VozaviForm
+        f = VozaviForm.objects.create(title='Resto', status='draft')
+
+        class FakeReq:
+            META = {'REMOTE_ADDR': '10.0.0.5'}
+            class user:  # anonyme
+                is_authenticated = False
+        log_event('form_created', target=f, request=FakeReq)
+
+        e = ActivityEvent.objects.get()
+        self.assertEqual(e.event_type, 'form_created')
+        self.assertEqual(e.target_type, 'vozaviform')
+        self.assertEqual(e.target_id, f.pk)
+        self.assertEqual(e.label, 'Resto')
+        self.assertEqual(e.ip, '10.0.0.5')
+
+    def test_log_event_never_raises(self):
+        from .activity import log_event
+        # event_type invalide / metadata non sérialisable : ne doit pas lever
+        log_event('form_created', metadata={'x': object()})
+        # le test réussit simplement s'il n'y a pas d'exception
