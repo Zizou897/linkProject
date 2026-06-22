@@ -76,3 +76,19 @@ class OverviewRenderTests(TestCase):
         r = self.client.get(reverse('bo_kpis_partial'))
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, 'bo-card')
+
+
+class UsersListTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_superuser('boss', 'b@x.co', 'x12345678')
+        self.client.force_login(self.admin)
+
+    def test_list_shows_users_and_search(self):
+        from app.models import VozaviForm
+        u = User.objects.create_user('awa', email='awa@x.co', password='x12345678')
+        VozaviForm.objects.create(user=u, title='F', status='active', slug='s1')
+        r = self.client.get(reverse('bo_users'))
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'awa@x.co')
+        r2 = self.client.get(reverse('bo_users'), {'q': 'introuvable'})
+        self.assertNotContains(r2, 'awa@x.co')

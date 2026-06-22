@@ -1,0 +1,35 @@
+{% extends 'backoffice/base_admin.html' %}
+{% block title %}Utilisateurs — Admin Vozavi{% endblock %}
+{% block heading %}Utilisateurs{% endblock %}
+{% block content %}
+<form method="get" style="margin-bottom:16px">
+  <input type="search" name="q" value="{{ q }}" placeholder="Rechercher (nom, e-mail)…"
+         style="padding:10px 14px;border:1.5px solid var(--bdr);border-radius:var(--r-sm);width:min(360px,100%);font-family:var(--fb)">
+</form>
+<div class="bo-section" style="padding:0;overflow:auto">
+  <table class="bo-table">
+    <thead><tr><th>Utilisateur</th><th>Inscrit</th><th>Formulaires</th><th>Réponses</th><th>Dernière activité</th><th>Statut</th></tr></thead>
+    <tbody>
+    {% for u in page_obj %}
+      <tr>
+        <td><a href="{% url 'bo_user_detail' u.pk %}" style="color:var(--ind);font-weight:600">{{ u.email|default:u.username }}</a></td>
+        <td>{{ u.date_joined|date:'d/m/Y' }}</td>
+        <td>{{ u.nb_forms }}</td>
+        <td>{{ u.nb_responses }}</td>
+        <td>{{ u.last_login|default:u.date_joined|date:'d/m/Y H:i' }}</td>
+        <td>{% if u.is_active %}<span class="bo-badge bo-ok">Actif</span>{% else %}<span class="bo-badge bo-ko">Désactivé</span>{% endif %}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6" style="text-align:center;color:var(--txt-3);padding:24px">Aucun utilisateur.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if page_obj.has_other_pages %}
+<div style="margin-top:14px;display:flex;gap:10px">
+  {% if page_obj.has_previous %}<a class="bo-link" style="color:var(--ind)" href="?q={{ q }}&page={{ page_obj.previous_page_number }}">← Préc.</a>{% endif %}
+  <span style="color:var(--txt-3)">Page {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="bo-link" style="color:var(--ind)" href="?q={{ q }}&page={{ page_obj.next_page_number }}">Suiv. →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

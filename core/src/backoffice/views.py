@@ -1,4 +1,7 @@
+from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.core.paginator import Paginator
+from django.db.models import Count, Max, Q
 from django.shortcuts import render
 
 from .decorators import superuser_required
@@ -27,7 +30,23 @@ def kpis_partial(request):
 
 @superuser_required
 def users_list(request):
-    return render(request, 'backoffice/stub.html', {'active': 'users', 'heading': 'Utilisateurs'})
+    qs = User.objects.filter(is_superuser=False).annotate(
+        nb_forms=Count('vozavi_forms', distinct=True),
+        nb_responses=Count('vozavi_forms__responses', distinct=True),
+        last_activity=Max('vozavi_forms__updated_at'),
+    )
+    q = request.GET.get('q', '').strip()
+    if q:
+        qs = qs.filter(Q(username__icontains=q) | Q(email__icontains=q))
+    qs = qs.order_by('-date_joined')
+    page = Paginator(qs, 25).get_page(request.GET.get('page'))
+    return render(request, 'backoffice/users.html',
+                  {'active': 'users', 'page_obj': page, 'q': q})
+
+
+@superuser_required
+def user_detail(request, pk):
+    return render(request, 'backoffice/stub.html', {'active': 'users', 'heading': 'Fiche utilisateur'})
 
 
 @superuser_required
