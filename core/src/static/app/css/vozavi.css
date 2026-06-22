@@ -1,0 +1,46 @@
+/* ============================================================================
+   Vozavi — Système de design partagé (pages publiques / contenu)
+   Source de vérité des tokens de marque, du reset, et du chrome (navbar + footer).
+   Les pages incluent ce fichier via base.html ; leur CSS spécifique va dans
+   {% block extra_css %}. Voir PRODUCT.md pour la charte (indigo / ambre / vert).
+   ========================================================================= */
+
+:root{
+  --ind:#4F46B8;--ind-d:#3D35A0;--ind-pale:#EEEDF9;--ind-mid:#D8D6F5;
+  --amb:#F2A93B;--amb-pale:#FEF5E4;
+  --grn:#1D9E75;--grn-pale:#E5F8F2;
+  --red:#E24B4A;--red-pale:#FEF2F2;
+  --bg:#F4F3FB;--white:#fff;
+  --txt:#2C2C3A;--txt-2:#5C5C72;--txt-3:#9B9BB5;--txt-4:#C2C1D8;
+  --bdr:#E2E1F0;
+  --sh:0 2px 8px rgba(44,44,58,.07);
+  --sh-md:0 8px 28px rgba(44,44,58,.10);
+  --r:14px;--r-sm:10px;--r-xs:7px;
+  --fh:'Poppins',sans-serif;--fb:'Inter',sans-serif;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+
+/* ── Reset ─────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--fb);font-size:15px;color:var(--txt);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ── Navbar ────────────────────────────────────────────────────────── */
+.nav{position:sticky;top:0;z-index:200;background:rgba(244,243,251,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--bdr);height:60px;display:flex;align-items:center;padding:0 clamp(20px,4vw,48px);gap:24px}
+.nav-logo{display:flex;align-items:center;flex-shrink:0}
+.nav-logo svg{height:24px;width:auto}
+.nav-links{display:flex;align-items:center;gap:4px;margin-left:auto}
+.nav-link{font-family:var(--fh);font-size:.8125rem;font-weight:500;color:var(--txt-2);padding:7px 13px;border-radius:var(--r-xs);transition:background .14s var(--ease),color .14s var(--ease)}
+.nav-link:hover{background:var(--ind-pale);color:var(--ind)}
+.nav-link.primary{background:var(--ind);color:#fff;box-shadow:0 2px 8px rgba(79,70,184,.28)}
+.nav-link.primary:hover{background:var(--ind-d)}
+@media(max-width:540px){.nav-links .nav-link:not(.primary){display:none}}
+
+/* ── Footer ────────────────────────────────────────────────────────── */
+.ft{border-top:1px solid var(--bdr);padding:28px clamp(20px,4vw,48px);max-width:1100px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.ft-copy{font-size:.8125rem;color:var(--txt-4);font-family:var(--fh)}
+.ft-links{display:flex;gap:16px;flex-wrap:wrap}
+.ft-link{font-size:.8125rem;color:var(--txt-4);font-family:var(--fh);transition:color .14s}
+.ft-link:hover{color:var(--ind)}

@@ -1,37 +1,11 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
-<title>Conditions Générales d'Utilisation — Vozavi</title>
-<meta name="description" content="Consultez les conditions générales d'utilisation de Vozavi, la plateforme de collecte d'avis.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"></noscript>
+{% extends 'base.html' %}
+
+{% block title %}Conditions Générales d'Utilisation — Vozavi{% endblock %}
+{% block meta_description %}Consultez les conditions générales d'utilisation de Vozavi, la plateforme de collecte d'avis.{% endblock %}
+
+{% block extra_css %}
 <style>
-/* ── TOKENS ── */
-:root{
-  --ind:#4F46B8;--ind-d:#3D35A0;--ind-pale:#EEEDF9;--ind-mid:#D8D6F5;
-  --amb:#F2A93B;--amb-pale:#FEF5E4;
-  --grn:#1D9E75;--grn-pale:#E5F8F2;
-  --red:#E24B4A;--red-pale:#FEF2F2;
-  --bg:#F4F3FB;--white:#fff;
-  --txt:#2C2C3A;--txt-2:#5C5C72;--txt-3:#9B9BB5;--txt-4:#C2C1D8;
-  --bdr:#E2E1F0;
-  --sh:0 2px 8px rgba(44,44,58,.07);
-  --sh-md:0 8px 28px rgba(44,44,58,.10);
-  --r:14px;--r-sm:10px;--r-xs:7px;
-  --fh:'Poppins',sans-serif;--fb:'Inter',sans-serif;
-  --ease:cubic-bezier(.4,0,.2,1);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{font-family:var(--fb);font-size:15px;color:var(--txt);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
-a{text-decoration:none;color:inherit}
-button{font-family:inherit;cursor:pointer;border:none;background:none}
+/* tokens + reset fournis par base.html → vozavi.css */
 
 /* ── READING PROGRESS BAR ── */
 #progress-bar{
@@ -298,9 +272,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   .section{opacity:1;transform:none;transition:none}
 }
 </style>
-</head>
-<body>
+{% endblock %}
 
+{% block chrome %}
 <!-- Reading progress bar -->
 <div id="progress-bar"></div>
 
@@ -322,6 +296,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     {% endif %}
   </div>
 </nav>
+{% endblock %}
+
+{% block content %}
 
 <!-- ── HERO ── -->
 <div class="hero">
@@ -633,6 +610,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   </main>
 </div>
 
+{% endblock %}
+
+{% block footer %}
 <!-- ── FOOTER ── -->
 <footer class="ft">
   <span class="ft-copy">© {% now "Y" %} Vozavi — Tous droits réservés</span>
@@ -642,7 +622,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     <a href="{% url 'cgu' %}" class="ft-link" aria-current="page">CGU</a>
   </div>
 </footer>
+{% endblock %}
 
+{% block extra_js %}
 <script>
 // Reading progress bar
 const bar = document.getElementById('progress-bar');
@@ -690,5 +672,4 @@ sections.forEach((s, i) => {
   revealObs.observe(s);
 });
 </script>
-</body>
-</html>
+{% endblock %}
