@@ -1,35 +1,51 @@
 {% extends 'backoffice/base_admin.html' %}
 {% block title %}Utilisateurs — Admin Vozavi{% endblock %}
 {% block heading %}Utilisateurs{% endblock %}
-{% block content %}
-<form method="get" style="margin-bottom:16px">
-  <input type="search" name="q" value="{{ q }}" placeholder="Rechercher (nom, e-mail)…"
-         style="padding:10px 14px;border:1.5px solid var(--bdr);border-radius:var(--r-sm);width:min(360px,100%);font-family:var(--fb)">
+{% block subtitle %}<div class="adm-subtitle">{{ page_obj.paginator.count }} compte{{ page_obj.paginator.count|pluralize }}{% if q %} · filtre « {{ q }} »{% endif %}</div>{% endblock %}
+{% block actions %}
+<form method="get" class="adm-search" style="width:min(300px,46vw)">
+  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="m11 11 3 3" stroke-linecap="round"/></svg>
+  <input type="search" name="q" value="{{ q }}" class="adm-input" placeholder="Nom ou e-mail…" aria-label="Rechercher un utilisateur">
 </form>
-<div class="bo-section" style="padding:0;overflow:auto">
-  <table class="bo-table">
-    <thead><tr><th>Utilisateur</th><th>Inscrit</th><th>Formulaires</th><th>Réponses</th><th>Dernière activité</th><th>Statut</th></tr></thead>
-    <tbody>
-    {% for u in page_obj %}
-      <tr>
-        <td><a href="{% url 'bo_user_detail' u.pk %}" style="color:var(--ind);font-weight:600">{{ u.email|default:u.username }}</a></td>
-        <td>{{ u.date_joined|date:'d/m/Y' }}</td>
-        <td>{{ u.nb_forms }}</td>
-        <td>{{ u.nb_responses }}</td>
-        <td>{{ u.last_login|default:u.date_joined|date:'d/m/Y H:i' }}</td>
-        <td>{% if u.is_active %}<span class="bo-badge bo-ok">Actif</span>{% else %}<span class="bo-badge bo-ko">Désactivé</span>{% endif %}</td>
-      </tr>
-    {% empty %}
-      <tr><td colspan="6" style="text-align:center;color:var(--txt-3);padding:24px">Aucun utilisateur.</td></tr>
-    {% endfor %}
-    </tbody>
-  </table>
+{% endblock %}
+{% block content %}
+<div class="adm-panel">
+  <div class="adm-tablewrap">
+    <table class="adm-table">
+      <thead><tr><th>Utilisateur</th><th>Inscrit</th><th>Formulaires</th><th>Réponses</th><th>Dernière activité</th><th>Statut</th></tr></thead>
+      <tbody>
+      {% for u in page_obj %}
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:11px;min-width:0">
+              <span class="adm-avatar">{{ u.email|default:u.username|slice:":2"|upper }}</span>
+              <a href="{% url 'bo_user_detail' u.pk %}" class="t-link" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.email|default:u.username }}</a>
+            </div>
+          </td>
+          <td class="adm-time">{{ u.date_joined|date:'d/m/Y' }}</td>
+          <td class="num">{{ u.nb_forms }}</td>
+          <td class="num">{{ u.nb_responses }}</td>
+          <td class="adm-time">{{ u.last_login|default:u.date_joined|date:'d/m/Y H:i' }}</td>
+          <td>{% if u.is_active %}<span class="adm-badge adm-badge-pos">Actif</span>{% else %}<span class="adm-badge adm-badge-neutral">Désactivé</span>{% endif %}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6">
+          <div class="adm-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <h3>Aucun utilisateur</h3>
+            <p>{% if q %}Aucun compte ne correspond à « {{ q }} ».{% else %}Les comptes apparaîtront ici dès les premières inscriptions.{% endif %}</p>
+          </div>
+        </td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page_obj.has_other_pages %}
+  <div class="adm-pager">
+    <span class="count">{{ page_obj.paginator.count }} résultat{{ page_obj.paginator.count|pluralize }} · page {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_previous %}<a class="adm-btn adm-btn-default adm-btn-sm" href="?q={{ q|urlencode }}&page={{ page_obj.previous_page_number }}">← Précédent</a>{% endif %}
+    {% if page_obj.has_next %}<a class="adm-btn adm-btn-default adm-btn-sm" href="?q={{ q|urlencode }}&page={{ page_obj.next_page_number }}">Suivant →</a>{% endif %}
+  </div>
+  {% endif %}
 </div>
-{% if page_obj.has_other_pages %}
-<div style="margin-top:14px;display:flex;gap:10px">
-  {% if page_obj.has_previous %}<a class="bo-link" style="color:var(--ind)" href="?q={{ q }}&page={{ page_obj.previous_page_number }}">← Préc.</a>{% endif %}
-  <span style="color:var(--txt-3)">Page {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
-  {% if page_obj.has_next %}<a class="bo-link" style="color:var(--ind)" href="?q={{ q }}&page={{ page_obj.next_page_number }}">Suiv. →</a>{% endif %}
-</div>
-{% endif %}
 {% endblock %}

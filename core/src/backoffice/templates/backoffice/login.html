@@ -8,43 +8,53 @@
 <title>Connexion — Espace admin Vozavi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
 <link rel="stylesheet" href="{% static 'app/css/vozavi.css' %}">
+<link rel="stylesheet" href="{% static 'app/css/backoffice.css' %}">
 <style>
-body{min-height:100dvh;display:flex;align-items:center;justify-content:center;background:#1A1929;padding:24px}
-.lg{width:100%;max-width:380px;background:var(--white);border-radius:var(--r);box-shadow:0 20px 56px rgba(0,0,0,.3);padding:32px 28px}
-.lg-brand{font-family:var(--fh);font-weight:700;font-size:1.2rem;color:var(--txt);text-align:center}
-.lg-brand span{color:var(--amb)}
-.lg-sub{text-align:center;color:var(--txt-3);font-size:.82rem;margin:6px 0 24px;font-family:var(--fh)}
-.lg-field{margin-bottom:14px}
-.lg-field label{display:block;font-family:var(--fh);font-size:.8rem;font-weight:600;color:var(--txt-2);margin-bottom:6px}
-.lg-field input{width:100%;padding:11px 14px;border:1.5px solid var(--bdr);border-radius:var(--r-sm);font-family:var(--fb);font-size:15px;color:var(--txt);transition:border-color .15s,box-shadow .15s}
-.lg-field input:focus{outline:none;border-color:var(--ind);box-shadow:0 0 0 3px var(--ind-pale)}
-.lg-btn{width:100%;margin-top:6px;padding:12px;border:none;border-radius:var(--r-sm);background:var(--ind);color:#fff;font-family:var(--fh);font-weight:600;font-size:.95rem;cursor:pointer;transition:background .15s}
-.lg-btn:hover{background:var(--ind-d)}
-.lg-error{background:var(--red-pale);color:var(--red);border-radius:var(--r-sm);padding:10px 12px;font-size:.83rem;margin-bottom:16px;font-family:var(--fh);text-align:center}
-.lg-back{display:block;text-align:center;margin-top:18px;font-size:.8rem;color:var(--txt-3);font-family:var(--fh)}
-.lg-back:hover{color:var(--ind)}
+body{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(120% 90% at 50% -10%, #2A2746 0%, var(--a-rail) 55%, #141226 100%)}
+.lg{width:100%;max-width:392px}
+.lg-mark{display:flex;align-items:center;justify-content:center;gap:9px;color:#fff;font-family:var(--fh);font-weight:700;font-size:1.12rem;margin-bottom:20px}
+.lg-mark .dot{width:9px;height:9px;border-radius:50%;background:var(--amb);box-shadow:0 0 0 4px rgba(242,169,59,.2)}
+.lg-mark .q{color:rgba(255,255,255,.5);font-weight:500}
+.lg-card{background:var(--a-surface);border-radius:var(--a-r-lg);box-shadow:var(--a-sh-pop);padding:30px 28px}
+.lg-h{font-family:var(--fh);font-weight:700;font-size:1.15rem;color:var(--a-ink);text-align:center}
+.lg-sub{text-align:center;color:var(--a-muted);font-size:.82rem;margin:5px 0 22px}
+.lg-error{display:flex;align-items:center;gap:8px;background:var(--a-neg-bg);color:var(--a-neg);border-radius:var(--a-r-sm);padding:10px 12px;font-size:.82rem;margin-bottom:16px;font-family:var(--fb)}
+.lg-error svg{width:16px;height:16px;flex-shrink:0}
+.lg .adm-field{margin-bottom:14px}
+.lg-foot{text-align:center;margin-top:18px}
+.lg-foot a{color:rgba(255,255,255,.62);font-size:.8rem;font-family:var(--fb)}
+.lg-foot a:hover{color:#fff}
 </style>
 </head>
 <body>
-<form class="lg" method="post" action="{% url 'bo_login' %}" novalidate>
-  {% csrf_token %}
-  <input type="hidden" name="next" value="{{ next }}">
-  <div class="lg-brand">vozavi<span>·admin</span></div>
-  <div class="lg-sub">Espace admin — réservé aux administrateurs</div>
-  {% if error %}<div class="lg-error">{{ error }}</div>{% endif %}
-  <div class="lg-field">
-    <label for="username">Identifiant</label>
-    <input type="text" id="username" name="username" autocomplete="username" autofocus required>
-  </div>
-  <div class="lg-field">
-    <label for="password">Mot de passe</label>
-    <input type="password" id="password" name="password" autocomplete="current-password" required>
-  </div>
-  <button type="submit" class="lg-btn">Se connecter</button>
-  <a href="{% url 'home' %}" class="lg-back">← Retour au site</a>
-</form>
+<div class="lg">
+  <div class="lg-mark"><span class="dot"></span>vozavi <span class="q">admin</span></div>
+  <form class="lg-card" method="post" action="{% url 'bo_login' %}" novalidate>
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <div class="lg-h">Espace admin</div>
+    <div class="lg-sub">Accès réservé aux administrateurs</div>
+    {% if error %}
+    <div class="lg-error">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01" stroke-linecap="round"/></svg>
+      {{ error }}
+    </div>
+    {% endif %}
+    <div class="adm-field">
+      <label class="adm-label" for="username">Identifiant</label>
+      <input class="adm-input" type="text" id="username" name="username" autocomplete="username" autofocus required>
+    </div>
+    <div class="adm-field">
+      <label class="adm-label" for="password">Mot de passe</label>
+      <input class="adm-input" type="password" id="password" name="password" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="adm-btn adm-btn-primary" style="width:100%;margin-top:8px;height:42px">Se connecter</button>
+  </form>
+  <div class="lg-foot"><a href="{% url 'home' %}">← Retour au site</a></div>
+</div>
 </body>
 </html>

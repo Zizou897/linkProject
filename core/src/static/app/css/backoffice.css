@@ -1,0 +1,215 @@
+/* ============================================================================
+   Vozavi — Back-office (admin) design system.
+   Surface "product" : calme, dense, lisible, niveau Linear/Stripe.
+   S'appuie sur vozavi.css pour le reset + les tokens de marque (--ind, --amb,
+   --grn, --red, --fh, --fb). Accent indigo unique ; sémantique ambre/vert/rouge.
+   ========================================================================= */
+
+:root{
+  /* Canevas & surfaces */
+  --a-canvas:#F6F6FB;          /* fond appli, neutre légèrement indigo */
+  --a-surface:#FFFFFF;         /* cartes, panneaux, lignes */
+  --a-rail:#1B1930;            /* rail latéral : indigo profond de marque */
+  --a-rail-2:#2A2746;          /* séparateurs/élévation dans le rail */
+  /* Texte (contrastes AA vérifiés sur surface blanche) */
+  --a-ink:#1E1E2A;             /* titres / valeurs */
+  --a-text:#41415A;            /* corps (≥7:1) */
+  --a-muted:#6B6B83;           /* secondaire (≥4.5:1) */
+  --a-faint:#9A9AB2;           /* tertiaire : non-essentiel uniquement */
+  /* Lignes */
+  --a-border:#E7E7F0;
+  --a-border-strong:#D8D8E6;
+  /* Sémantique (texte + fond doux) */
+  --a-pos:#0E875B; --a-pos-bg:#E6F6EF;
+  --a-warn:#9A6411; --a-warn-bg:#FCF1DC;
+  --a-neg:#C5403F; --a-neg-bg:#FCEDED;
+  --a-info:var(--ind); --a-info-bg:#ECEBFA;
+  /* Élévation, rayons, focus */
+  --a-sh-sm:0 1px 2px rgba(20,18,45,.06), 0 1px 1px rgba(20,18,45,.04);
+  --a-sh:0 6px 20px rgba(20,18,45,.07);
+  --a-sh-pop:0 12px 32px rgba(20,18,45,.16);
+  --a-r:10px; --a-r-sm:7px; --a-r-lg:14px; --a-r-pill:999px;
+  --a-ring:0 0 0 3px rgba(79,70,184,.30);
+  /* Motion */
+  --a-ease:cubic-bezier(.22,1,.36,1);
+  --a-dur:160ms;
+  /* z-index sémantique */
+  --z-rail:50; --z-topbar:40; --z-pop:300; --z-toast:400;
+}
+
+.adm-app{font-variant-numeric:tabular-nums}
+.adm-app *{font-feature-settings:"cv05" 1}
+
+/* ── App shell ─────────────────────────────────────────────────────── */
+.adm-app{display:grid;grid-template-columns:248px 1fr;min-height:100dvh;background:var(--a-canvas);color:var(--a-text)}
+.adm-main{min-width:0;display:flex;flex-direction:column}
+.adm-content{padding:24px clamp(16px,2.4vw,32px) 56px;width:100%;max-width:1200px;margin:0 auto;flex:1}
+
+/* ── Rail ──────────────────────────────────────────────────────────── */
+.adm-rail{position:sticky;top:0;height:100dvh;z-index:var(--z-rail);background:var(--a-rail);
+  display:flex;flex-direction:column;padding:18px 14px;gap:2px;overflow-y:auto}
+.adm-brand{display:flex;align-items:center;gap:9px;padding:6px 10px 18px;color:#fff;font-family:var(--fh);font-weight:700;font-size:1.06rem;letter-spacing:-.01em}
+.adm-brand .dot{width:9px;height:9px;border-radius:50%;background:var(--amb);box-shadow:0 0 0 4px rgba(242,169,59,.18)}
+.adm-navgroup{margin-top:14px;padding:0 10px 6px;color:rgba(255,255,255,.34);font-family:var(--fh);font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.adm-link{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:var(--a-r-sm);
+  color:rgba(255,255,255,.66);font-family:var(--fb);font-size:.875rem;font-weight:500;
+  transition:background var(--a-dur) var(--a-ease),color var(--a-dur) var(--a-ease)}
+.adm-link svg{width:17px;height:17px;flex-shrink:0;opacity:.85}
+.adm-link:hover{background:rgba(255,255,255,.07);color:#fff}
+.adm-link.is-active{background:var(--ind);color:#fff;box-shadow:0 2px 8px rgba(79,70,184,.45)}
+.adm-link.is-active svg{opacity:1}
+.adm-rail-foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--a-rail-2)}
+.adm-who{padding:2px 11px 10px;min-width:0}
+.adm-who-label{color:rgba(255,255,255,.4);font-size:.68rem;font-family:var(--fb)}
+.adm-who-name{color:#fff;font-size:.82rem;font-weight:600;font-family:var(--fb);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.adm-link-quiet{display:flex;align-items:center;gap:11px;width:100%;padding:9px 11px;border:none;background:none;cursor:pointer;
+  border-radius:var(--a-r-sm);color:rgba(255,255,255,.6);font-family:var(--fb);font-size:.84rem;text-align:left;
+  transition:background var(--a-dur) var(--a-ease),color var(--a-dur) var(--a-ease)}
+.adm-link-quiet svg{width:16px;height:16px;flex-shrink:0}
+.adm-link-quiet:hover{background:rgba(255,255,255,.07);color:#fff}
+
+/* ── Topbar ────────────────────────────────────────────────────────── */
+.adm-topbar{position:sticky;top:0;z-index:var(--z-topbar);background:rgba(246,246,251,.82);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--a-border);
+  display:flex;align-items:center;gap:16px;padding:14px clamp(16px,2.4vw,32px);min-height:62px}
+.adm-title{font-family:var(--fh);font-weight:700;font-size:1.18rem;color:var(--a-ink);letter-spacing:-.01em;line-height:1.2}
+.adm-subtitle{color:var(--a-muted);font-size:.82rem;margin-top:1px}
+.adm-topbar-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+
+/* ── Boutons ───────────────────────────────────────────────────────── */
+.adm-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;padding:0 16px;
+  border-radius:var(--a-r-sm);font-family:var(--fb);font-size:.86rem;font-weight:600;cursor:pointer;border:1px solid transparent;
+  white-space:nowrap;transition:background var(--a-dur) var(--a-ease),border-color var(--a-dur) var(--a-ease),box-shadow var(--a-dur) var(--a-ease),color var(--a-dur) var(--a-ease)}
+.adm-btn svg{width:16px;height:16px}
+.adm-btn:focus-visible{outline:none;box-shadow:var(--a-ring)}
+.adm-btn-primary{background:var(--ind);color:#fff}
+.adm-btn-primary:hover{background:var(--ind-d)}
+.adm-btn-primary:active{background:#332B8C}
+.adm-btn-default{background:var(--a-surface);color:var(--a-ink);border-color:var(--a-border-strong)}
+.adm-btn-default:hover{border-color:var(--ind);color:var(--ind);background:#fff}
+.adm-btn-ghost{background:transparent;color:var(--a-muted)}
+.adm-btn-ghost:hover{background:rgba(79,70,184,.07);color:var(--ind)}
+.adm-btn-danger{background:var(--a-surface);color:var(--a-neg);border-color:#F2C9C9}
+.adm-btn-danger:hover{background:var(--a-neg);color:#fff;border-color:var(--a-neg)}
+.adm-btn-sm{height:32px;padding:0 12px;font-size:.8rem}
+.adm-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── Champs ────────────────────────────────────────────────────────── */
+.adm-field{display:flex;flex-direction:column;gap:6px}
+.adm-label{font-family:var(--fb);font-size:.78rem;font-weight:600;color:var(--a-text)}
+.adm-input,.adm-select{height:38px;padding:0 12px;border:1px solid var(--a-border-strong);border-radius:var(--a-r-sm);
+  background:var(--a-surface);font-family:var(--fb);font-size:.875rem;color:var(--a-ink);width:100%;
+  transition:border-color var(--a-dur) var(--a-ease),box-shadow var(--a-dur) var(--a-ease)}
+.adm-input::placeholder{color:var(--a-faint)}
+.adm-input:focus,.adm-select:focus{outline:none;border-color:var(--ind);box-shadow:var(--a-ring)}
+.adm-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5' stroke='%236B6B83' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:32px;cursor:pointer}
+.adm-search{position:relative}
+.adm-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--a-faint);pointer-events:none}
+.adm-search .adm-input{padding-left:36px}
+
+/* ── Panneaux ──────────────────────────────────────────────────────── */
+.adm-panel{background:var(--a-surface);border:1px solid var(--a-border);border-radius:var(--a-r-lg);box-shadow:var(--a-sh-sm)}
+.adm-panel + .adm-panel,.adm-stack > * + *{margin-top:20px}
+.adm-panel-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--a-border)}
+.adm-panel-head h2{font-family:var(--fh);font-size:.98rem;font-weight:700;color:var(--a-ink);letter-spacing:-.005em}
+.adm-panel-head .sub{color:var(--a-muted);font-size:.8rem}
+.adm-panel-body{padding:20px}
+.adm-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+
+/* ── Métriques (barre segmentée, pas de grille de cartes identiques) ── */
+.adm-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  background:var(--a-surface);border:1px solid var(--a-border);border-radius:var(--a-r-lg);box-shadow:var(--a-sh-sm);overflow:hidden}
+.adm-metric{padding:18px 20px;border-right:1px solid var(--a-border);border-bottom:1px solid var(--a-border)}
+.adm-metric:last-child{border-right:none}
+.adm-metric-k{font-family:var(--fh);font-weight:700;font-size:1.7rem;color:var(--a-ink);line-height:1;letter-spacing:-.02em}
+.adm-metric-l{font-size:.78rem;color:var(--a-muted);margin-top:7px;display:flex;align-items:center;gap:6px}
+.adm-metric-l svg{width:14px;height:14px;color:var(--a-faint)}
+.adm-metric.is-primary{background:linear-gradient(180deg,#FBFBFE,#F3F2FC)}
+.adm-metric.is-primary .adm-metric-k{color:var(--ind);font-size:2rem}
+
+/* ── Funnel ────────────────────────────────────────────────────────── */
+.adm-funnel{display:flex;flex-direction:column;gap:2px}
+.adm-stage{display:grid;grid-template-columns:1fr auto;align-items:center;gap:14px;padding:11px 0}
+.adm-stage-bar{height:34px;border-radius:var(--a-r-sm);background:var(--ind);display:flex;align-items:center;padding:0 12px;color:#fff;font-family:var(--fb);font-weight:600;font-size:.84rem;min-width:64px;transition:width var(--a-dur) var(--a-ease)}
+.adm-stage:nth-child(2) .adm-stage-bar{background:#5C54C4}
+.adm-stage:nth-child(3) .adm-stage-bar{background:#7B74D2}
+.adm-stage:nth-child(4) .adm-stage-bar{background:#9C96DF}
+.adm-stage-meta{text-align:right;white-space:nowrap}
+.adm-stage-v{font-family:var(--fh);font-weight:700;color:var(--a-ink);font-size:1rem}
+.adm-stage-c{font-size:.74rem;color:var(--a-muted)}
+
+/* ── Tendances (sparkbars) ─────────────────────────────────────────── */
+.adm-trend{display:flex;align-items:flex-end;gap:3px;height:120px;padding-top:6px}
+.adm-trend-col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;min-width:0}
+.adm-trend-bar{width:100%;max-width:14px;background:var(--ind-pale);border-radius:3px 3px 0 0;min-height:3px;transition:background var(--a-dur) var(--a-ease)}
+.adm-trend-col:hover .adm-trend-bar{background:var(--ind)}
+.adm-trend-x{font-size:.6rem;color:var(--a-faint);white-space:nowrap}
+.adm-trend-foot{display:flex;justify-content:space-between;margin-top:10px;font-size:.74rem;color:var(--a-muted)}
+
+/* ── Tables ────────────────────────────────────────────────────────── */
+.adm-tablewrap{overflow:auto;border-radius:0 0 var(--a-r-lg) var(--a-r-lg)}
+.adm-table{width:100%;border-collapse:collapse;font-size:.86rem}
+.adm-table thead th{position:sticky;top:0;background:#FBFBFD;text-align:left;font-family:var(--fb);font-weight:600;
+  font-size:.74rem;letter-spacing:.02em;text-transform:uppercase;color:var(--a-muted);
+  padding:11px 16px;border-bottom:1px solid var(--a-border);white-space:nowrap}
+.adm-table tbody td{padding:13px 16px;border-bottom:1px solid var(--a-border);color:var(--a-text);vertical-align:middle}
+.adm-table tbody tr:last-child td{border-bottom:none}
+.adm-table tbody tr{transition:background var(--a-dur) var(--a-ease)}
+.adm-table tbody tr:hover{background:#FAFAFE}
+.adm-table .num{font-variant-numeric:tabular-nums;color:var(--a-ink);font-weight:500}
+.adm-table .t-strong{color:var(--a-ink);font-weight:600}
+.adm-table a.t-link{color:var(--ind);font-weight:600}
+.adm-table a.t-link:hover{text-decoration:underline}
+.adm-time{font-variant-numeric:tabular-nums;color:var(--a-faint);white-space:nowrap}
+
+/* ── Badges ────────────────────────────────────────────────────────── */
+.adm-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:var(--a-r-pill);
+  font-family:var(--fb);font-size:.72rem;font-weight:600;line-height:1.5;white-space:nowrap}
+.adm-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.adm-badge-pos{color:var(--a-pos);background:var(--a-pos-bg)}
+.adm-badge-warn{color:var(--a-warn);background:var(--a-warn-bg)}
+.adm-badge-neg{color:var(--a-neg);background:var(--a-neg-bg)}
+.adm-badge-info{color:var(--a-info);background:var(--a-info-bg)}
+.adm-badge-neutral{color:var(--a-muted);background:#EFEFF4}
+.adm-badge.no-dot::before{display:none}
+
+/* ── Empty state ───────────────────────────────────────────────────── */
+.adm-empty{text-align:center;padding:44px 20px;color:var(--a-muted)}
+.adm-empty svg{width:34px;height:34px;color:var(--a-faint);margin-bottom:12px}
+.adm-empty h3{font-family:var(--fh);font-size:.95rem;color:var(--a-ink);margin-bottom:5px;font-weight:600}
+.adm-empty p{font-size:.84rem;max-width:340px;margin:0 auto}
+.adm-empty.ok svg{color:var(--a-pos)}
+
+/* ── Pagination ────────────────────────────────────────────────────── */
+.adm-pager{display:flex;align-items:center;gap:8px;padding:14px 20px;border-top:1px solid var(--a-border)}
+.adm-pager .count{margin-right:auto;color:var(--a-muted);font-size:.8rem;font-variant-numeric:tabular-nums}
+
+/* ── Avatar ────────────────────────────────────────────────────────── */
+.adm-avatar{width:30px;height:30px;border-radius:50%;background:var(--ind-pale);color:var(--ind);
+  display:inline-flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:700;font-size:.72rem;flex-shrink:0}
+
+/* ── Banner / confirm ──────────────────────────────────────────────── */
+.adm-confirm{border:1px solid #F2C9C9;background:var(--a-neg-bg);border-radius:var(--a-r);padding:18px 20px}
+.adm-confirm h3{font-family:var(--fh);font-size:.98rem;color:#9A2B2B;font-weight:700;margin-bottom:6px}
+.adm-confirm p{color:#8A4A4A;font-size:.85rem;line-height:1.6;margin-bottom:14px}
+
+/* ── Liens utilitaires ─────────────────────────────────────────────── */
+.adm-back{color:var(--a-muted);font-size:.82rem;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.adm-back:hover{color:var(--ind)}
+
+/* ── Responsive : rail réduit ──────────────────────────────────────── */
+@media(max-width:860px){
+  .adm-app{grid-template-columns:1fr}
+  .adm-rail{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;gap:4px;padding:10px 12px}
+  .adm-brand{padding:4px 8px;width:auto}
+  .adm-navgroup{display:none}
+  .adm-link{padding:8px 10px}.adm-link span{display:none}
+  .adm-rail-foot{margin:0 0 0 auto;padding:0;border:none;display:flex;align-items:center;gap:4px}
+  .adm-who{display:none}
+  .adm-metric{border-right:none}
+}
+
+/* ── Réduction de mouvement ────────────────────────────────────────── */
+@media(prefers-reduced-motion:reduce){
+  .adm-app *,.adm-app *::before,.adm-app *::after{transition:none!important;animation:none!important}
+}

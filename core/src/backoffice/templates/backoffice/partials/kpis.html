@@ -1,9 +1,30 @@
-<div class="bo-cards">
-  <div class="bo-card"><div class="bo-card-k">{{ users_total }}</div><div class="bo-card-l">Utilisateurs</div></div>
-  <div class="bo-card"><div class="bo-card-k">{{ users_active_7d }}</div><div class="bo-card-l">Actifs 7 j</div></div>
-  <div class="bo-card"><div class="bo-card-k">{{ forms_total }}</div><div class="bo-card-l">Formulaires</div></div>
-  <div class="bo-card"><div class="bo-card-k">{{ forms_active }}</div><div class="bo-card-l">Actifs</div></div>
-  <div class="bo-card"><div class="bo-card-k">{{ responses_total }}</div><div class="bo-card-l">Réponses</div></div>
-  <div class="bo-card"><div class="bo-card-k">{{ publish_rate }} %</div><div class="bo-card-l">Taux de publication</div></div>
-  <div class="bo-card"><div class="bo-card-k">{{ avg_responses }}</div><div class="bo-card-l">Réponses / formulaire</div></div>
+<div class="adm-metrics">
+  <div class="adm-metric is-primary">
+    <div class="adm-metric-k">{{ responses_total }}</div>
+    <div class="adm-metric-l">Réponses collectées</div>
+  </div>
+  <div class="adm-metric">
+    <div class="adm-metric-k">{{ users_total }}</div>
+    <div class="adm-metric-l">Utilisateurs</div>
+  </div>
+  <div class="adm-metric">
+    <div class="adm-metric-k">{{ users_active_7d }}</div>
+    <div class="adm-metric-l">Actifs · 7 j</div>
+  </div>
+  <div class="adm-metric">
+    <div class="adm-metric-k">{{ forms_total }}</div>
+    <div class="adm-metric-l">Formulaires</div>
+  </div>
+  <div class="adm-metric">
+    <div class="adm-metric-k">{{ forms_active }}</div>
+    <div class="adm-metric-l">Formulaires actifs</div>
+  </div>
+  <div class="adm-metric">
+    <div class="adm-metric-k">{{ publish_rate }}<span style="font-size:1rem;color:var(--a-muted)"> %</span></div>
+    <div class="adm-metric-l">Taux de publication</div>
+  </div>
+  <div class="adm-metric">
+    <div class="adm-metric-k">{{ avg_responses }}</div>
+    <div class="adm-metric-l">Réponses / formulaire</div>
+  </div>
 </div>

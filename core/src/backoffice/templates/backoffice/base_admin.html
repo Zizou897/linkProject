@@ -8,57 +8,64 @@
 <title>{% block title %}Admin Vozavi{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
 <link rel="stylesheet" href="{% static 'app/css/vozavi.css' %}">
+<link rel="stylesheet" href="{% static 'app/css/backoffice.css' %}">
 <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.12/dist/htmx.min.js" crossorigin="anonymous" defer></script>
-<style>
-.bo{display:grid;grid-template-columns:230px 1fr;min-height:100dvh}
-.bo-side{background:#1A1929;padding:22px 14px;display:flex;flex-direction:column;gap:4px}
-.bo-brand{font-family:var(--fh);font-weight:700;color:#fff;font-size:1.05rem;padding:8px 12px 18px}
-.bo-brand span{color:var(--amb)}
-.bo-link{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-xs);color:rgba(255,255,255,.72);font-family:var(--fh);font-size:.875rem;font-weight:500;transition:background .14s,color .14s}
-.bo-link:hover{background:rgba(255,255,255,.07);color:#fff}
-.bo-link.active{background:var(--ind);color:#fff}
-.bo-main{padding:28px clamp(18px,3vw,40px);max-width:1180px}
-.bo-h1{font-family:var(--fh);font-weight:700;font-size:1.5rem;color:var(--txt);margin-bottom:22px}
-.bo-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
-.bo-card{background:var(--white);border:1px solid var(--bdr);border-radius:var(--r);padding:18px;box-shadow:var(--sh)}
-.bo-card-k{font-family:var(--fh);font-size:1.9rem;font-weight:700;color:var(--ind);line-height:1}
-.bo-card-l{font-size:.8rem;color:var(--txt-3);margin-top:6px;font-family:var(--fh)}
-.bo-section{background:var(--white);border:1px solid var(--bdr);border-radius:var(--r);padding:20px;box-shadow:var(--sh);margin-top:20px}
-.bo-section h2{font-family:var(--fh);font-size:1.05rem;font-weight:700;margin-bottom:14px}
-.bo-table{width:100%;border-collapse:collapse;font-size:.85rem}
-.bo-table th{text-align:left;color:var(--txt-3);font-family:var(--fh);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--bdr)}
-.bo-table td{padding:9px 10px;border-bottom:1px solid var(--bdr)}
-.bo-badge{display:inline-block;padding:2px 9px;border-radius:var(--r-pill,999px);font-size:.72rem;font-weight:600;font-family:var(--fh)}
-.bo-ok{background:var(--grn-pale);color:var(--grn)}
-.bo-ko{background:var(--red-pale);color:var(--red)}
-.bo-bar{height:8px;background:var(--ind);border-radius:4px;min-width:2px}
-@media(max-width:760px){.bo{grid-template-columns:1fr}.bo-side{flex-direction:row;flex-wrap:wrap;min-height:auto}}
-</style>
 {% block extra_css %}{% endblock %}
 </head>
 <body>
-<div class="bo">
-  <aside class="bo-side">
-    <div class="bo-brand">vozavi<span>·admin</span></div>
-    <a href="{% url 'bo_overview' %}" class="bo-link {% if active == 'overview' %}active{% endif %}">Vue d'ensemble</a>
-    <a href="{% url 'bo_users' %}" class="bo-link {% if active == 'users' %}active{% endif %}">Utilisateurs</a>
-    <a href="{% url 'bo_journal' %}" class="bo-link {% if active == 'journal' %}active{% endif %}">Journal</a>
-    <a href="{% url 'bo_health' %}" class="bo-link {% if active == 'health' %}active{% endif %}">Santé technique</a>
-    <div style="margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
-      <div style="color:rgba(255,255,255,.5);font-size:.72rem;font-family:var(--fh);padding:0 12px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Connecté : {{ request.user.email|default:request.user.username }}</div>
-      <a href="{% url 'dashboard' %}" class="bo-link">← Retour à l'app</a>
+<div class="adm-app">
+  <aside class="adm-rail">
+    <div class="adm-brand"><span class="dot"></span>vozavi <span style="color:rgba(255,255,255,.45);font-weight:500">admin</span></div>
+
+    <div class="adm-navgroup">Pilotage</div>
+    <a href="{% url 'bo_overview' %}" class="adm-link {% if active == 'overview' %}is-active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7.5" height="7.5" rx="1.6"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.6"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.6"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.6"/></svg>
+      <span>Vue d'ensemble</span>
+    </a>
+    <a href="{% url 'bo_users' %}" class="adm-link {% if active == 'users' %}is-active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M16 5.2a3.2 3.2 0 0 1 0 6.1"/><path d="M18 14.8c1.8.7 3 2.4 3 4.7"/></svg>
+      <span>Utilisateurs</span>
+    </a>
+    <a href="{% url 'bo_journal' %}" class="adm-link {% if active == 'journal' %}is-active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h7"/><circle cx="4.5" cy="6" r="1.1" fill="currentColor" stroke="none"/><circle cx="4.5" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="4.5" cy="18" r="1.1" fill="currentColor" stroke="none"/></svg>
+      <span>Journal</span>
+    </a>
+    <a href="{% url 'bo_health' %}" class="adm-link {% if active == 'health' %}is-active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12.5h4l2-6.5 4 13 2-6.5h6"/></svg>
+      <span>Santé technique</span>
+    </a>
+
+    <div class="adm-rail-foot">
+      <div class="adm-who">
+        <div class="adm-who-label">Connecté</div>
+        <div class="adm-who-name">{{ request.user.email|default:request.user.username }}</div>
+      </div>
+      <a href="{% url 'dashboard' %}" class="adm-link-quiet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5l-7 7 7 7"/><path d="M4 12h16"/></svg>
+        <span>Retour à l'app</span>
+      </a>
       <form method="post" action="{% url 'bo_logout' %}" style="margin:0">{% csrf_token %}
-        <button type="submit" class="bo-link" style="width:100%;border:none;background:none;cursor:pointer;text-align:left">Déconnexion</button>
+        <button type="submit" class="adm-link-quiet">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+          Déconnexion
+        </button>
       </form>
     </div>
   </aside>
-  <main class="bo-main">
-    <h1 class="bo-h1">{% block heading %}{% endblock %}</h1>
-    {% block content %}{% endblock %}
-  </main>
+
+  <div class="adm-main">
+    <header class="adm-topbar">
+      <div>
+        <div class="adm-title">{% block heading %}{% endblock %}</div>
+        {% block subtitle %}{% endblock %}
+      </div>
+      <div class="adm-topbar-actions">{% block actions %}{% endblock %}</div>
+    </header>
+    <main class="adm-content">{% block content %}{% endblock %}</main>
+  </div>
 </div>
 {% block extra_js %}{% endblock %}
 </body>

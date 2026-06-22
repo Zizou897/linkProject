@@ -55,7 +55,7 @@ class ChromeRenderTests(TestCase):
         for name in ['bo_overview', 'bo_users', 'bo_journal', 'bo_health']:
             r = self.client.get(reverse(name))
             self.assertEqual(r.status_code, 200, name)
-            self.assertContains(r, 'bo-side')          # chrome present
+            self.assertContains(r, 'adm-rail')         # chrome present
 
 
 class OverviewRenderTests(TestCase):
@@ -75,7 +75,7 @@ class OverviewRenderTests(TestCase):
     def test_kpis_partial_ok(self):
         r = self.client.get(reverse('bo_kpis_partial'))
         self.assertEqual(r.status_code, 200)
-        self.assertContains(r, 'bo-card')
+        self.assertContains(r, 'adm-metric')
 
 
 class UsersListTests(TestCase):

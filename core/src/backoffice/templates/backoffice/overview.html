@@ -1,40 +1,69 @@
 {% extends 'backoffice/base_admin.html' %}
 {% block title %}Vue d'ensemble — Admin Vozavi{% endblock %}
 {% block heading %}Vue d'ensemble{% endblock %}
+{% block subtitle %}<div class="adm-subtitle">Comportement du SaaS et de ses utilisateurs, en temps réel</div>{% endblock %}
 {% block content %}
-<div hx-get="{% url 'bo_kpis_partial' %}" hx-trigger="every 20s" hx-swap="innerHTML">
-  {% include 'backoffice/partials/kpis.html' %}
-</div>
+<div class="adm-stack">
 
-<div class="bo-section">
-  <h2>Funnel d'activation</h2>
-  <table class="bo-table">
-    <tr><td>Inscrits</td><td><strong>{{ funnel.signed_up }}</strong></td></tr>
-    <tr><td>Ont créé un formulaire</td><td><strong>{{ funnel.created }}</strong></td></tr>
-    <tr><td>Ont publié</td><td><strong>{{ funnel.published }}</strong></td></tr>
-    <tr><td>Ont ≥ 1 réponse</td><td><strong>{{ funnel.with_response }}</strong></td></tr>
-  </table>
-</div>
+  <div hx-get="{% url 'bo_kpis_partial' %}" hx-trigger="every 20s" hx-swap="innerHTML">
+    {% include 'backoffice/partials/kpis.html' %}
+  </div>
 
-<div class="bo-section">
-  <h2>Inscriptions (30 j)</h2>
-  <table class="bo-table">
-    {% for d in signups_series %}
-    <tr><td style="width:60px">{{ d.label }}</td>
-      <td><div class="bo-bar" style="width:{{ d.pct }}%"></div></td>
-      <td style="width:40px;text-align:right">{{ d.count }}</td></tr>
-    {% endfor %}
-  </table>
-</div>
+  <div class="adm-panel">
+    <div class="adm-panel-head">
+      <h2>Funnel d'activation</h2>
+      <span class="sub">Du compte créé à la première réponse reçue</span>
+    </div>
+    <div class="adm-panel-body">
+      <div class="adm-funnel">
+        <div class="adm-stage">
+          <div class="adm-stage-bar" style="width:100%">Inscrits</div>
+          <div class="adm-stage-meta"><div class="adm-stage-v">{{ funnel.signed_up }}</div><div class="adm-stage-c">100 %</div></div>
+        </div>
+        <div class="adm-stage">
+          <div class="adm-stage-bar" style="width:{% widthratio funnel.created funnel.signed_up 100 %}%">Ont créé un formulaire</div>
+          <div class="adm-stage-meta"><div class="adm-stage-v">{{ funnel.created }}</div><div class="adm-stage-c">{% widthratio funnel.created funnel.signed_up 100 %} % des inscrits</div></div>
+        </div>
+        <div class="adm-stage">
+          <div class="adm-stage-bar" style="width:{% widthratio funnel.published funnel.signed_up 100 %}%">Ont publié</div>
+          <div class="adm-stage-meta"><div class="adm-stage-v">{{ funnel.published }}</div><div class="adm-stage-c">{% widthratio funnel.published funnel.signed_up 100 %} % des inscrits</div></div>
+        </div>
+        <div class="adm-stage">
+          <div class="adm-stage-bar" style="width:{% widthratio funnel.with_response funnel.signed_up 100 %}%">Ont ≥ 1 réponse</div>
+          <div class="adm-stage-meta"><div class="adm-stage-v">{{ funnel.with_response }}</div><div class="adm-stage-c">{% widthratio funnel.with_response funnel.signed_up 100 %} % des inscrits</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<div class="bo-section">
-  <h2>Réponses (30 j)</h2>
-  <table class="bo-table">
-    {% for d in responses_series %}
-    <tr><td style="width:60px">{{ d.label }}</td>
-      <td><div class="bo-bar" style="width:{{ d.pct }}%"></div></td>
-      <td style="width:40px;text-align:right">{{ d.count }}</td></tr>
-    {% endfor %}
-  </table>
+  <div class="adm-grid-2">
+    <div class="adm-panel">
+      <div class="adm-panel-head"><h2>Inscriptions</h2><span class="sub">30 derniers jours</span></div>
+      <div class="adm-panel-body">
+        <div class="adm-trend">
+          {% for d in signups_series %}
+          <div class="adm-trend-col" title="{{ d.label }} · {{ d.count }}">
+            <div class="adm-trend-bar" style="height:{{ d.pct }}%"></div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="adm-trend-foot"><span>{{ signups_series.0.label }}</span><span>Aujourd'hui</span></div>
+      </div>
+    </div>
+    <div class="adm-panel">
+      <div class="adm-panel-head"><h2>Réponses reçues</h2><span class="sub">30 derniers jours</span></div>
+      <div class="adm-panel-body">
+        <div class="adm-trend">
+          {% for d in responses_series %}
+          <div class="adm-trend-col" title="{{ d.label }} · {{ d.count }}">
+            <div class="adm-trend-bar" style="height:{{ d.pct }}%"></div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="adm-trend-foot"><span>{{ responses_series.0.label }}</span><span>Aujourd'hui</span></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 {% endblock %}
