@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Connexion — Espace admin Vozavi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="{% static 'app/css/vozavi.css' %}">
+<style>
+body{min-height:100dvh;display:flex;align-items:center;justify-content:center;background:#1A1929;padding:24px}
+.lg{width:100%;max-width:380px;background:var(--white);border-radius:var(--r);box-shadow:0 20px 56px rgba(0,0,0,.3);padding:32px 28px}
+.lg-brand{font-family:var(--fh);font-weight:700;font-size:1.2rem;color:var(--txt);text-align:center}
+.lg-brand span{color:var(--amb)}
+.lg-sub{text-align:center;color:var(--txt-3);font-size:.82rem;margin:6px 0 24px;font-family:var(--fh)}
+.lg-field{margin-bottom:14px}
+.lg-field label{display:block;font-family:var(--fh);font-size:.8rem;font-weight:600;color:var(--txt-2);margin-bottom:6px}
+.lg-field input{width:100%;padding:11px 14px;border:1.5px solid var(--bdr);border-radius:var(--r-sm);font-family:var(--fb);font-size:15px;color:var(--txt);transition:border-color .15s,box-shadow .15s}
+.lg-field input:focus{outline:none;border-color:var(--ind);box-shadow:0 0 0 3px var(--ind-pale)}
+.lg-btn{width:100%;margin-top:6px;padding:12px;border:none;border-radius:var(--r-sm);background:var(--ind);color:#fff;font-family:var(--fh);font-weight:600;font-size:.95rem;cursor:pointer;transition:background .15s}
+.lg-btn:hover{background:var(--ind-d)}
+.lg-error{background:var(--red-pale);color:var(--red);border-radius:var(--r-sm);padding:10px 12px;font-size:.83rem;margin-bottom:16px;font-family:var(--fh);text-align:center}
+.lg-back{display:block;text-align:center;margin-top:18px;font-size:.8rem;color:var(--txt-3);font-family:var(--fh)}
+.lg-back:hover{color:var(--ind)}
+</style>
+</head>
+<body>
+<form class="lg" method="post" action="{% url 'bo_login' %}" novalidate>
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
+  <div class="lg-brand">vozavi<span>·admin</span></div>
+  <div class="lg-sub">Espace admin — réservé aux administrateurs</div>
+  {% if error %}<div class="lg-error">{{ error }}</div>{% endif %}
+  <div class="lg-field">
+    <label for="username">Identifiant</label>
+    <input type="text" id="username" name="username" autocomplete="username" autofocus required>
+  </div>
+  <div class="lg-field">
+    <label for="password">Mot de passe</label>
+    <input type="password" id="password" name="password" autocomplete="current-password" required>
+  </div>
+  <button type="submit" class="lg-btn">Se connecter</button>
+  <a href="{% url 'home' %}" class="lg-back">← Retour au site</a>
+</form>
+</body>
+</html>

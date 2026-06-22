@@ -47,7 +47,13 @@
     <a href="{% url 'bo_users' %}" class="bo-link {% if active == 'users' %}active{% endif %}">Utilisateurs</a>
     <a href="{% url 'bo_journal' %}" class="bo-link {% if active == 'journal' %}active{% endif %}">Journal</a>
     <a href="{% url 'bo_health' %}" class="bo-link {% if active == 'health' %}active{% endif %}">Santé technique</a>
-    <a href="{% url 'dashboard' %}" class="bo-link" style="margin-top:auto">← Retour à l'app</a>
+    <div style="margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <div style="color:rgba(255,255,255,.5);font-size:.72rem;font-family:var(--fh);padding:0 12px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Connecté : {{ request.user.email|default:request.user.username }}</div>
+      <a href="{% url 'dashboard' %}" class="bo-link">← Retour à l'app</a>
+      <form method="post" action="{% url 'bo_logout' %}" style="margin:0">{% csrf_token %}
+        <button type="submit" class="bo-link" style="width:100%;border:none;background:none;cursor:pointer;text-align:left">Déconnexion</button>
+      </form>
+    </div>
   </aside>
   <main class="bo-main">
     <h1 class="bo-h1">{% block heading %}{% endblock %}</h1>

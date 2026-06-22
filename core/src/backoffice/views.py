@@ -1,18 +1,66 @@
 from datetime import timedelta
 
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.db.models import Count, Max, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponse
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from app.models import ActivityEvent, ContactMessage, VozaviForm
 from app.activity import log_event
 
 from .decorators import superuser_required
 from .kpis import overview_context
+
+
+# ── AUTHENTIFICATION ADMIN ─────────────────────────────────────────────────────
+
+def bo_login(request):
+    """Connexion dédiée au back-office : super-utilisateurs uniquement."""
+    if request.user.is_authenticated and request.user.is_superuser:
+        return redirect('bo_overview')
+
+    error = None
+    if request.method == 'POST':
+        ip = (request.META.get('HTTP_X_FORWARDED_FOR',
+                               request.META.get('REMOTE_ADDR', '')) or '').split(',')[0].strip()
+        rate_key = f'bo_login_attempts_{ip}'
+        attempts = cache.get(rate_key, 0)
+        if attempts >= 5:
+            return render(request, 'backoffice/login.html', {
+                'error': "Trop de tentatives. Réessayez dans 15 minutes.",
+                'next': request.POST.get('next', ''),
+            })
+
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+        user = authenticate(request, username=username, password=password)
+        if user is not None and user.is_active and user.is_superuser:
+            cache.delete(rate_key)
+            login(request, user)
+            next_url = request.POST.get('next') or request.GET.get('next')
+            if not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+                next_url = reverse('bo_overview')
+            return redirect(next_url)
+
+        cache.set(rate_key, attempts + 1, 900)
+        error = "Identifiants invalides ou accès non autorisé."
+
+    return render(request, 'backoffice/login.html', {
+        'error': error, 'next': request.GET.get('next', request.POST.get('next', '')),
+    })
+
+
+def bo_logout(request):
+    """Déconnexion du back-office (POST) → écran de connexion admin."""
+    if request.method == 'POST':
+        logout(request)
+    return redirect('bo_login')
 
 
 def _cached_overview():

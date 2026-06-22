@@ -179,3 +179,60 @@ class HealthTests(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, 'Contacts non lus')
         self.assertContains(r, 'E-mails échoués')
+
+
+class AdminAuthTests(TestCase):
+    """Connexion / déconnexion dédiées au back-office (super-admin)."""
+
+    def setUp(self):
+        self.admin = User.objects.create_superuser('boss', 'b@x.co', 'motdepasse123')
+        self.normal = User.objects.create_user('jo', email='jo@x.co', password='motdepasse123')
+
+    def test_anonymous_redirected_to_admin_login(self):
+        r = self.client.get(reverse('bo_overview'))
+        self.assertEqual(r.status_code, 302)
+        self.assertTrue(r.url.startswith(reverse('bo_login')))   # pas la connexion client
+        self.assertIn('next=', r.url)
+
+    def test_login_page_renders(self):
+        r = self.client.get(reverse('bo_login'))
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'Espace admin')
+
+    def test_superuser_login_succeeds(self):
+        r = self.client.post(reverse('bo_login'),
+                             {'username': 'boss', 'password': 'motdepasse123'})
+        self.assertRedirects(r, reverse('bo_overview'), fetch_redirect_response=False)
+        self.assertEqual(self.client.get(reverse('bo_overview')).status_code, 200)
+
+    def test_normal_user_cannot_login_admin(self):
+        r = self.client.post(reverse('bo_login'),
+                             {'username': 'jo', 'password': 'motdepasse123'})
+        self.assertEqual(r.status_code, 200)              # réaffichage avec erreur
+        self.assertContains(r, 'accès non autorisé')
+        # non connecté → l'accès admin redirige toujours vers le login
+        self.assertEqual(self.client.get(reverse('bo_overview')).status_code, 302)
+
+    def test_login_honors_safe_next(self):
+        r = self.client.post(reverse('bo_login'),
+                             {'username': 'boss', 'password': 'motdepasse123',
+                              'next': reverse('bo_journal')})
+        self.assertRedirects(r, reverse('bo_journal'), fetch_redirect_response=False)
+
+    def test_login_rejects_unsafe_next(self):
+        r = self.client.post(reverse('bo_login'),
+                             {'username': 'boss', 'password': 'motdepasse123',
+                              'next': 'http://evil.example/x'})
+        self.assertRedirects(r, reverse('bo_overview'), fetch_redirect_response=False)
+
+    def test_logout(self):
+        self.client.force_login(self.admin)
+        r = self.client.post(reverse('bo_logout'))
+        self.assertRedirects(r, reverse('bo_login'), fetch_redirect_response=False)
+        self.assertEqual(self.client.get(reverse('bo_overview')).status_code, 302)
+
+    def test_sidebar_shows_logout(self):
+        self.client.force_login(self.admin)
+        r = self.client.get(reverse('bo_overview'))
+        self.assertContains(r, reverse('bo_logout'))
+        self.assertContains(r, 'Déconnexion')
