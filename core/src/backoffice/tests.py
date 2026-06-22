@@ -133,3 +133,24 @@ class UserActionsTests(TestCase):
     def test_cannot_delete_other_superuser(self):
         self.client.post(reverse('bo_user_delete', args=[self.admin2.pk]))
         self.assertTrue(User.objects.filter(pk=self.admin2.pk).exists())
+
+
+class JournalTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_superuser('boss', 'b@x.co', 'x12345678')
+        self.client.force_login(self.admin)
+
+    def test_journal_lists_and_filters(self):
+        from app.models import ActivityEvent
+        ActivityEvent.objects.create(event_type='form_published', label='Resto')
+        ActivityEvent.objects.create(event_type='response_received', label='NPS')
+        r = self.client.get(reverse('bo_journal'))
+        self.assertContains(r, 'Resto')
+        self.assertContains(r, 'NPS')
+        r2 = self.client.get(reverse('bo_journal'), {'type': 'form_published'})
+        self.assertContains(r2, 'Resto')
+        self.assertNotContains(r2, 'NPS')
+
+    def test_feed_partial_ok(self):
+        r = self.client.get(reverse('bo_journal_feed'))
+        self.assertEqual(r.status_code, 200)

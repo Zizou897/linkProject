@@ -1,0 +1,16 @@
+<table class="bo-table">
+  <thead><tr><th>Quand</th><th>Type</th><th>Acteur</th><th>Cible</th><th>État</th></tr></thead>
+  <tbody>
+  {% for e in events %}
+    <tr>
+      <td style="width:130px;color:var(--txt-3)">{{ e.created_at|date:'d/m H:i:s' }}</td>
+      <td>{{ e.get_event_type_display }}</td>
+      <td>{% if e.actor %}{{ e.actor.email|default:e.actor.username }}{% else %}—{% endif %}</td>
+      <td>{{ e.label }}</td>
+      <td>{% if e.success %}<span class="bo-badge bo-ok">OK</span>{% else %}<span class="bo-badge bo-ko">Échec</span>{% endif %}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="5" style="text-align:center;color:var(--txt-3);padding:24px">Aucun événement.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>

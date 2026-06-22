@@ -97,9 +97,32 @@ def user_delete(request, pk):
     })
 
 
+def _journal_qs(request):
+    qs = ActivityEvent.objects.select_related('actor')
+    etype = request.GET.get('type', '').strip()
+    if etype:
+        qs = qs.filter(event_type=etype)
+    q = request.GET.get('q', '').strip()
+    if q:
+        qs = qs.filter(Q(actor__username__icontains=q) | Q(actor__email__icontains=q)
+                       | Q(label__icontains=q))
+    return qs
+
+
 @superuser_required
 def journal(request):
-    return render(request, 'backoffice/stub.html', {'active': 'journal', 'heading': 'Journal'})
+    page = Paginator(_journal_qs(request), 50).get_page(request.GET.get('page'))
+    return render(request, 'backoffice/journal.html', {
+        'active': 'journal', 'page_obj': page,
+        'type': request.GET.get('type', ''), 'q': request.GET.get('q', ''),
+        'event_types': ActivityEvent.EVENT_CHOICES,
+    })
+
+
+@superuser_required
+def journal_feed(request):
+    events = _journal_qs(request)[:40]
+    return render(request, 'backoffice/partials/feed.html', {'events': events})
 
 
 @superuser_required

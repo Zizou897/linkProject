@@ -1,0 +1,37 @@
+{% extends 'backoffice/base_admin.html' %}
+{% block title %}Journal — Admin Vozavi{% endblock %}
+{% block heading %}Journal d'événements{% endblock %}
+{% block content %}
+<form method="get" style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+  <select name="type" onchange="this.form.submit()" style="padding:9px 12px;border:1.5px solid var(--bdr);border-radius:var(--r-sm);font-family:var(--fb)">
+    <option value="">Tous les types</option>
+    {% for value, lbl in event_types %}
+    <option value="{{ value }}" {% if value == type %}selected{% endif %}>{{ lbl }}</option>
+    {% endfor %}
+  </select>
+  <input type="search" name="q" value="{{ q }}" placeholder="Acteur ou cible…"
+         style="padding:9px 12px;border:1.5px solid var(--bdr);border-radius:var(--r-sm);font-family:var(--fb)">
+  <button style="padding:9px 16px;border:none;background:var(--ind);color:#fff;border-radius:var(--r-sm);font-family:var(--fh);cursor:pointer">Filtrer</button>
+</form>
+
+{% if not type and not q %}
+<div class="bo-section" style="padding:0;overflow:auto">
+  <h2 style="padding:16px 18px 0">Flux temps réel</h2>
+  <div hx-get="{% url 'bo_journal_feed' %}" hx-trigger="every 15s" hx-swap="innerHTML">
+    {% include 'backoffice/partials/feed.html' with events=page_obj %}
+  </div>
+</div>
+{% else %}
+<div class="bo-section" style="padding:0;overflow:auto">
+  {% include 'backoffice/partials/feed.html' with events=page_obj %}
+</div>
+{% endif %}
+
+{% if page_obj.has_other_pages %}
+<div style="margin-top:14px;display:flex;gap:10px">
+  {% if page_obj.has_previous %}<a style="color:var(--ind)" href="?type={{ type }}&q={{ q }}&page={{ page_obj.previous_page_number }}">← Préc.</a>{% endif %}
+  <span style="color:var(--txt-3)">Page {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a style="color:var(--ind)" href="?type={{ type }}&q={{ q }}&page={{ page_obj.next_page_number }}">Suiv. →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

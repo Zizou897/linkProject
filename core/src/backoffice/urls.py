@@ -9,5 +9,6 @@ urlpatterns = [
     path('users/<int:pk>/toggle-active/', views.user_toggle_active, name='bo_user_toggle'),
     path('users/<int:pk>/delete/', views.user_delete, name='bo_user_delete'),
     path('journal/', views.journal, name='bo_journal'),
+    path('partials/journal-feed/', views.journal_feed, name='bo_journal_feed'),
     path('health/', views.health, name='bo_health'),
 ]
