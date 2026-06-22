@@ -18,10 +18,7 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'tinymce',
-    'colorfield',
     'corsheaders',
-    'sweetify',
     'django_celery_results',
     'after_response',
 ]
@@ -106,6 +103,14 @@ STORAGES = {
     'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
 }
 
+# Le test runner force DEBUG=False, ce qui active le manifeste statique
+# (CompressedManifestStaticFilesStorage) — celui-ci exige un collectstatic
+# préalable et fait échouer {% static %} dans les templates. En contexte de test,
+# on bascule sur un stockage statique sans manifeste.
+import sys
+if 'test' in sys.argv:
+    STORAGES['staticfiles']['BACKEND'] = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media_cdn'
 
@@ -136,7 +141,7 @@ else:
     _db_pass = config('DB_PASSWORD', default='')
     _db_host = config('DB_HOST', default='localhost')
     _db_port = config('DB_PORT', default='3306')
-    _db_name = config('DB_NAME', default='avizo_bd')
+    _db_name = config('DB_NAME', default='vozavi_bd')
     CELERY_BROKER_URL = config(
         'CELERY_BROKER_URL',
         default=f'sqla+mysql+pymysql://{_db_user}:{_db_pass}@{_db_host}:{_db_port}/{_db_name}',
@@ -178,3 +183,13 @@ if not DEBUG:
     X_FRAME_OPTIONS = 'DENY'
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+    # HSTS : force HTTPS côté navigateur. 1 an + sous-domaines (le site redirige déjà en SSL).
+    SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=31536000, cast=int)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# ── Limites d'upload (anti-DoS / anti-saturation disque) ──────────────
+# Plafonne la taille des requêtes et des fichiers (logos de formulaire).
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024   # 5 Mo (champs non-fichier)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024   # 5 Mo en mémoire avant temp file
