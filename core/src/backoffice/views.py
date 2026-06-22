@@ -25,7 +25,7 @@ def _cached_overview():
 
 @superuser_required
 def overview(request):
-    ctx = _cached_overview()
+    ctx = dict(_cached_overview())
     ctx['active'] = 'overview'
     return render(request, 'backoffice/overview.html', ctx)
 
@@ -76,7 +76,7 @@ def user_toggle_active(request, pk):
         return redirect('bo_user_detail', pk=pk)
     target.is_active = not target.is_active
     target.save(update_fields=['is_active'])
-    log_event('account_deactivated' if not target.is_active else 'user_login',
+    log_event('account_deactivated' if not target.is_active else 'account_reactivated',
               actor=request.user, request=request, label=target.get_username(),
               now_active=target.is_active)
     return redirect('bo_user_detail', pk=pk)

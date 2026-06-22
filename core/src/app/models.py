@@ -118,6 +118,7 @@ class ActivityEvent(models.Model):
         ('email_sent', 'E-mail envoyé'),
         ('email_failed', 'E-mail échoué'),
         ('account_deactivated', 'Compte désactivé (admin)'),
+        ('account_reactivated', 'Compte réactivé (admin)'),
         ('account_deleted_by_admin', 'Compte supprimé (admin)'),
     ]
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)

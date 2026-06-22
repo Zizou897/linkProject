@@ -134,6 +134,16 @@ class UserActionsTests(TestCase):
         self.client.post(reverse('bo_user_delete', args=[self.admin2.pk]))
         self.assertTrue(User.objects.filter(pk=self.admin2.pk).exists())
 
+    def test_reactivate_logs_account_reactivated(self):
+        from app.models import ActivityEvent
+        self.target.is_active = False
+        self.target.save(update_fields=['is_active'])
+        self.client.post(reverse('bo_user_toggle', args=[self.target.pk]))
+        self.target.refresh_from_db()
+        self.assertTrue(self.target.is_active)
+        self.assertTrue(ActivityEvent.objects.filter(event_type='account_reactivated').exists())
+        self.assertFalse(ActivityEvent.objects.filter(event_type='user_login', label=self.target.get_username()).exists())
+
 
 class JournalTests(TestCase):
     def setUp(self):
