@@ -564,6 +564,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
       <form class="cf" method="post" action="{% url 'contact' %}" id="contactForm" novalidate>
         {% csrf_token %}
         <input type="hidden" name="category" id="categoryHidden" value="support">
+        {# Anti-spam : champ leurre (honeypot). Invisible pour les humains, souvent rempli par les bots. #}
+        <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden">
+          <label>Ne pas remplir ce champ<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+        </div>
 
         <div class="cf-row fade-up" style="transition-delay:.17s">
           <div class="cf-field">

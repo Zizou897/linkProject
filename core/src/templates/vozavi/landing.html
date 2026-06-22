@@ -7,6 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
 <title>Vozavi — Formulaires d'avis et de feedback gratuits, en 2 minutes</title>
 <meta name="description" content="Créez votre formulaire d'avis personnalisé en 2 minutes, partagez un lien ou un QR code, suivez les réponses en temps réel. 100 % gratuit, sans carte bancaire.">
+<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}">
 <meta property="og:title" content="Vozavi — Formulaires d'avis gratuits en 2 minutes">
 <meta property="og:description" content="Recueillez les avis de vos clients, employés ou étudiants. Gratuit, sans installation, prêt en 2 minutes.">
 <meta property="og:type" content="website">
@@ -23,7 +24,31 @@
 <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% url 'og_image' %}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap"></noscript>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Vozavi",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "description": "Créez des formulaires d'avis et de feedback en 2 minutes, partagez un lien ou un QR code, et suivez les réponses en temps réel. Gratuit, sans carte bancaire.",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}",
+  "image": "{{ request.scheme }}://{{ request.get_host }}{% url 'og_image' %}",
+  "inLanguage": "fr",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "XOF"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Vozavi",
+    "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}"
+  }
+}
+</script>
 <style>
 /* ── TOKENS ─────────────────────────────────────────────────────── */
 :root{
