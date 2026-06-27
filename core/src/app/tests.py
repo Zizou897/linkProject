@@ -125,6 +125,16 @@ class ResponseSubmissionTests(TestCase):
         self.assertEqual(Answer.objects.count(), 0)
         self.assertEqual(resp.status_code, 200)   # ré-affichage avec erreurs
 
+    def test_failed_submission_keeps_entered_values(self):
+        """Une erreur de validation ne doit pas vider les réponses déjà saisies."""
+        resp = self.client.post(self.url, {
+            f'q_{self.q_text.pk}': 'Commentaire à conserver',
+            # q_rating obligatoire laissé vide → erreur
+        })
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'Commentaire à conserver')
+
     def test_inactive_form_is_not_reachable(self):
         self.vform.status = 'draft'
         self.vform.save()

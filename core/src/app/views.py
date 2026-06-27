@@ -746,6 +746,9 @@ def public_form(request, slug):
     vform = get_object_or_404(VozaviForm, slug=slug, status='active')
     questions = list(vform.questions.order_by('position'))
     errors = {}
+    # Valeurs déjà saisies, ré-injectées dans le template si la validation échoue
+    # (sinon tout le formulaire se vide à la moindre erreur). Vide en GET.
+    collected = {}
 
     if request.method == 'POST':
         # Anti-spam : si le honeypot est rempli, c'est un bot. On simule le succès
@@ -754,7 +757,6 @@ def public_form(request, slug):
             return redirect('public_form_thanks', slug=slug)
 
         # Phase 1 — validate without touching the DB
-        collected = {}
         for q in questions:
             field = f'q_{q.pk}'
             if q.type == 'multiple_choice':
@@ -790,7 +792,7 @@ def public_form(request, slug):
 
             return redirect('public_form_thanks', slug=slug)
 
-    return render(request, 'vozavi/public/form.html', {'vform': vform, 'questions': questions, 'errors': errors})
+    return render(request, 'vozavi/public/form.html', {'vform': vform, 'questions': questions, 'errors': errors, 'values': collected})
 
 
 def public_form_thanks(request, slug):

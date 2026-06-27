@@ -258,41 +258,45 @@ input,textarea,select{font-family:inherit}
         </div>
 
         {% if q.type == 'rating' %}
-          {% with max_stars=q.options.max|default:5 %}
+          {% with rv=values|get_item:q.pk|default:0 %}
           <div class="star-row" id="stars-{{ q.pk }}">
             {% for i in "12345" %}
               {% if forloop.counter <= q.options.max|default:5 %}
-              <span class="star" data-val="{{ forloop.counter }}" onclick="setRating({{ q.pk }}, {{ forloop.counter }})">⭐</span>
+              <span class="star{% if forloop.counter <= rv %} active{% endif %}" data-val="{{ forloop.counter }}" onclick="setRating({{ q.pk }}, {{ forloop.counter }})">⭐</span>
               {% endif %}
             {% endfor %}
           </div>
-          <input type="hidden" name="q_{{ q.pk }}" id="rating-{{ q.pk }}" value="">
+          <input type="hidden" name="q_{{ q.pk }}" id="rating-{{ q.pk }}" value="{{ rv|default:'' }}">
           {% endwith %}
 
         {% elif q.type == 'single_choice' %}
+          {% with cv=values|get_item:q.pk %}
           <div class="choice-list">
             {% for ch in q.options.choices %}
-            <label class="choice-item" onclick="selectChoice(this)">
-              <input type="radio" name="q_{{ q.pk }}" value="{{ ch }}">
+            <label class="choice-item{% if cv == ch %} selected{% endif %}" onclick="selectChoice(this)">
+              <input type="radio" name="q_{{ q.pk }}" value="{{ ch }}"{% if cv == ch %} checked{% endif %}>
               <span class="choice-mark"></span>
               {{ ch }}
             </label>
             {% endfor %}
           </div>
+          {% endwith %}
 
         {% elif q.type == 'multiple_choice' %}
+          {% with cv=values|get_item:q.pk %}
           <div class="choice-list">
             {% for ch in q.options.choices %}
-            <label class="choice-item check" onclick="toggleCheck(this)">
-              <input type="checkbox" name="q_{{ q.pk }}" value="{{ ch }}">
+            <label class="choice-item check{% if cv and ch in cv %} selected{% endif %}" onclick="toggleCheck(this)">
+              <input type="checkbox" name="q_{{ q.pk }}" value="{{ ch }}"{% if cv and ch in cv %} checked{% endif %}>
               <span class="choice-mark"></span>
               {{ ch }}
             </label>
             {% endfor %}
           </div>
+          {% endwith %}
 
         {% elif q.type == 'text' %}
-          <textarea class="q-textarea" name="q_{{ q.pk }}" placeholder="Votre réponse…" rows="4"></textarea>
+          <textarea class="q-textarea" name="q_{{ q.pk }}" placeholder="Votre réponse…" rows="4">{{ values|get_item:q.pk|default:'' }}</textarea>
 
         {% elif q.type == 'grid' %}
           {% with max_cols=q.options.max|default:5 %}
@@ -329,6 +333,7 @@ input,textarea,select{font-family:inherit}
 
         {% elif q.type == 'contact' %}
           {% get_contact_fields as cfields %}
+          {% with cval=values|get_item:q.pk %}
           <div class="contact-fields">
             {% for f in cfields %}
               {% if f.key in q.options.fields %}
@@ -342,12 +347,14 @@ input,textarea,select{font-family:inherit}
                   id="cf_{{ q.pk }}_{{ f.key }}"
                   name="q_{{ q.pk }}_{{ f.key }}"
                   placeholder="{{ f.placeholder }}"
+                  value="{{ cval|get_item:f.key|default:'' }}"
                   {% if q.required %}required{% endif %}
                 >
               </div>
               {% endif %}
             {% endfor %}
           </div>
+          {% endwith %}
 
         {% endif %}
 
