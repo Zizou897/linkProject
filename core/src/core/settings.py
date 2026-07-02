@@ -8,6 +8,12 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = [h.strip() for h in config('ALLOWED_HOSTS', default='vozavi.online,www.vozavi.online').split(',') if h.strip()]
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in config('CSRF_TRUSTED_ORIGINS', default='').split(',') if o.strip()]
 
+# Identifiant de mesure Google Analytics 4. Actif en production (default), désactivé
+# en développement (DEBUG) pour ne pas polluer les statistiques avec le trafic local.
+# Surchargeable via le .env (GA_MEASUREMENT_ID). Exposé aux templates via
+# app.context_processors ; le suivi ne se charge qu'après consentement (bandeau cookies).
+GA_MEASUREMENT_ID = config('GA_MEASUREMENT_ID', default='' if DEBUG else 'G-EV5EW8J48F')
+
 DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -55,6 +61,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'app.context_processors.site_settings',
             ],
         },
     },
@@ -178,6 +185,9 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 
 if not DEBUG:
+    # Derrière nginx (proxy TLS) : Gunicorn parle HTTP, nginx ajoute
+    # X-Forwarded-Proto. Sans ceci, SECURE_SSL_REDIRECT crée une boucle.
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True

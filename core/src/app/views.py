@@ -363,10 +363,28 @@ def og_image_view(request):
     return resp
 
 
+# Date de dernière modification du contenu public (pages marketing).
+# À incrémenter quand le contenu des pages du sitemap change réellement :
+# un <lastmod> honnête aide les moteurs et les IA à prioriser le recrawl.
+CONTENT_LASTMOD = "2026-07-02"
+
+
 def robots_txt(request):
-    """robots.txt : autorise l'indexation des pages publiques, bloque l'app privée."""
+    """robots.txt : autorise l'indexation des pages publiques, bloque l'app privée.
+
+    Les crawlers des IA de recherche (ChatGPT, Perplexity, Claude, Google AI
+    Overviews) sont explicitement listés pour signaler qu'ils sont bienvenus.
+    Ils partagent le même groupe de règles que les autres robots : pages
+    publiques autorisées, application privée bloquée.
+    """
     host = f"{request.scheme}://{request.get_host()}"
     lines = [
+        "User-agent: GPTBot",
+        "User-agent: OAI-SearchBot",
+        "User-agent: ChatGPT-User",
+        "User-agent: ClaudeBot",
+        "User-agent: PerplexityBot",
+        "User-agent: Google-Extended",
         "User-agent: *",
         "Allow: /$",
         "Disallow: /dashboard/",
@@ -386,13 +404,53 @@ def sitemap_xml(request):
     """Sitemap des pages publiques (pas l'app privée ni les formulaires individuels)."""
     host = f"{request.scheme}://{request.get_host()}"
     names = ['home', 'contact', 'aide', 'blog', 'cgu', 'confidentialite']
-    urls = [f"{host}{reverse(n)}" for n in names]
     body = ['<?xml version="1.0" encoding="UTF-8"?>',
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-    for u in urls:
-        body.append(f"  <url><loc>{u}</loc></url>")
+    for n in names:
+        loc = f"{host}{reverse(n)}"
+        body.append(f"  <url><loc>{loc}</loc><lastmod>{CONTENT_LASTMOD}</lastmod></url>")
     body.append('</urlset>')
     return HttpResponse("\n".join(body), content_type="application/xml")
+
+
+def llms_txt(request):
+    """llms.txt : guide structuré pour les IA génératives (standard llms.txt).
+
+    Fournit aux modèles (ChatGPT, Perplexity, Claude…) une description concise
+    et factuelle de Vozavi + les pages clés, pour améliorer la citabilité.
+    """
+    host = f"{request.scheme}://{request.get_host()}"
+    lines = [
+        "# Vozavi",
+        "> Vozavi est une application web gratuite pour créer des formulaires "
+        "d'avis et de feedback en 2 minutes, les partager via un lien ou un QR "
+        "code, et suivre les réponses en temps réel. Aucun compte requis pour les "
+        "répondants, aucune carte bancaire, personnalisable à votre marque (logo, "
+        "couleurs). Éditée depuis Abidjan, Côte d'Ivoire.",
+        "",
+        "## Pages principales",
+        f"- [Accueil]({host}/) : présentation, fonctionnalités, tarifs (gratuit) et FAQ.",
+        f"- [Centre d'aide]({host}/aide/) : guides d'utilisation de Vozavi.",
+        f"- [Blog]({host}/blog/) : articles sur la collecte d'avis et de feedback.",
+        f"- [Contact]({host}/contact/) : formulaire de contact.",
+        f"- [Confidentialité]({host}/confidentialite/) : politique de confidentialité.",
+        f"- [Conditions d'utilisation]({host}/conditions-utilisation/) : CGU.",
+        "",
+        "## Faits clés",
+        "- Prix : 100 % gratuit, sans carte bancaire, sans plafond artificiel de réponses.",
+        "- Répondants : aucun compte ni application à installer — un lien ou un QR code suffit.",
+        "- Personnalisation : logo, couleur principale et nom de marque sur chaque formulaire.",
+        "- Anonymat : réponses anonymes activables par formulaire (feedback interne, évaluations).",
+        "- Mobile : formulaires conçus d'abord pour le téléphone, chargement rapide.",
+        "- Cas d'usage : commerces, restaurants, entreprises, écoles, événements.",
+        "- Temps de création d'un formulaire : environ 2 minutes.",
+        "",
+        "## Contact",
+        f"- Site : {host}/",
+        f"- Page de contact : {host}/contact/",
+    ]
+    return HttpResponse("\n".join(lines) + "\n",
+                        content_type="text/plain; charset=utf-8")
 
 
 def cgu_view(request):
