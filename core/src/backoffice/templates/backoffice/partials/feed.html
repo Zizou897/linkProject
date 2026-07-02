@@ -1,3 +1,4 @@
+{% load bo_extras %}
 <div class="adm-tablewrap">
   <table class="adm-table">
     <thead><tr><th>Quand</th><th>Événement</th><th>Acteur</th><th>Cible</th><th>État</th></tr></thead>
@@ -5,10 +6,10 @@
     {% for e in events %}
       <tr>
         <td class="adm-time">{{ e.created_at|date:'d/m · H:i:s' }}</td>
-        <td class="t-strong">{{ e.get_event_type_display }}</td>
+        <td><span class="adm-badge adm-badge-{{ e.event_type|event_tone }}">{{ e.get_event_type_display }}</span></td>
         <td>{% if e.actor %}{{ e.actor.email|default:e.actor.username }}{% else %}<span style="color:var(--a-faint)">système</span>{% endif %}</td>
         <td>{{ e.label|default:"—" }}</td>
-        <td>{% if e.success %}<span class="adm-badge adm-badge-pos">Réussi</span>{% else %}<span class="adm-badge adm-badge-neg">Échec</span>{% endif %}</td>
+        <td>{% if e.success %}<span class="adm-badge adm-badge-pos no-dot">Réussi</span>{% else %}<span class="adm-badge adm-badge-neg">Échec</span>{% endif %}</td>
       </tr>
     {% empty %}
       <tr><td colspan="5">

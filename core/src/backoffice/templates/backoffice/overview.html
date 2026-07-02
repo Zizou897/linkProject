@@ -17,20 +17,24 @@
     <div class="adm-panel-body">
       <div class="adm-funnel">
         <div class="adm-stage">
+          <div class="adm-stage-name">Inscrits</div>
           <div class="adm-stage-bar" style="width:100%">Inscrits</div>
-          <div class="adm-stage-meta"><div class="adm-stage-v">{{ funnel.signed_up }}</div><div class="adm-stage-c">100 %</div></div>
+          <div class="adm-stage-meta"><div class="adm-stage-v">{{ funnel.signed_up }}</div><div class="adm-stage-c">100&nbsp;%</div></div>
         </div>
         <div class="adm-stage">
+          <div class="adm-stage-name">Ont créé un formulaire</div>
           <div class="adm-stage-bar" style="width:{% widthratio funnel.created funnel.signed_up 100 %}%">Ont créé un formulaire</div>
-          <div class="adm-stage-meta"><div class="adm-stage-v">{{ funnel.created }}</div><div class="adm-stage-c">{% widthratio funnel.created funnel.signed_up 100 %} % des inscrits</div></div>
+          <div class="adm-stage-meta"><div class="adm-stage-v">{{ funnel.created }}</div><div class="adm-stage-c">{% widthratio funnel.created funnel.signed_up 100 %}&nbsp;% des inscrits</div></div>
         </div>
         <div class="adm-stage">
+          <div class="adm-stage-name">Ont publié</div>
           <div class="adm-stage-bar" style="width:{% widthratio funnel.published funnel.signed_up 100 %}%">Ont publié</div>
-          <div class="adm-stage-meta"><div class="adm-stage-v">{{ funnel.published }}</div><div class="adm-stage-c">{% widthratio funnel.published funnel.signed_up 100 %} % des inscrits</div></div>
+          <div class="adm-stage-meta"><div class="adm-stage-v">{{ funnel.published }}</div><div class="adm-stage-c">{% widthratio funnel.published funnel.signed_up 100 %}&nbsp;% des inscrits{% if funnel.created %} · {% widthratio funnel.published funnel.created 100 %}&nbsp;% de l'étape précédente{% endif %}</div></div>
         </div>
         <div class="adm-stage">
+          <div class="adm-stage-name">Ont ≥ 1 réponse</div>
           <div class="adm-stage-bar" style="width:{% widthratio funnel.with_response funnel.signed_up 100 %}%">Ont ≥ 1 réponse</div>
-          <div class="adm-stage-meta"><div class="adm-stage-v">{{ funnel.with_response }}</div><div class="adm-stage-c">{% widthratio funnel.with_response funnel.signed_up 100 %} % des inscrits</div></div>
+          <div class="adm-stage-meta"><div class="adm-stage-v">{{ funnel.with_response }}</div><div class="adm-stage-c">{% widthratio funnel.with_response funnel.signed_up 100 %}&nbsp;% des inscrits{% if funnel.published %} · {% widthratio funnel.with_response funnel.published 100 %}&nbsp;% de l'étape précédente{% endif %}</div></div>
         </div>
       </div>
     </div>
@@ -38,11 +42,11 @@
 
   <div class="adm-grid-2">
     <div class="adm-panel">
-      <div class="adm-panel-head"><h2>Inscriptions</h2><span class="sub">30 derniers jours</span></div>
+      <div class="adm-panel-head"><h2>Inscriptions</h2><span class="sub">30 derniers jours</span><span class="end sub">{{ signups_30d }} au total</span></div>
       <div class="adm-panel-body">
         <div class="adm-trend">
           {% for d in signups_series %}
-          <div class="adm-trend-col" title="{{ d.label }} · {{ d.count }}">
+          <div class="adm-trend-col" data-v="{{ d.label }} · {{ d.count }}" title="{{ d.label }} · {{ d.count }} inscription{{ d.count|pluralize }}">
             <div class="adm-trend-bar" style="height:{{ d.pct }}%"></div>
           </div>
           {% endfor %}
@@ -51,11 +55,11 @@
       </div>
     </div>
     <div class="adm-panel">
-      <div class="adm-panel-head"><h2>Réponses reçues</h2><span class="sub">30 derniers jours</span></div>
+      <div class="adm-panel-head"><h2>Réponses reçues</h2><span class="sub">30 derniers jours</span><span class="end sub">{{ responses_30d }} au total</span></div>
       <div class="adm-panel-body">
         <div class="adm-trend">
           {% for d in responses_series %}
-          <div class="adm-trend-col" title="{{ d.label }} · {{ d.count }}">
+          <div class="adm-trend-col" data-v="{{ d.label }} · {{ d.count }}" title="{{ d.label }} · {{ d.count }} réponse{{ d.count|pluralize }}">
             <div class="adm-trend-bar" style="height:{{ d.pct }}%"></div>
           </div>
           {% endfor %}

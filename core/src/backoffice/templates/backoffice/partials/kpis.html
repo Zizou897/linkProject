@@ -1,30 +1,49 @@
 <div class="adm-metrics">
-  <div class="adm-metric is-primary">
-    <div class="adm-metric-k">{{ responses_total }}</div>
+  <div class="adm-metric">
     <div class="adm-metric-l">Réponses collectées</div>
+    <div class="adm-metric-k">{{ responses_total }}</div>
+    <div class="adm-metric-d">
+      {% if wow.responses.diff > 0 %}<span class="adm-delta up"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M6 3l4 6H2z"/></svg>+{{ wow.responses.diff }} · 7 j</span>
+      {% elif wow.responses.diff < 0 %}<span class="adm-delta down"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M6 9 2 3h8z"/></svg>{{ wow.responses.diff }} · 7 j</span>
+      {% else %}<span class="adm-delta flat">stable · 7 j</span>{% endif %}
+    </div>
   </div>
   <div class="adm-metric">
-    <div class="adm-metric-k">{{ users_total }}</div>
     <div class="adm-metric-l">Utilisateurs</div>
+    <div class="adm-metric-k">{{ users_total }}</div>
+    <div class="adm-metric-d">
+      {% if wow.signups.diff > 0 %}<span class="adm-delta up"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M6 3l4 6H2z"/></svg>+{{ wow.signups.diff }} · 7 j</span>
+      {% elif wow.signups.diff < 0 %}<span class="adm-delta down"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M6 9 2 3h8z"/></svg>{{ wow.signups.diff }} · 7 j</span>
+      {% else %}<span class="adm-delta flat">stable · 7 j</span>{% endif %}
+    </div>
   </div>
   <div class="adm-metric">
-    <div class="adm-metric-k">{{ users_active_7d }}</div>
     <div class="adm-metric-l">Actifs · 7 j</div>
+    <div class="adm-metric-k">{{ users_active_7d }}</div>
+    <div class="adm-metric-d"><span class="adm-delta flat">{{ users_active_30d }} sur 30 j</span></div>
   </div>
   <div class="adm-metric">
-    <div class="adm-metric-k">{{ forms_total }}</div>
     <div class="adm-metric-l">Formulaires</div>
+    <div class="adm-metric-k">{{ forms_total }}</div>
+    <div class="adm-metric-d">
+      {% if wow.forms.diff > 0 %}<span class="adm-delta up"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M6 3l4 6H2z"/></svg>+{{ wow.forms.diff }} · 7 j</span>
+      {% elif wow.forms.diff < 0 %}<span class="adm-delta down"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M6 9 2 3h8z"/></svg>{{ wow.forms.diff }} · 7 j</span>
+      {% else %}<span class="adm-delta flat">stable · 7 j</span>{% endif %}
+    </div>
   </div>
   <div class="adm-metric">
-    <div class="adm-metric-k">{{ forms_active }}</div>
     <div class="adm-metric-l">Formulaires actifs</div>
+    <div class="adm-metric-k">{{ forms_active }}</div>
+    <div class="adm-metric-d"><span class="adm-delta flat">{{ forms_draft }} brouillon{{ forms_draft|pluralize }}</span></div>
   </div>
   <div class="adm-metric">
-    <div class="adm-metric-k">{{ publish_rate }}<span style="font-size:1rem;color:var(--a-muted)"> %</span></div>
     <div class="adm-metric-l">Taux de publication</div>
+    <div class="adm-metric-k">{{ publish_rate }}<span class="unit"> %</span></div>
+    <div class="adm-metric-d"><span class="adm-delta flat">{{ forms_closed }} fermé{{ forms_closed|pluralize }}</span></div>
   </div>
   <div class="adm-metric">
-    <div class="adm-metric-k">{{ avg_responses }}</div>
     <div class="adm-metric-l">Réponses / formulaire</div>
+    <div class="adm-metric-k">{{ avg_responses }}</div>
+    <div class="adm-metric-d"></div>
   </div>
 </div>

@@ -1,25 +1,49 @@
 {% extends 'backoffice/base_admin.html' %}
+{% load bo_extras %}
 {% block title %}Santé technique — Admin Vozavi{% endblock %}
 {% block heading %}Santé technique{% endblock %}
 {% block subtitle %}<div class="adm-subtitle">État opérationnel des notifications, des contacts et des tâches</div>{% endblock %}
 {% block content %}
 <div class="adm-stack">
+
+  {% if not emails_failed and not recent_failures %}
+  <div class="adm-panel"><div class="adm-panel-body" style="display:flex;align-items:center;gap:12px">
+    <span style="width:10px;height:10px;border-radius:50%;background:var(--a-pos);box-shadow:0 0 0 4px var(--a-pos-bg);flex-shrink:0"></span>
+    <div>
+      <div style="font-family:var(--fh);font-weight:700;color:var(--a-ink);font-size:.95rem">Tout fonctionne normalement</div>
+      <div style="color:var(--a-muted);font-size:.82rem;margin-top:2px">Aucun échec d'e-mail ni de tâche détecté récemment.</div>
+    </div>
+  </div></div>
+  {% else %}
+  <div class="adm-panel"><div class="adm-panel-body" style="display:flex;align-items:center;gap:12px">
+    <span style="width:10px;height:10px;border-radius:50%;background:var(--a-warn);box-shadow:0 0 0 4px var(--a-warn-bg);flex-shrink:0"></span>
+    <div>
+      <div style="font-family:var(--fh);font-weight:700;color:var(--a-ink);font-size:.95rem">Attention requise</div>
+      <div style="color:var(--a-muted);font-size:.82rem;margin-top:2px">{% if emails_failed %}{{ emails_failed }} e-mail{{ emails_failed|pluralize }} en échec. {% endif %}{% if recent_failures %}Des événements récents n'ont pas abouti — détail ci-dessous.{% endif %}</div>
+    </div>
+  </div></div>
+  {% endif %}
+
   <div class="adm-metrics">
     <div class="adm-metric">
-      <div class="adm-metric-k">{{ emails_sent }}</div>
       <div class="adm-metric-l">E-mails envoyés</div>
+      <div class="adm-metric-k">{{ emails_sent }}</div>
+      <div class="adm-metric-d"></div>
     </div>
     <div class="adm-metric">
+      <div class="adm-metric-l">E-mails échoués</div>
       <div class="adm-metric-k" style="{% if emails_failed %}color:var(--a-neg){% endif %}">{{ emails_failed }}</div>
-      <div class="adm-metric-l">E-mails échoués {% if emails_failed %}<span class="adm-badge adm-badge-neg no-dot" style="margin-left:2px">à vérifier</span>{% endif %}</div>
+      <div class="adm-metric-d">{% if emails_failed %}<span class="adm-delta down">à vérifier</span>{% endif %}</div>
     </div>
     <div class="adm-metric">
-      <div class="adm-metric-k" style="{% if contacts_unread %}color:var(--a-warn){% endif %}">{{ contacts_unread }}</div>
       <div class="adm-metric-l">Contacts non lus</div>
+      <div class="adm-metric-k" style="{% if contacts_unread %}color:var(--a-warn){% endif %}">{{ contacts_unread }}</div>
+      <div class="adm-metric-d">{% if contacts_unread %}<a href="{% url 'bo_contacts' %}?status=unread" class="adm-delta flat" style="text-decoration:none">Ouvrir la boîte →</a>{% endif %}</div>
     </div>
     <div class="adm-metric">
-      <div class="adm-metric-k">{{ guest_forms }}</div>
       <div class="adm-metric-l">Formulaires invités · &lt; 48 h</div>
+      <div class="adm-metric-k">{{ guest_forms }}</div>
+      <div class="adm-metric-d"></div>
     </div>
   </div>
 
@@ -33,7 +57,7 @@
         {% for e in recent_failures %}
           <tr>
             <td class="adm-time">{{ e.created_at|date:'d/m · H:i' }}</td>
-            <td class="t-strong">{{ e.get_event_type_display }}</td>
+            <td><span class="adm-badge adm-badge-{{ e.event_type|event_tone }}">{{ e.get_event_type_display }}</span></td>
             <td>{{ e.label|default:"—" }}</td>
             <td style="color:var(--a-muted)">{{ e.metadata.error|default:"—" }}</td>
           </tr>

@@ -52,7 +52,8 @@ class ChromeRenderTests(TestCase):
         self.client.force_login(self.admin)
 
     def test_all_nav_pages_render(self):
-        for name in ['bo_overview', 'bo_users', 'bo_journal', 'bo_health']:
+        for name in ['bo_overview', 'bo_users', 'bo_journal', 'bo_contacts',
+                     'bo_health', 'bo_search']:
             r = self.client.get(reverse(name))
             self.assertEqual(r.status_code, 200, name)
             self.assertContains(r, 'adm-rail')         # chrome present
@@ -236,3 +237,122 @@ class AdminAuthTests(TestCase):
         r = self.client.get(reverse('bo_overview'))
         self.assertContains(r, reverse('bo_logout'))
         self.assertContains(r, 'Déconnexion')
+
+
+class ContactMessagesTests(TestCase):
+    def setUp(self):
+        from app.models import ContactMessage
+        self.admin = User.objects.create_superuser('boss', 'b@x.co', 'motdepasse123')
+        self.client.force_login(self.admin)
+        self.m1 = ContactMessage.objects.create(
+            name='Alice', email='alice@x.co', category='support', message='Bug sur le builder')
+        self.m2 = ContactMessage.objects.create(
+            name='Bob', email='bob@x.co', category='billing', message='Question de facturation',
+            is_read=True)
+
+    def test_list_shows_messages(self):
+        r = self.client.get(reverse('bo_contacts'))
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'Alice')
+        self.assertContains(r, 'Bug sur le builder')
+        self.assertContains(r, 'Bob')
+
+    def test_filter_unread(self):
+        r = self.client.get(reverse('bo_contacts'), {'status': 'unread'})
+        self.assertContains(r, 'Alice')
+        self.assertNotContains(r, 'Bob')
+
+    def test_filter_category_and_search(self):
+        r = self.client.get(reverse('bo_contacts'), {'cat': 'billing'})
+        self.assertContains(r, 'Bob')
+        self.assertNotContains(r, 'Alice')
+        r = self.client.get(reverse('bo_contacts'), {'q': 'builder'})
+        self.assertContains(r, 'Alice')
+        self.assertNotContains(r, 'Bob')
+
+    def test_toggle_read(self):
+        r = self.client.post(reverse('bo_contact_toggle', args=[self.m1.pk]))
+        self.assertRedirects(r, reverse('bo_contacts'), fetch_redirect_response=False)
+        self.m1.refresh_from_db()
+        self.assertTrue(self.m1.is_read)
+
+    def test_toggle_honors_safe_next(self):
+        next_url = reverse('bo_contacts') + '?status=unread'
+        r = self.client.post(reverse('bo_contact_toggle', args=[self.m1.pk]), {'next': next_url})
+        self.assertRedirects(r, next_url, fetch_redirect_response=False)
+
+    def test_toggle_rejects_unsafe_next(self):
+        r = self.client.post(reverse('bo_contact_toggle', args=[self.m1.pk]),
+                             {'next': 'http://evil.example/x'})
+        self.assertRedirects(r, reverse('bo_contacts'), fetch_redirect_response=False)
+
+    def test_delete(self):
+        from app.models import ContactMessage
+        r = self.client.post(reverse('bo_contact_delete', args=[self.m2.pk]))
+        self.assertRedirects(r, reverse('bo_contacts'), fetch_redirect_response=False)
+        self.assertFalse(ContactMessage.objects.filter(pk=self.m2.pk).exists())
+
+    def test_get_not_allowed_on_actions(self):
+        self.assertEqual(self.client.get(reverse('bo_contact_toggle', args=[self.m1.pk])).status_code, 405)
+        self.assertEqual(self.client.get(reverse('bo_contact_delete', args=[self.m1.pk])).status_code, 405)
+
+    def test_requires_superuser(self):
+        self.client.force_login(User.objects.create_user('jo', password='motdepasse123'))
+        self.assertEqual(self.client.get(reverse('bo_contacts')).status_code, 404)
+
+    def test_toggle_shows_toast(self):
+        r = self.client.post(reverse('bo_contact_toggle', args=[self.m1.pk]), follow=True)
+        self.assertContains(r, 'marqué comme lu')
+
+    def test_unread_badge_in_rail(self):
+        r = self.client.get(reverse('bo_overview'))
+        self.assertContains(r, 'adm-count')   # 1 message non lu → badge visible
+
+
+class GlobalSearchTests(TestCase):
+    def setUp(self):
+        from app.models import ContactMessage, VozaviForm
+        self.admin = User.objects.create_superuser('boss', 'b@x.co', 'motdepasse123')
+        self.client.force_login(self.admin)
+        self.u = User.objects.create_user('marie', email='marie@x.co', password='x12345678')
+        VozaviForm.objects.create(user=self.u, title='Enquête satisfaction', status='active', slug='enq')
+        ContactMessage.objects.create(name='Paul', email='paul@x.co', message='Souci de connexion')
+
+    def test_empty_query_renders(self):
+        r = self.client.get(reverse('bo_search'))
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'Recherche globale')
+
+    def test_finds_across_models(self):
+        r = self.client.get(reverse('bo_search'), {'q': 'marie'})
+        self.assertContains(r, 'marie@x.co')
+        r = self.client.get(reverse('bo_search'), {'q': 'satisfaction'})
+        self.assertContains(r, 'Enquête satisfaction')
+        r = self.client.get(reverse('bo_search'), {'q': 'connexion'})
+        self.assertContains(r, 'Paul')
+
+    def test_no_results(self):
+        r = self.client.get(reverse('bo_search'), {'q': 'zzzzzz'})
+        self.assertContains(r, 'Aucun résultat')
+
+    def test_requires_superuser(self):
+        self.client.force_login(User.objects.create_user('jo', password='motdepasse123'))
+        self.assertEqual(self.client.get(reverse('bo_search')).status_code, 404)
+
+
+class UsersFilterTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_superuser('boss', 'b@x.co', 'motdepasse123')
+        self.client.force_login(self.admin)
+        User.objects.create_user('actif', email='actif@x.co', password='x12345678')
+        inactive = User.objects.create_user('parti', email='parti@x.co', password='x12345678')
+        inactive.is_active = False
+        inactive.save(update_fields=['is_active'])
+
+    def test_state_filter(self):
+        r = self.client.get(reverse('bo_users'), {'state': 'active'})
+        self.assertContains(r, 'actif@x.co')
+        self.assertNotContains(r, 'parti@x.co')
+        r = self.client.get(reverse('bo_users'), {'state': 'inactive'})
+        self.assertContains(r, 'parti@x.co')
+        self.assertNotContains(r, 'actif@x.co')

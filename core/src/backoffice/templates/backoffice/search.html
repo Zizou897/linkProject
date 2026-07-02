@@ -1,0 +1,87 @@
+{% extends 'backoffice/base_admin.html' %}
+{% load bo_extras %}
+{% block title %}Recherche — Admin Vozavi{% endblock %}
+{% block heading %}Recherche{% endblock %}
+{% block subtitle %}<div class="adm-subtitle">{% if q %}{{ total }} résultat{{ total|pluralize }} pour « {{ q }} »{% else %}Utilisateurs, formulaires et messages{% endif %}</div>{% endblock %}
+{% block content %}
+<div class="adm-stack">
+
+  {% if not q %}
+  <div class="adm-panel">
+    <div class="adm-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <h3>Recherche globale</h3>
+      <p>Tapez un nom, un e-mail ou un titre dans la barre de recherche (Ctrl K) pour chercher dans les utilisateurs, les formulaires et les messages de contact.</p>
+    </div>
+  </div>
+  {% elif not total %}
+  <div class="adm-panel">
+    <div class="adm-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <h3>Aucun résultat</h3>
+      <p>Rien ne correspond à « {{ q }} » — ni compte, ni formulaire, ni message.</p>
+    </div>
+  </div>
+  {% else %}
+
+  {% if users %}
+  <div class="adm-panel">
+    <div class="adm-panel-head"><h2>Utilisateurs</h2><span class="sub">{{ users|length }} résultat{{ users|length|pluralize }}</span></div>
+    <div class="adm-hits">
+      {% for u in users %}
+      <a class="adm-hit" href="{% url 'bo_user_detail' u.pk %}">
+        <span class="adm-avatar {{ u.pk|hue }}">{{ u.email|default:u.username|slice:":2"|upper }}</span>
+        <div class="adm-id-meta">
+          <div class="adm-id-name">{{ u.email|default:u.username }}</div>
+          <div class="adm-id-sub">Inscrit le {{ u.date_joined|date:'d/m/Y' }}</div>
+        </div>
+        <span class="end">{% if u.is_active %}<span class="adm-badge adm-badge-pos">Actif</span>{% else %}<span class="adm-badge adm-badge-neutral">Désactivé</span>{% endif %}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if forms %}
+  <div class="adm-panel">
+    <div class="adm-panel-head"><h2>Formulaires</h2><span class="sub">{{ forms|length }} résultat{{ forms|length|pluralize }}</span></div>
+    <div class="adm-hits">
+      {% for f in forms %}
+      {% if f.user %}<a class="adm-hit" href="{% url 'bo_user_detail' f.user.pk %}">{% else %}<div class="adm-hit">{% endif %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        <div class="adm-id-meta">
+          <div class="adm-id-name">{{ f.title }}</div>
+          <div class="adm-id-sub">{% if f.user %}{{ f.user.email|default:f.user.username }}{% else %}Invité{% endif %} · modifié le {{ f.updated_at|date:'d/m/Y' }}</div>
+        </div>
+        <span class="end">
+          {% if f.status == 'active' %}<span class="adm-badge adm-badge-pos">{{ f.get_status_display }}</span>
+          {% elif f.status == 'closed' %}<span class="adm-badge adm-badge-neutral">{{ f.get_status_display }}</span>
+          {% else %}<span class="adm-badge adm-badge-warn">{{ f.get_status_display }}</span>{% endif %}
+        </span>
+      {% if f.user %}</a>{% else %}</div>{% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if contacts %}
+  <div class="adm-panel">
+    <div class="adm-panel-head"><h2>Messages de contact</h2><span class="sub">{{ contacts|length }} résultat{{ contacts|length|pluralize }}</span></div>
+    <div class="adm-hits">
+      {% for m in contacts %}
+      <a class="adm-hit" href="{% url 'bo_contacts' %}?q={{ m.email|urlencode }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
+        <div class="adm-id-meta">
+          <div class="adm-id-name">{{ m.name }} · {{ m.email }}</div>
+          <div class="adm-id-sub">{{ m.message|truncatechars:90 }}</div>
+        </div>
+        <span class="end">{% if not m.is_read %}<span class="adm-badge adm-badge-warn">Non lu</span>{% endif %}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% endif %}
+</div>
+{% endblock %}

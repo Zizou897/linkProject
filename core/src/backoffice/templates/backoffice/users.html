@@ -1,31 +1,43 @@
 {% extends 'backoffice/base_admin.html' %}
+{% load bo_extras %}
 {% block title %}Utilisateurs — Admin Vozavi{% endblock %}
 {% block heading %}Utilisateurs{% endblock %}
 {% block subtitle %}<div class="adm-subtitle">{{ page_obj.paginator.count }} compte{{ page_obj.paginator.count|pluralize }}{% if q %} · filtre « {{ q }} »{% endif %}</div>{% endblock %}
-{% block actions %}
-<form method="get" class="adm-search" style="width:min(300px,46vw)">
-  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="m11 11 3 3" stroke-linecap="round"/></svg>
-  <input type="search" name="q" value="{{ q }}" class="adm-input" placeholder="Nom ou e-mail…" aria-label="Rechercher un utilisateur">
-</form>
-{% endblock %}
 {% block content %}
+
+<div class="adm-toolbar">
+  <nav class="adm-seg" aria-label="Filtrer par statut">
+    <a href="?q={{ q|urlencode }}" class="{% if not state %}is-on{% endif %}">Tous</a>
+    <a href="?state=active&q={{ q|urlencode }}" class="{% if state == 'active' %}is-on{% endif %}">Actifs</a>
+    <a href="?state=inactive&q={{ q|urlencode }}" class="{% if state == 'inactive' %}is-on{% endif %}">Désactivés</a>
+  </nav>
+  <form method="get" class="adm-search">
+    <input type="hidden" name="state" value="{{ state }}">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="m11 11 3 3" stroke-linecap="round"/></svg>
+    <input type="search" name="q" value="{{ q }}" class="adm-input" placeholder="Nom ou e-mail…" aria-label="Rechercher un utilisateur">
+  </form>
+</div>
+
 <div class="adm-panel">
   <div class="adm-tablewrap">
     <table class="adm-table">
-      <thead><tr><th>Utilisateur</th><th>Inscrit</th><th>Formulaires</th><th>Réponses</th><th>Dernière activité</th><th>Statut</th></tr></thead>
+      <thead><tr><th>Utilisateur</th><th>Inscrit</th><th>Formulaires</th><th>Réponses</th><th>Dernière connexion</th><th>Statut</th></tr></thead>
       <tbody>
       {% for u in page_obj %}
         <tr>
           <td>
-            <div style="display:flex;align-items:center;gap:11px;min-width:0">
-              <span class="adm-avatar">{{ u.email|default:u.username|slice:":2"|upper }}</span>
-              <a href="{% url 'bo_user_detail' u.pk %}" class="t-link" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.email|default:u.username }}</a>
-            </div>
+            <a href="{% url 'bo_user_detail' u.pk %}" class="adm-id t-link" style="text-decoration:none">
+              <span class="adm-avatar {{ u.pk|hue }}">{{ u.email|default:u.username|slice:":2"|upper }}</span>
+              <span class="adm-id-meta">
+                <span class="adm-id-name">{{ u.email|default:u.username }}</span>
+                {% if u.email and u.username != u.email %}<span class="adm-id-sub">{{ u.username }}</span>{% endif %}
+              </span>
+            </a>
           </td>
           <td class="adm-time">{{ u.date_joined|date:'d/m/Y' }}</td>
           <td class="num">{{ u.nb_forms }}</td>
           <td class="num">{{ u.nb_responses }}</td>
-          <td class="adm-time">{{ u.last_login|default:u.date_joined|date:'d/m/Y H:i' }}</td>
+          <td class="adm-time">{{ u.last_login|date:'d/m/Y H:i'|default:'Jamais' }}</td>
           <td>{% if u.is_active %}<span class="adm-badge adm-badge-pos">Actif</span>{% else %}<span class="adm-badge adm-badge-neutral">Désactivé</span>{% endif %}</td>
         </tr>
       {% empty %}
@@ -33,7 +45,8 @@
           <div class="adm-empty">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
             <h3>Aucun utilisateur</h3>
-            <p>{% if q %}Aucun compte ne correspond à « {{ q }} ».{% else %}Les comptes apparaîtront ici dès les premières inscriptions.{% endif %}</p>
+            <p>{% if q or state %}Aucun compte ne correspond à ces filtres.{% else %}Les comptes apparaîtront ici dès les premières inscriptions.{% endif %}</p>
+            {% if q or state %}<a href="{% url 'bo_users' %}" class="adm-btn adm-btn-default adm-btn-sm">Réinitialiser les filtres</a>{% endif %}
           </div>
         </td></tr>
       {% endfor %}
@@ -43,8 +56,8 @@
   {% if page_obj.has_other_pages %}
   <div class="adm-pager">
     <span class="count">{{ page_obj.paginator.count }} résultat{{ page_obj.paginator.count|pluralize }} · page {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_previous %}<a class="adm-btn adm-btn-default adm-btn-sm" href="?q={{ q|urlencode }}&page={{ page_obj.previous_page_number }}">← Précédent</a>{% endif %}
-    {% if page_obj.has_next %}<a class="adm-btn adm-btn-default adm-btn-sm" href="?q={{ q|urlencode }}&page={{ page_obj.next_page_number }}">Suivant →</a>{% endif %}
+    {% if page_obj.has_previous %}<a class="adm-btn adm-btn-default adm-btn-sm" href="?state={{ state|urlencode }}&q={{ q|urlencode }}&page={{ page_obj.previous_page_number }}">← Précédent</a>{% endif %}
+    {% if page_obj.has_next %}<a class="adm-btn adm-btn-default adm-btn-sm" href="?state={{ state|urlencode }}&q={{ q|urlencode }}&page={{ page_obj.next_page_number }}">Suivant →</a>{% endif %}
   </div>
   {% endif %}
 </div>

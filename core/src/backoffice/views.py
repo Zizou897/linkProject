@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -90,13 +91,18 @@ def users_list(request):
         nb_responses=Count('vozavi_forms__responses', distinct=True),
         last_activity=Max('vozavi_forms__updated_at'),
     )
+    state = request.GET.get('state', '').strip()
+    if state == 'active':
+        qs = qs.filter(is_active=True)
+    elif state == 'inactive':
+        qs = qs.filter(is_active=False)
     q = request.GET.get('q', '').strip()
     if q:
         qs = qs.filter(Q(username__icontains=q) | Q(email__icontains=q))
     qs = qs.order_by('-date_joined')
     page = Paginator(qs, 25).get_page(request.GET.get('page'))
     return render(request, 'backoffice/users.html',
-                  {'active': 'users', 'page_obj': page, 'q': q})
+                  {'active': 'users', 'page_obj': page, 'q': q, 'state': state})
 
 
 def _protected(request, target):
@@ -127,6 +133,8 @@ def user_toggle_active(request, pk):
     log_event('account_deactivated' if not target.is_active else 'account_reactivated',
               actor=request.user, request=request, label=target.get_username(),
               now_active=target.is_active)
+    messages.success(request, f"Compte {target.get_username()} "
+                              f"{'réactivé' if target.is_active else 'désactivé'}.")
     return redirect('bo_user_detail', pk=pk)
 
 
@@ -140,10 +148,13 @@ def user_delete(request, pk):
         target.delete()
         log_event('account_deleted_by_admin', actor=request.user, request=request,
                   label=username)
+        messages.success(request, f"Compte {username} supprimé définitivement.")
         return redirect('bo_users')
     return render(request, 'backoffice/user_detail.html', {
         'active': 'users', 'target': target, 'confirm_delete': True,
-        'forms': target.vozavi_forms.all(), 'events': [],
+        'forms': target.vozavi_forms.annotate(
+            nb=Count('responses', distinct=True)).order_by('-updated_at'),
+        'events': ActivityEvent.objects.filter(actor=target)[:50],
         'protected': _protected(request, target),
     })
 
@@ -174,6 +185,83 @@ def journal(request):
 def journal_feed(request):
     events = _journal_qs(request)[:40]
     return render(request, 'backoffice/partials/feed.html', {'events': events})
+
+
+# ── RECHERCHE GLOBALE ──────────────────────────────────────────────────────────
+
+@superuser_required
+def search(request):
+    q = request.GET.get('q', '').strip()
+    ctx = {'active': 'search', 'q': q, 'users': [], 'forms': [], 'contacts': []}
+    if q:
+        ctx['users'] = list(
+            User.objects.filter(is_superuser=False)
+            .filter(Q(username__icontains=q) | Q(email__icontains=q))
+            .order_by('-date_joined')[:10])
+        ctx['forms'] = list(
+            VozaviForm.objects.select_related('user')
+            .filter(title__icontains=q).order_by('-updated_at')[:10])
+        ctx['contacts'] = list(
+            ContactMessage.objects.filter(
+                Q(name__icontains=q) | Q(email__icontains=q) | Q(message__icontains=q))[:10])
+    ctx['total'] = len(ctx['users']) + len(ctx['forms']) + len(ctx['contacts'])
+    return render(request, 'backoffice/search.html', ctx)
+
+
+# ── MESSAGES DE CONTACT ────────────────────────────────────────────────────────
+
+@superuser_required
+def contacts(request):
+    qs = ContactMessage.objects.all()
+    status = request.GET.get('status', '').strip()
+    if status == 'unread':
+        qs = qs.filter(is_read=False)
+    elif status == 'read':
+        qs = qs.filter(is_read=True)
+    cat = request.GET.get('cat', '').strip()
+    if cat:
+        qs = qs.filter(category=cat)
+    q = request.GET.get('q', '').strip()
+    if q:
+        qs = qs.filter(Q(name__icontains=q) | Q(email__icontains=q) | Q(message__icontains=q))
+    page = Paginator(qs, 20).get_page(request.GET.get('page'))
+    return render(request, 'backoffice/contacts.html', {
+        'active': 'contacts', 'page_obj': page,
+        'status': status, 'cat': cat, 'q': q,
+        'categories': ContactMessage.CATEGORY_CHOICES,
+        'unread_total': ContactMessage.objects.filter(is_read=False).count(),
+    })
+
+
+def _contacts_next(request):
+    """URL de retour vers la liste des messages, filtres conservés."""
+    next_url = request.POST.get('next', '')
+    if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+        return next_url
+    return reverse('bo_contacts')
+
+
+@superuser_required
+def contact_toggle_read(request, pk):
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+    msg = get_object_or_404(ContactMessage, pk=pk)
+    msg.is_read = not msg.is_read
+    msg.save(update_fields=['is_read'])
+    messages.success(request, f"Message de {msg.name} marqué comme "
+                              f"{'lu' if msg.is_read else 'non lu'}.")
+    return redirect(_contacts_next(request))
+
+
+@superuser_required
+def contact_delete(request, pk):
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+    msg = get_object_or_404(ContactMessage, pk=pk)
+    name = msg.name
+    msg.delete()
+    messages.success(request, f"Message de {name} supprimé.")
+    return redirect(_contacts_next(request))
 
 
 @superuser_required

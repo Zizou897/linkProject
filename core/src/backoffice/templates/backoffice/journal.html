@@ -2,22 +2,23 @@
 {% block title %}Journal — Admin Vozavi{% endblock %}
 {% block heading %}Journal d'événements{% endblock %}
 {% block subtitle %}<div class="adm-subtitle">Qui a fait quoi, et ce qui a abouti — au fil de l'eau</div>{% endblock %}
-{% block actions %}
-<form method="get" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-  <select name="type" class="adm-select" style="width:auto;min-width:150px" onchange="this.form.submit()" aria-label="Filtrer par type">
+{% block content %}
+
+<form method="get" class="adm-toolbar">
+  <select name="type" class="adm-select" style="width:auto;min-width:170px" onchange="this.form.submit()" aria-label="Filtrer par type">
     <option value="">Tous les types</option>
     {% for value, lbl in event_types %}
     <option value="{{ value }}" {% if value == type %}selected{% endif %}>{{ lbl }}</option>
     {% endfor %}
   </select>
-  <div class="adm-search" style="width:200px">
+  <div class="adm-search">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="m11 11 3 3" stroke-linecap="round"/></svg>
     <input type="search" name="q" value="{{ q }}" class="adm-input" placeholder="Acteur ou cible…" aria-label="Rechercher dans le journal">
   </div>
-  <button class="adm-btn adm-btn-primary adm-btn-sm" type="submit">Filtrer</button>
+  <button class="adm-btn adm-btn-default adm-btn-sm" type="submit">Filtrer</button>
+  {% if type or q %}<a href="{% url 'bo_journal' %}" class="adm-btn adm-btn-ghost adm-btn-sm">Réinitialiser</a>{% endif %}
 </form>
-{% endblock %}
-{% block content %}
+
 <div class="adm-panel">
   {% if not type and not q %}
   <div class="adm-panel-head">

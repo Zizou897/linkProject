@@ -1,0 +1,75 @@
+{% extends 'backoffice/base_admin.html' %}
+{% load bo_extras %}
+{% block title %}Messages — Admin Vozavi{% endblock %}
+{% block heading %}Messages de contact{% endblock %}
+{% block subtitle %}<div class="adm-subtitle">{{ page_obj.paginator.count }} message{{ page_obj.paginator.count|pluralize }}{% if unread_total %} · {{ unread_total }} non lu{{ unread_total|pluralize }}{% endif %}</div>{% endblock %}
+{% block content %}
+
+<div class="adm-toolbar">
+  <nav class="adm-seg" aria-label="Filtrer par statut">
+    <a href="?cat={{ cat|urlencode }}&q={{ q|urlencode }}" class="{% if not status %}is-on{% endif %}">Tous</a>
+    <a href="?status=unread&cat={{ cat|urlencode }}&q={{ q|urlencode }}" class="{% if status == 'unread' %}is-on{% endif %}">Non lus{% if unread_total %} · {{ unread_total }}{% endif %}</a>
+    <a href="?status=read&cat={{ cat|urlencode }}&q={{ q|urlencode }}" class="{% if status == 'read' %}is-on{% endif %}">Lus</a>
+  </nav>
+  <form method="get" style="display:flex;gap:10px;flex:1;flex-wrap:wrap">
+    <input type="hidden" name="status" value="{{ status }}">
+    <select name="cat" class="adm-select" style="width:auto;min-width:160px" onchange="this.form.submit()" aria-label="Filtrer par catégorie">
+      <option value="">Toutes catégories</option>
+      {% for value, lbl in categories %}
+      <option value="{{ value }}" {% if value == cat %}selected{% endif %}>{{ lbl }}</option>
+      {% endfor %}
+    </select>
+    <div class="adm-search">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="m11 11 3 3" stroke-linecap="round"/></svg>
+      <input type="search" name="q" value="{{ q }}" class="adm-input" placeholder="Nom, e-mail, contenu…" aria-label="Rechercher un message">
+    </div>
+    <button class="adm-btn adm-btn-default adm-btn-sm" type="submit" style="height:38px">Filtrer</button>
+  </form>
+</div>
+
+<div class="adm-panel">
+  <div class="adm-msglist">
+  {% for m in page_obj %}
+    <article class="adm-msg {% if not m.is_read %}is-unread{% endif %}">
+      <header class="adm-msg-head">
+        {% if not m.is_read %}<span class="adm-msg-dot" title="Non lu"></span>{% endif %}
+        <span class="adm-avatar {{ m.pk|hue }}">{{ m.name|slice:":2"|upper }}</span>
+        <span class="adm-msg-from">{{ m.name }}</span>
+        <a href="mailto:{{ m.email }}" class="adm-msg-mail">{{ m.email }}</a>
+        <div class="adm-msg-meta">
+          {% if m.category %}<span class="adm-badge adm-badge-info no-dot">{{ m.get_category_display }}</span>{% endif %}
+          <span class="adm-time">{{ m.created_at|date:'d/m/Y H:i' }}</span>
+        </div>
+      </header>
+      <div class="adm-msg-body">{{ m.message|linebreaksbr }}</div>
+      <footer class="adm-msg-foot">
+        <form method="post" action="{% url 'bo_contact_toggle' m.pk %}" style="margin:0">{% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="adm-btn adm-btn-default adm-btn-sm">{% if m.is_read %}Marquer non lu{% else %}Marquer lu{% endif %}</button>
+        </form>
+        <a href="mailto:{{ m.email }}?subject=Re%3A%20votre%20message%20%C3%A0%20Vozavi" class="adm-btn adm-btn-ghost adm-btn-sm">Répondre</a>
+        <form method="post" action="{% url 'bo_contact_delete' m.pk %}" style="margin:0"
+              onsubmit="return confirm('Supprimer définitivement ce message de {{ m.name|escapejs }} ?')">{% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="adm-btn adm-btn-danger adm-btn-sm">Supprimer</button>
+        </form>
+      </footer>
+    </article>
+  {% empty %}
+    <div class="adm-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
+      <h3>Aucun message</h3>
+      <p>{% if q or status or cat %}Aucun message ne correspond à ces filtres.{% else %}Les messages envoyés depuis la page contact apparaîtront ici.{% endif %}</p>
+      {% if q or status or cat %}<a href="{% url 'bo_contacts' %}" class="adm-btn adm-btn-default adm-btn-sm">Réinitialiser les filtres</a>{% endif %}
+    </div>
+  {% endfor %}
+  </div>
+  {% if page_obj.has_other_pages %}
+  <div class="adm-pager">
+    <span class="count">{{ page_obj.paginator.count }} message{{ page_obj.paginator.count|pluralize }} · page {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_previous %}<a class="adm-btn adm-btn-default adm-btn-sm" href="?status={{ status|urlencode }}&cat={{ cat|urlencode }}&q={{ q|urlencode }}&page={{ page_obj.previous_page_number }}">← Précédent</a>{% endif %}
+    {% if page_obj.has_next %}<a class="adm-btn adm-btn-default adm-btn-sm" href="?status={{ status|urlencode }}&cat={{ cat|urlencode }}&q={{ q|urlencode }}&page={{ page_obj.next_page_number }}">Suivant →</a>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

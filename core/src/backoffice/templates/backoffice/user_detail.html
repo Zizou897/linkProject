@@ -1,7 +1,8 @@
 {% extends 'backoffice/base_admin.html' %}
+{% load bo_extras %}
 {% block title %}{{ target.email|default:target.username }} — Admin Vozavi{% endblock %}
 {% block heading %}{{ target.email|default:target.username }}{% endblock %}
-{% block subtitle %}<div class="adm-subtitle">Inscrit le {{ target.date_joined|date:'d/m/Y' }} · {% if target.is_active %}<span class="adm-badge adm-badge-pos">Actif</span>{% else %}<span class="adm-badge adm-badge-neutral">Désactivé</span>{% endif %}</div>{% endblock %}
+{% block subtitle %}<div class="adm-subtitle">Inscrit le {{ target.date_joined|date:'d/m/Y' }} · {% if target.is_active %}actif{% else %}désactivé{% endif %}</div>{% endblock %}
 {% block actions %}
 {% if not protected and not confirm_delete %}
 <form method="post" action="{% url 'bo_user_toggle' target.pk %}" style="display:inline">{% csrf_token %}
@@ -12,13 +13,22 @@
 {% endblock %}
 {% block content %}
 <div class="adm-stack">
-  <a href="{% url 'bo_users' %}" class="adm-back">← Tous les utilisateurs</a>
+  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <a href="{% url 'bo_users' %}" class="adm-back">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"/></svg>
+      Tous les utilisateurs
+    </a>
+    <span style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      {% if target.is_active %}<span class="adm-badge adm-badge-pos">Actif</span>{% else %}<span class="adm-badge adm-badge-neutral">Désactivé</span>{% endif %}
+      {% if target.last_login %}<span class="adm-badge adm-badge-neutral no-dot">Dernière connexion {{ target.last_login|date:'d/m/Y H:i' }}</span>{% endif %}
+    </span>
+  </div>
 
   {% if confirm_delete %}
   <div class="adm-confirm">
     <h3>Supprimer définitivement ce compte ?</h3>
     <p>Cette action supprime le compte <strong>{{ target.email|default:target.username }}</strong> ainsi que tous ses formulaires et réponses. Cette opération est irréversible.</p>
-    <form method="post" action="{% url 'bo_user_delete' target.pk %}" style="display:flex;gap:12px;align-items:center">{% csrf_token %}
+    <form method="post" action="{% url 'bo_user_delete' target.pk %}" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">{% csrf_token %}
       <button class="adm-btn adm-btn-danger" style="background:var(--a-neg);color:#fff;border-color:var(--a-neg)" type="submit">Confirmer la suppression</button>
       <a href="{% url 'bo_user_detail' target.pk %}" class="adm-back">Annuler</a>
     </form>
@@ -58,7 +68,7 @@
         {% for e in events %}
           <tr>
             <td class="adm-time" style="width:140px">{{ e.created_at|date:'d/m · H:i' }}</td>
-            <td class="t-strong">{{ e.get_event_type_display }}</td>
+            <td><span class="adm-badge adm-badge-{{ e.event_type|event_tone }}">{{ e.get_event_type_display }}</span></td>
             <td>{{ e.label|default:"—" }}</td>
           </tr>
         {% empty %}<tr><td><div class="adm-empty"><h3>Aucune activité</h3><p>Les événements liés à ce compte apparaîtront ici.</p></div></td></tr>{% endfor %}

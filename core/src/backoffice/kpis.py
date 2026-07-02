@@ -20,10 +20,17 @@ def _daily_series(timestamps, days=30):
              'pct': round(counts[d] / peak * 100)} for d in dates]
 
 
+def _wow(current, previous):
+    """Comparaison semaine vs semaine précédente pour un delta lisible."""
+    return {'n': current, 'diff': current - previous}
+
+
 def overview_context():
     customers = User.objects.filter(is_superuser=False)
-    week = timezone.now() - timedelta(days=7)
-    month = timezone.now() - timedelta(days=30)
+    now = timezone.now()
+    week = now - timedelta(days=7)
+    two_weeks = now - timedelta(days=14)
+    month = now - timedelta(days=30)
 
     forms_agg = VozaviForm.objects.aggregate(
         total=Count('id'),
@@ -45,7 +52,22 @@ def overview_context():
     publish_rate = round(published_forms / forms_agg['total'] * 100) if forms_agg['total'] else 0
     avg_resp = round(responses_total / forms_agg['total'], 1) if forms_agg['total'] else 0
 
+    wow = {
+        'signups': _wow(
+            customers.filter(date_joined__gte=week).count(),
+            customers.filter(date_joined__gte=two_weeks, date_joined__lt=week).count()),
+        'responses': _wow(
+            VozaviResponse.objects.filter(created_at__gte=week).count(),
+            VozaviResponse.objects.filter(created_at__gte=two_weeks,
+                                          created_at__lt=week).count()),
+        'forms': _wow(
+            VozaviForm.objects.filter(created_at__gte=week).count(),
+            VozaviForm.objects.filter(created_at__gte=two_weeks,
+                                      created_at__lt=week).count()),
+    }
+
     return {
+        'wow': wow,
         'users_total': customers.count(),
         'users_active_7d': customers.filter(last_login__gte=week).count(),
         'users_active_30d': customers.filter(last_login__gte=month).count(),
@@ -61,4 +83,6 @@ def overview_context():
             customers.values_list('date_joined', flat=True), 30),
         'responses_series': _daily_series(
             VozaviResponse.objects.values_list('created_at', flat=True), 30),
+        'signups_30d': customers.filter(date_joined__gte=month).count(),
+        'responses_30d': VozaviResponse.objects.filter(created_at__gte=month).count(),
     }
