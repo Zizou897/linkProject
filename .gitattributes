@@ -1,0 +1,3 @@
+# Force les scripts shell en fins de ligne LF : un .sh en CRLF échoue sur Linux
+# avec l'erreur "/bin/bash^M: bad interpreter".
+*.sh text eol=lf
