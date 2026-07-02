@@ -155,6 +155,127 @@ class ResponseSubmissionTests(TestCase):
         )
 
 
+class FileQuestionTests(TestCase):
+    """Question de type 'file' : upload, limites (4 Mo, extensions) et
+    téléchargement réservé au créateur du formulaire."""
+
+    def setUp(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        self.SimpleUploadedFile = SimpleUploadedFile
+        self.owner = User.objects.create_user('owner', password='motdepasse123')
+        self.other = User.objects.create_user('intrus', password='motdepasse123')
+        self.vform = VozaviForm.objects.create(
+            user=self.owner, title='Candidature', slug='files1', status='active',
+        )
+        self.q_file = Question.objects.create(
+            form=self.vform, type='file', label='Votre CV', required=True,
+            position=0, options={},
+        )
+        self.url = reverse('public_form', args=['files1'])
+
+    def _pdf(self, name='cv.pdf', size=1024):
+        return self.SimpleUploadedFile(name, b'%PDF-1.4 ' + b'x' * size,
+                                       content_type='application/pdf')
+
+    def test_upload_valid_pdf_creates_answer_with_file(self):
+        resp = self.client.post(self.url, {f'q_{self.q_file.pk}': self._pdf()})
+        self.assertRedirects(resp, reverse('public_form_thanks', args=['files1']),
+                             fetch_redirect_response=False)
+        answer = Answer.objects.get()
+        self.assertTrue(answer.file)
+        self.assertEqual(answer.value['name'], 'cv.pdf')
+        self.assertGreater(answer.value['size'], 0)
+
+    def test_file_over_4mb_is_rejected(self):
+        big = self.SimpleUploadedFile('gros.pdf', b'x' * (4 * 1024 * 1024 + 1),
+                                      content_type='application/pdf')
+        resp = self.client.post(self.url, {f'q_{self.q_file.pk}': big})
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, '4&nbsp;Mo max')          # page ré-affichée
+        self.assertContains(resp, 'dépasse la taille maximale')
+        self.assertEqual(Answer.objects.count(), 0)
+
+    def test_forbidden_extension_is_rejected(self):
+        exe = self.SimpleUploadedFile('virus.exe', b'MZ' + b'x' * 100)
+        resp = self.client.post(self.url, {f'q_{self.q_file.pk}': exe})
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'Format non accepté')
+        self.assertEqual(Answer.objects.count(), 0)
+
+    def test_required_file_missing_blocks_submission(self):
+        resp = self.client.post(self.url, {})
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'Ce champ est obligatoire')
+        self.assertEqual(VozaviResponse.objects.count(), 0)
+
+    def _submit_and_get_answer(self):
+        self.client.post(self.url, {f'q_{self.q_file.pk}': self._pdf()})
+        return Answer.objects.get()
+
+    def test_owner_can_download_file(self):
+        answer = self._submit_and_get_answer()
+        self.client.login(username='owner', password='motdepasse123')
+        resp = self.client.get(reverse('answer_file', args=[answer.pk]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('cv.pdf', resp['Content-Disposition'])
+
+    def test_other_user_gets_404(self):
+        answer = self._submit_and_get_answer()
+        self.client.login(username='intrus', password='motdepasse123')
+        resp = self.client.get(reverse('answer_file', args=[answer.pk]))
+        self.assertEqual(resp.status_code, 404)
+
+    def test_anonymous_is_redirected_to_login(self):
+        answer = self._submit_and_get_answer()
+        resp = self.client.get(reverse('answer_file', args=[answer.pk]))
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn('/connexion/', resp['Location'])
+
+    def test_file_removed_from_disk_when_response_deleted(self):
+        import os
+        answer = self._submit_and_get_answer()
+        path = answer.file.path
+        self.assertTrue(os.path.exists(path))
+        answer.response.delete()                            # cascade → post_delete
+        self.assertFalse(os.path.exists(path))
+
+    def test_logo_over_4mb_is_rejected(self):
+        """update_form_meta : un logo > 4 Mo n'est pas enregistré."""
+        self.client.login(username='owner', password='motdepasse123')
+        big = self.SimpleUploadedFile('logo.png', b'\x89PNG' + b'x' * (4 * 1024 * 1024 + 1),
+                                      content_type='image/png')
+        resp = self.client.post(reverse('update_form_meta', args=[self.vform.pk]),
+                                {'title': self.vform.title, 'logo': big})
+        self.assertContains(resp, 'Logo trop lourd')
+        self.vform.refresh_from_db()
+        self.assertFalse(self.vform.logo)
+
+    @override_settings(MEDIA_ROOT=__import__('tempfile').mkdtemp(prefix='vozavi_test_media_'))
+    def test_logo_valid_image_is_saved(self):
+        """update_form_meta : une vraie image ≤ 4 Mo est enregistrée."""
+        from PIL import Image as PILImage
+        buf = io.BytesIO()
+        PILImage.new('RGB', (10, 10), '#4F46B8').save(buf, 'PNG')
+        buf.seek(0)
+        self.client.login(username='owner', password='motdepasse123')
+        logo = self.SimpleUploadedFile('logo.png', buf.read(), content_type='image/png')
+        resp = self.client.post(reverse('update_form_meta', args=[self.vform.pk]),
+                                {'title': self.vform.title, 'logo': logo})
+        self.assertContains(resp, 'Enregistré')
+        self.vform.refresh_from_db()
+        self.assertTrue(self.vform.logo)
+
+    def test_file_stats_and_export(self):
+        answer = self._submit_and_get_answer()
+        stats = _compute_question_stats(self.q_file, [answer.value], [answer.pk])
+        self.assertEqual(stats['type'], 'file')
+        self.assertEqual(stats['count'], 1)
+        self.assertEqual(stats['files'][0]['name'], 'cv.pdf')
+        # Export CSV : le nom du fichier, pas le dict brut
+        from .views import _fmt_answer
+        self.assertEqual(_fmt_answer(answer.value), 'cv.pdf')
+
+
 class StatsComputationTests(TestCase):
     """_compute_question_stats : agrégats par type de question."""
 

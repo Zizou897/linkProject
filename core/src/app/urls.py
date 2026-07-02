@@ -62,6 +62,7 @@ urlpatterns = [
     path('dashboard/forms/<int:pk>/preview/', views.preview_form, name='preview_form'),
     path('dashboard/forms/<int:pk>/results/', views.form_results, name='form_results'),
     path('dashboard/forms/<int:pk>/responses/', views.form_responses, name='form_responses'),
+    path('dashboard/answers/<int:pk>/file/', views.answer_file_download, name='answer_file'),
     path('dashboard/forms/<int:pk>/results/export/csv/', views.export_results_csv, name='export_results_csv'),
     path('dashboard/forms/<int:pk>/results/export/excel/', views.export_results_excel, name='export_results_excel'),
 

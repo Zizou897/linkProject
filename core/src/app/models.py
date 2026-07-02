@@ -1,6 +1,22 @@
 import secrets
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 from django.contrib.auth.models import User
+
+
+def private_storage():
+    """Stockage des documents envoyés par les répondants.
+
+    Hors de MEDIA_ROOT : /media/ est servi publiquement (urls.py), alors que
+    ces documents ne doivent être téléchargeables que par le créateur du
+    formulaire, via la vue protégée answer_file_download. Callable (et non
+    instance) pour que la migration sérialise une référence, pas un chemin
+    absolu propre à la machine.
+    """
+    return FileSystemStorage(location=str(settings.PRIVATE_MEDIA_ROOT))
 
 
 class Convention(models.Model):
@@ -45,6 +61,7 @@ class Question(models.Model):
         ('text', 'Texte libre'),
         ('grid', 'Grille de critères'),
         ('contact', 'Infos personnelles'),
+        ('file', 'Fichier'),
     ]
     form = models.ForeignKey(VozaviForm, on_delete=models.CASCADE, related_name='questions')
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
@@ -70,6 +87,17 @@ class Answer(models.Model):
     response = models.ForeignKey(VozaviResponse, on_delete=models.CASCADE, related_name='answers')
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     value = models.JSONField()
+    # Document envoyé par le répondant (questions de type 'file'). Le nom
+    # original et la taille sont conservés dans value ({"name": ..., "size": ...}).
+    file = models.FileField(storage=private_storage, upload_to='responses/%Y/%m/', blank=True)
+
+
+@receiver(post_delete, sender=Answer)
+def _delete_answer_file(sender, instance, **kwargs):
+    """Supprime le document du disque quand la réponse disparaît (suppression
+    d'une réponse, d'un formulaire ou d'un compte — cascades comprises)."""
+    if instance.file:
+        instance.file.delete(save=False)
 
 
 # ── PAGE CONTACT ──────────────────────────────────────────────────────────────

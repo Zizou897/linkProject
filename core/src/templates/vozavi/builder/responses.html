@@ -150,6 +150,8 @@ button{font-family:var(--f-body);cursor:pointer;border:none;background:none}
 
 /* Rating display */
 .rating-cell{display:flex;align-items:center;gap:8px}
+.file-link{display:inline-flex;align-items:center;gap:6px;color:var(--indigo,#4F46B8);font-weight:600;text-decoration:none}
+.file-link:hover{text-decoration:underline}
 .rating-stars{
   font-size:1.1rem;
   background:linear-gradient(90deg,var(--amber) var(--pct),#E2E1F0 var(--pct));
@@ -373,6 +375,16 @@ button{font-family:var(--f-body);cursor:pointer;border:none;background:none}
               <div class="text-response">{{ cell.display }}</div>
             {% else %}
               <span class="qa-a-empty">Aucun commentaire</span>
+            {% endif %}
+
+          {% elif cell.type == 'file' %}
+            {% if cell.answer_pk %}
+              <a class="file-link" href="{% url 'answer_file' cell.answer_pk %}">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" style="width:14px;height:14px"><path d="M13.5 8.5 9 13a2.5 2.5 0 0 1-3.5-3.5l5.5-5.5a4 4 0 0 1 5.7 5.6L11 15.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                {{ cell.display }}{% if cell.size_h %} ({{ cell.size_h }}){% endif %}
+              </a>
+            {% else %}
+              <span class="qa-a-empty">Aucun document</span>
             {% endif %}
 
           {% else %}

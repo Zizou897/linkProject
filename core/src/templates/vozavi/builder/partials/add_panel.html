@@ -93,5 +93,20 @@
       </button>
     </form>
 
+    <form method="post" action="{% url 'add_question' vform.pk %}" style="display:contents">
+      {% csrf_token %}
+      <input type="hidden" name="type" value="file">
+      <button type="submit" class="add-type-btn"
+        hx-post="{% url 'add_question' vform.pk %}"
+        hx-include="this"
+        hx-target="#questions-list"
+        hx-swap="innerHTML"
+        hx-on::after-request="$dispatch('close-panel')">
+        <span class="add-type-icon">📎</span>
+        <span class="add-type-name">Fichier</span>
+        <span class="add-type-desc">Document du répondant — 4 Mo max</span>
+      </button>
+    </form>
+
   </div>
 </div>

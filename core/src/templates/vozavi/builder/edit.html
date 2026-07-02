@@ -58,6 +58,7 @@ input,textarea,select{font-family:inherit}
 .hdr-title-input:hover{border-color:var(--border);background:var(--lavender)}
 .hdr-title-input:focus{border-color:var(--indigo);background:var(--white);outline:none}
 .save-ok{font-size:.75rem;color:var(--green);font-weight:600;animation:fadeout 2s forwards}
+.save-err{font-size:.75rem;color:var(--red,#E24B4A);font-weight:600;animation:fadeout 5s forwards}
 @keyframes fadeout{0%{opacity:1}70%{opacity:1}100%{opacity:0}}
 .badge{
   display:inline-flex;align-items:center;gap:4px;
@@ -544,7 +545,7 @@ input,textarea,select{font-family:inherit}
                 <label class="logo-upload-btn">
                   Choisir un fichier
                   <input type="file" name="logo" accept="image/*" style="display:none"
-                    onchange="this.closest('form').dispatchEvent(new Event('submit'))"
+                    onchange="previewLogo(this) || event.stopImmediatePropagation()"
                     hx-post="{% url 'update_form_meta' vform.pk %}"
                     hx-trigger="change"
                     hx-target="#save-status"
@@ -680,6 +681,39 @@ input,textarea,select{font-family:inherit}
 document.body.addEventListener('htmx:configRequest', function(e){
   e.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
 });
+
+// ── LOGO : prévisualisation instantanée ──────────────────────────────────────
+// Affiche le logo choisi immédiatement (avant même la fin de l'upload HTMX,
+// qui part en parallèle via hx-trigger="change"). Retourne false pour bloquer
+// l'upload (fichier trop lourd, non-image ou sélection annulée) — le onchange
+// stoppe alors la propagation vers HTMX. La limite de 4 Mo est aussi vérifiée
+// côté serveur (update_form_meta), qui reste la référence.
+function previewLogo(input) {
+  var f = input.files && input.files[0];
+  var status = document.getElementById('save-status');
+  if (!f) return false;
+  if (f.size > 4 * 1024 * 1024) {
+    input.value = '';
+    if (status) status.innerHTML = '<span class="save-err">Logo trop lourd (4 Mo max)</span>';
+    return false;
+  }
+  if (f.type.indexOf('image/') !== 0) {
+    input.value = '';
+    if (status) status.innerHTML = '<span class="save-err">Choisissez une image (JPG, PNG, WebP…)</span>';
+    return false;
+  }
+  var box = document.getElementById('logo-preview');
+  if (box) {
+    var url = URL.createObjectURL(f);
+    var img = document.createElement('img');
+    img.alt = 'Logo';
+    img.onload = function(){ URL.revokeObjectURL(url); };
+    img.src = url;
+    box.innerHTML = '';
+    box.appendChild(img);
+  }
+  return true;
+}
 
 // ── CHOICE / CRITERIA MANAGEMENT ─────────────────────────────────────────────
 

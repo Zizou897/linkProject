@@ -122,6 +122,16 @@ if 'test' in sys.argv:
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media_cdn'
 
+# Documents envoyés par les répondants (questions de type 'file').
+# Hors de MEDIA_ROOT : /media/ est servi publiquement, ces documents ne doivent
+# être accessibles que via la vue protégée (créateur du formulaire connecté).
+PRIVATE_MEDIA_ROOT = BASE_DIR / 'private_media'
+if 'test' in sys.argv:
+    # Les uploads de test vont dans un dossier temporaire jetable, pas dans
+    # private_media/ (sinon chaque run de tests y laisse des fichiers).
+    import tempfile
+    PRIVATE_MEDIA_ROOT = Path(tempfile.mkdtemp(prefix='vozavi_test_private_'))
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/connexion/'

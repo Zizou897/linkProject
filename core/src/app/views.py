@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.db.models import Count, Q
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, StreamingHttpResponse
+from django.http import HttpResponse, StreamingHttpResponse, FileResponse, Http404
 from django.urls import reverse
 from django.db import models as db_models
 from django.utils import timezone
@@ -567,18 +567,26 @@ def update_form_meta(request, pk):
         brand_color = request.POST.get('brand_color', vform.brand_color)
         if _re.fullmatch(r'#[0-9A-Fa-f]{6}', brand_color):
             vform.brand_color = brand_color
+        logo_error = None
         if 'logo' in request.FILES:
             logo_file = request.FILES['logo']
-            try:
-                from PIL import Image as _Image
-                img = _Image.open(logo_file)
-                img.verify()
-                logo_file.seek(0)
-                if img.format in ('JPEG', 'PNG', 'WEBP', 'GIF'):
-                    vform.logo = logo_file
-            except Exception:
-                pass
+            if logo_file.size > MAX_UPLOAD_SIZE:
+                logo_error = 'Logo trop lourd (4 Mo max)'
+            else:
+                try:
+                    from PIL import Image as _Image
+                    img = _Image.open(logo_file)
+                    img.verify()
+                    logo_file.seek(0)
+                    if img.format in ('JPEG', 'PNG', 'WEBP', 'GIF'):
+                        vform.logo = logo_file
+                    else:
+                        logo_error = 'Format non accepté (JPG, PNG, WebP ou GIF)'
+                except Exception:
+                    logo_error = 'Fichier illisible — choisissez une image valide'
         vform.save()
+        if logo_error:
+            return HttpResponse(f'<span class="save-err">{logo_error}</span>')
         return HttpResponse('<span class="save-ok">Enregistré ✓</span>')
     return HttpResponse(status=204)
 
@@ -605,6 +613,7 @@ def add_question(request, pk):
             'text': ('Votre commentaire', {}),
             'grid': ('Évaluez les critères suivants', {'criteria': ['Critère 1', 'Critère 2', 'Critère 3'], 'max': 5}),
             'contact': ('Vos coordonnées', {'fields': ['first_name', 'email']}),
+            'file': ('Joignez votre document', {}),
         }
         max_pos = vform.questions.aggregate(m=db_models.Max('position'))['m']
         label, options = defaults.get(q_type, ('Nouvelle question', {}))
@@ -800,7 +809,16 @@ def preview_form(request, pk):
     return render(request, 'vozavi/public/form.html', {'vform': vform, 'questions': questions, 'preview': True})
 
 
+# Questions de type 'file' : formats acceptés et taille maximale (4 Mo).
+# La validation serveur est la seule qui compte — l'attribut accept du <input>
+# n'est qu'une aide côté navigateur.
+ALLOWED_UPLOAD_EXTS = {'.pdf', '.doc', '.docx', '.xls', '.xlsx', '.jpg', '.jpeg', '.png', '.webp'}
+MAX_UPLOAD_SIZE = 4 * 1024 * 1024  # 4 Mo
+
+
 def public_form(request, slug):
+    import os as _os
+
     vform = get_object_or_404(VozaviForm, slug=slug, status='active')
     questions = list(vform.questions.order_by('position'))
     errors = {}
@@ -815,6 +833,7 @@ def public_form(request, slug):
             return redirect('public_form_thanks', slug=slug)
 
         # Phase 1 — validate without touching the DB
+        files_by_q = {}
         for q in questions:
             field = f'q_{q.pk}'
             if q.type == 'multiple_choice':
@@ -826,6 +845,21 @@ def public_form(request, slug):
                 enabled = q.options.get('fields', ['email'])
                 value = {k: request.POST.get(f'{field}_{k}', '').strip() for k in enabled}
                 value = {k: v for k, v in value.items() if v}
+            elif q.type == 'file':
+                f = request.FILES.get(field)
+                if f:
+                    ext = _os.path.splitext(f.name)[1].lower()
+                    if ext not in ALLOWED_UPLOAD_EXTS:
+                        errors[str(q.pk)] = 'Format non accepté. Formats autorisés : PDF, Word, Excel, JPG, PNG, WebP.'
+                    elif f.size > MAX_UPLOAD_SIZE:
+                        errors[str(q.pk)] = 'Le fichier dépasse la taille maximale de 4 Mo.'
+                    else:
+                        files_by_q[q.pk] = f
+                    # Métadonnées conservées dans value (affichage + exports
+                    # sans toucher au disque). Le nom est nettoyé de tout chemin.
+                    value = {'name': _os.path.basename(f.name), 'size': f.size}
+                else:
+                    value = None
             else:
                 value = request.POST.get(field, '').strip()
             if q.required and not value:
@@ -835,10 +869,19 @@ def public_form(request, slug):
         # Phase 2 — write only if all fields pass
         if not errors:
             response = VozaviResponse.objects.create(form=vform)
-            Answer.objects.bulk_create([
-                Answer(response=response, question_id=qid, value=val)
-                for qid, val in collected.items()
-            ])
+            plain, with_file = [], []
+            for qid, val in collected.items():
+                answer = Answer(response=response, question_id=qid, value=val)
+                if qid in files_by_q:
+                    answer.file = files_by_q[qid]
+                    with_file.append(answer)
+                else:
+                    plain.append(answer)
+            Answer.objects.bulk_create(plain)
+            # Les réponses avec document passent par save() individuel :
+            # l'écriture du fichier sur le storage est alors garantie.
+            for answer in with_file:
+                answer.save()
             cache.delete(f'form_results_{vform.pk}')
             log_event('response_received', actor=vform.user, target=vform, request=request)
 
@@ -1004,7 +1047,7 @@ def demo_form_thanks(request):
 
 # ── VOZAVI RESULTS ─────────────────────────────────────────────────────────────
 
-def _compute_question_stats(q, values):
+def _compute_question_stats(q, values, answer_ids=None):
     if q.type == 'rating':
         mx = q.options.get('max', 5)
         nums = []
@@ -1072,12 +1115,36 @@ def _compute_question_stats(q, values):
                 rows.append(v)
         return {'type': 'contact', 'count': len(rows), 'fields': enabled, 'rows': rows}
 
+    elif q.type == 'file':
+        files = []
+        for aid, v in zip(answer_ids or [], values):
+            if isinstance(v, dict) and v.get('name'):
+                files.append({'id': aid, 'name': v['name'], 'size_h': _fmt_size(v.get('size', 0))})
+        return {'type': 'file', 'count': len(files), 'files': files}
+
     return {'type': q.type, 'count': 0}
+
+
+def _fmt_size(size):
+    """Taille lisible : 812345 → '0,8 Mo', 45056 → '44 Ko'."""
+    try:
+        size = int(size)
+    except (TypeError, ValueError):
+        return ''
+    if size >= 1024 * 1024:
+        return f"{size / (1024 * 1024):.1f} Mo".replace('.', ',')
+    return f"{max(1, round(size / 1024))} Ko"
 
 
 def _fmt_answer(value):
     if isinstance(value, list):
         return ', '.join(str(v) for v in value)
+    if isinstance(value, dict):
+        # Réponse fichier ({"name", "size"}) : le nom du document suffit.
+        if set(value.keys()) == {'name', 'size'}:
+            return str(value['name'])
+        # Réponse contact : valeurs jointes, lisibles dans un tableur.
+        return ' · '.join(str(v) for v in value.values() if v)
     return str(value) if value is not None else ''
 
 
@@ -1092,14 +1159,16 @@ def form_results(request, pk):
     if cached is None:
         # One query for all answers — eliminates N+1
         answers_by_q = {}
-        for a in Answer.objects.filter(question__form=vform).values('question_id', 'value'):
+        answer_ids_by_q = {}
+        for a in Answer.objects.filter(question__form=vform).values('question_id', 'value', 'id'):
             answers_by_q.setdefault(a['question_id'], []).append(a['value'])
+            answer_ids_by_q.setdefault(a['question_id'], []).append(a['id'])
 
         stats_by_q = {}
         avg_sum = 0.0
         avg_weight = 0
         for q in questions:
-            stats = _compute_question_stats(q, answers_by_q.get(q.pk, []))
+            stats = _compute_question_stats(q, answers_by_q.get(q.pk, []), answer_ids_by_q.get(q.pk))
             stats_by_q[q.pk] = stats
             if stats['type'] == 'rating' and stats.get('avg'):
                 avg_sum += stats['avg'] * stats['count']
@@ -1191,6 +1260,23 @@ def form_results(request, pk):
 
 
 @login_required
+def answer_file_download(request, pk):
+    """Télécharge le document d'une réponse (question de type 'file').
+
+    Réservé au créateur du formulaire : les fichiers vivent hors de /media/
+    (stockage privé) et ne sont servis que par cette vue. 404 pour toute
+    autre personne, y compris connectée.
+    """
+    answer = get_object_or_404(Answer, pk=pk, question__form__user=request.user)
+    if not answer.file:
+        raise Http404
+    name = (answer.value or {}).get('name') if isinstance(answer.value, dict) else None
+    import os as _os
+    return FileResponse(answer.file.open('rb'), as_attachment=True,
+                        filename=name or _os.path.basename(answer.file.name))
+
+
+@login_required
 def form_responses(request, pk):
     from django.core.paginator import Paginator
 
@@ -1209,6 +1295,7 @@ def form_responses(request, pk):
     response_rows = []
     for r in page_obj:
         ans_map = {a.question_id: a.value for a in r.answers.all()}
+        ans_pk_map = {a.question_id: a.pk for a in r.answers.all()}
         cells = []
         has_negative = False
         for q in questions:
@@ -1225,6 +1312,10 @@ def form_responses(request, pk):
                                   'raw': n, 'max': mx, 'pct': round(n / mx * 100)})
                 except (TypeError, ValueError):
                     cells.append({'label': q.label, 'display': '—', 'type': q.type, 'raw': None})
+            elif q.type == 'file':
+                cells.append({'label': q.label, 'display': _fmt_answer(raw), 'type': 'file',
+                              'raw': raw, 'answer_pk': ans_pk_map.get(q.pk),
+                              'size_h': _fmt_size(raw.get('size', 0)) if isinstance(raw, dict) else ''})
             else:
                 cells.append({'label': q.label, 'display': _fmt_answer(raw), 'type': q.type, 'raw': raw})
         response_rows.append({'response': r, 'cells': cells, 'has_negative': has_negative})
