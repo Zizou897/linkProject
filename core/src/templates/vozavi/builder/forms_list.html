@@ -159,11 +159,22 @@ ul{list-style:none}
     </a>
   </nav>
   <div class="hdr-space"></div>
-  <button class="mob-nav-btn" id="mob-btn" aria-label="Menu" onclick="location.href='{% url 'dashboard' %}'">
+  <button class="mob-nav-btn" id="mob-btn" aria-label="Menu" aria-expanded="false" aria-controls="mob-nav">
     <svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
   </button>
   {% include 'vozavi/partials/user_menu.html' %}
 </header>
+
+<!-- mobile nav -->
+<div id="mob-nav" style="display:none;position:fixed;inset:var(--hdr) 0 0 0;background:rgba(44,44,58,.4);z-index:150" onclick="closeMobNav()">
+  <nav style="background:var(--white);padding:16px;display:flex;flex-direction:column;gap:4px;border-bottom:1px solid var(--border)" onclick="event.stopPropagation()" aria-label="Navigation mobile">
+    <a href="{% url 'dashboard' %}" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;font-family:var(--f-head);font-size:.9rem;color:var(--text-2)">Tableau de bord</a>
+    <a href="{% url 'forms_list' %}" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;font-family:var(--f-head);font-weight:600;font-size:.9rem;background:var(--indigo-pale);color:var(--indigo)">Mes formulaires</a>
+    <a href="{% url 'new_form' %}" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;font-family:var(--f-head);font-size:.9rem;color:var(--text-2)">Nouveau formulaire</a>
+    <div style="height:1px;background:var(--border);margin:4px 0"></div>
+    <form method="post" action="{% url 'logout' %}" style="margin:0">{% csrf_token %}<button type="submit" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;font-family:var(--f-head);font-size:.9rem;color:var(--red);background:none;border:none;cursor:pointer;width:100%;text-align:left">Se déconnecter</button></form>
+  </nav>
+</div>
 
 <main class="page">
 
@@ -331,6 +342,22 @@ ul{list-style:none}
       document.querySelectorAll('.kebab.open').forEach(function(m){m.classList.remove('open')});
     }
   });
+
+  // Menu mobile (hamburger) : même mécanique que le tableau de bord.
+  var mobBtn=document.getElementById('mob-btn');
+  var mobNav=document.getElementById('mob-nav');
+  if(mobBtn&&mobNav){
+    mobBtn.addEventListener('click',function(){
+      var open=mobNav.style.display==='none';
+      mobNav.style.display=open?'block':'none';
+      mobBtn.setAttribute('aria-expanded',open?'true':'false');
+    });
+  }
+  function closeMobNav(){
+    if(mobNav) mobNav.style.display='none';
+    if(mobBtn) mobBtn.setAttribute('aria-expanded','false');
+  }
+  window.closeMobNav=closeMobNav;
 })();
 </script>
 </body>
