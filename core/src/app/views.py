@@ -352,7 +352,7 @@ def og_image_view(request):
     draw.text((tx, 195), 'vozavi',                         font=f_title,  fill=WHITE)
     draw.text((tx, 345), "Formulaires d'avis gratuits,",   font=f_tag,    fill=MUTED)
     draw.text((tx, 395), "prêts en 2 minutes.",             font=f_tag,    fill=MUTED)
-    draw.text((tx, 476), 'vozavi.com',                     font=f_domain, fill=SUBTLE)
+    draw.text((tx, 476), 'vozavi.online',                  font=f_domain, fill=SUBTLE)
 
     buf = io.BytesIO()
     img.save(buf, 'PNG', optimize=True)
@@ -980,7 +980,7 @@ def form_og_image_view(request, slug):
         y += 96
 
     # Pied : invitation + domaine
-    draw.text((LEFT, H - 88), 'Donnez votre avis en 2 minutes · vozavi.com', font=f_foot, fill=muted)
+    draw.text((LEFT, H - 88), 'Donnez votre avis en 2 minutes · vozavi.online', font=f_foot, fill=muted)
 
     buf = io.BytesIO()
     img.save(buf, 'PNG', optimize=True)
