@@ -195,6 +195,11 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL',
                             default='Vozavi <contact.vozavi@gmail.com>')
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
+# Lien de réinitialisation de mot de passe : 15 minutes.
+# La durée est mentionnée dans l'e-mail (templates account/password_reset_email*) —
+# garder les deux synchronisés.
+PASSWORD_RESET_TIMEOUT = 15 * 60
+
 
 if not DEBUG:
     # Derrière nginx (proxy TLS) : Gunicorn parle HTTP, nginx ajoute
