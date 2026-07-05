@@ -4,7 +4,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
+<link rel="icon" type="image/svg+xml" href="{% static 'app/assets/img/favicon.svg' %}">
+<link rel="icon" type="image/png" sizes="48x48" href="{% static 'app/assets/img/favicon-48.png' %}">
+<link rel="icon" type="image/png" sizes="96x96" href="{% static 'app/assets/img/favicon-96.png' %}">
+<link rel="icon" type="image/png" sizes="192x192" href="{% static 'app/assets/img/favicon-192.png' %}">
+<link rel="apple-touch-icon" sizes="180x180" href="{% static 'app/assets/img/apple-touch-icon.png' %}"><rect width='64' height='64' rx='14' fill='%234F46B8'/><path d='M32 12 l4.2 8.5 9.4 1.4 -6.8 6.6 1.6 9.4 -8.4-4.4 -8.4 4.4 1.6-9.4 -6.8-6.6 9.4-1.4 z' fill='%23F2A93B'/></svg>">
 <title>Vozavi — Formulaires d'avis et de feedback gratuits, en 2 minutes</title>
 <meta name="description" content="Créez votre formulaire d'avis personnalisé en 2 minutes, partagez un lien ou un QR code, suivez les réponses en temps réel. 100 % gratuit, sans carte bancaire.">
 <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}">
@@ -59,7 +63,7 @@
   "@id": "{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}#organization",
   "name": "Vozavi",
   "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}",
-  "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'app/assets/img/vozavi-logo-principal.svg' %}",
+  "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'app/assets/img/favicon-512.png' %}",
   "description": "Application web gratuite pour créer des formulaires d'avis et de feedback en 2 minutes, les partager par lien ou QR code, et suivre les réponses en temps réel.",
   "foundingLocation": {
     "@type": "Place",

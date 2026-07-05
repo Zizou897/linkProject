@@ -369,6 +369,17 @@ def og_image_view(request):
 CONTENT_LASTMOD = "2026-07-02"
 
 
+def favicon_ico(request):
+    """/favicon.ico : redirige vers le fichier statique (résolu à la requête).
+
+    Google et de nombreux navigateurs demandent /favicon.ico à la racine.
+    Redirection temporaire : avec le manifeste statique, l'URL hachée change
+    à chaque modification du fichier (et deploy.sh fait collectstatic --clear).
+    """
+    from django.templatetags.static import static
+    return redirect(static('app/assets/img/favicon.ico'))
+
+
 def robots_txt(request):
     """robots.txt : autorise l'indexation des pages publiques, bloque l'app privée.
 
