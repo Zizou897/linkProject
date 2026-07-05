@@ -180,17 +180,19 @@ CELERY_TASK_SOFT_TIME_LIMIT = 4 * 60
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
-# ── Email (Resend via SMTP) ───────────────────────────────────────────
-# Resend : host=smtp.resend.com, user="resend", password = clé API (re_...).
-# DEFAULT_FROM_EMAIL doit utiliser un domaine vérifié dans Resend
-# (onboarding@resend.dev fonctionne uniquement vers l'e-mail du compte, en test).
+# ── Email (Gmail via SMTP) ────────────────────────────────────────────
+# Gmail : host=smtp.gmail.com, user = adresse complète, password = mot de
+# passe d'application (myaccount.google.com/apppasswords, 16 caractères).
+# EMAIL_TIMEOUT évite qu'un SMTP injoignable bloque le thread d'envoi.
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST', default='smtp.resend.com')
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='resend')
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='contact.vozavi@gmail.com')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Vozavi <onboarding@resend.dev>')
+EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=10, cast=int)
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL',
+                            default='Vozavi <contact.vozavi@gmail.com>')
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 
